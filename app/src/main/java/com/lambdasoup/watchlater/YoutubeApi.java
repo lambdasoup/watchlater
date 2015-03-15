@@ -69,11 +69,11 @@ public interface YoutubeApi {
 	}
 
 	public static class ResourceId {
-		public final String kind;
+		@SuppressWarnings("unused")
+		public final String kind = "youtube#video";
 		public final String videoId;
 
-		public ResourceId(String kind, String videoId) {
-			this.kind = kind;
+		public ResourceId(String videoId) {
 			this.videoId = videoId;
 		}
 	}

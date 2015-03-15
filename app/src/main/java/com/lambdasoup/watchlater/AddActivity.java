@@ -59,8 +59,8 @@ import retrofit.converter.GsonConverter;
 
 public class AddActivity extends Activity {
 
-	public static final String ACCOUNT_TYPE_GOOGLE = "com.google";
-	public static final String SCOPE_YOUTUBE = "oauth2:https://www.googleapis.com/auth/youtube";
+	private static final String ACCOUNT_TYPE_GOOGLE = "com.google";
+	private static final String SCOPE_YOUTUBE = "oauth2:https://www.googleapis.com/auth/youtube";
 
 	private AccountManager manager;
 	private YoutubeApi api;
@@ -130,7 +130,7 @@ public class AddActivity extends Activity {
 			return;
 		}
 
-		YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId("youtube#video", getVideoId());
+		YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId(getVideoId());
 		YoutubeApi.Snippet snippet = new YoutubeApi.Snippet(playlistId, resourceId);
 		YoutubeApi.PlaylistItem item = new YoutubeApi.PlaylistItem(snippet);
 
@@ -239,7 +239,7 @@ public class AddActivity extends Activity {
 		api = adapter.create(YoutubeApi.class);
 	}
 
-	public void onError(ErrorType type) {
+	private void onError(ErrorType type) {
 		String msg;
 		switch (type) {
 			case NEED_ACCESS:
@@ -264,7 +264,7 @@ public class AddActivity extends Activity {
 		showError(msg);
 	}
 
-	public void onSuccess() {
+	private void onSuccess() {
 		String msg = getString(R.string.success_added_video);
 
 		if (isFinishing()) {

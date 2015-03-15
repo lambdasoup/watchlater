@@ -59,8 +59,8 @@ import retrofit.converter.GsonConverter;
 
 public class AddActivity extends Activity {
 
-	public static final String ACCOUNT_TYPE_GOOGLE = "com.google";
-	public static final String SCOPE_YOUTUBE = "oauth2:https://www.googleapis.com/auth/youtube";
+	private static final String ACCOUNT_TYPE_GOOGLE = "com.google";
+	private static final String SCOPE_YOUTUBE = "oauth2:https://www.googleapis.com/auth/youtube";
 
 	private AccountManager manager;
 	private YoutubeApi api;
@@ -130,7 +130,7 @@ public class AddActivity extends Activity {
 			return;
 		}
 
-		YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId("youtube#video", getVideoId());
+		YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId(getVideoId());
 		YoutubeApi.Snippet snippet = new YoutubeApi.Snippet(playlistId, resourceId);
 		YoutubeApi.PlaylistItem item = new YoutubeApi.PlaylistItem(snippet);
 
@@ -239,40 +239,41 @@ public class AddActivity extends Activity {
 		api = adapter.create(YoutubeApi.class);
 	}
 
-	public void onError(ErrorType type) {
-		String msg;
+	private void onError(ErrorType type) {
+		int msgId;
 		switch (type) {
 			case NEED_ACCESS:
-				msg = getString(R.string.error_need_account);
+				msgId = R.string.error_need_account;
 				break;
 			case OTHER:
 			case NETWORK:
-				msg = getString(R.string.error_other);
+				msgId = R.string.error_other;
 				break;
 			case PLAYLIST_FULL:
-				msg = getString(R.string.error_playlist_full);
+				msgId = R.string.error_playlist_full;
 				break;
 			default:
 				throw new IllegalArgumentException("unexpected error type: " + type);
 		}
 
 		if (isFinishing()) {
-			showToast(msg);
+			showToast(msgId);
 			return;
 		}
 
-		showError(msg);
+		TextView errorMsg = (TextView) findViewById(R.id.error_msg);
+		errorMsg.setText(msgId);
+
+		showError();
 	}
 
-	public void onSuccess() {
-		String msg = getString(R.string.success_added_video);
-
+	private void onSuccess() {
 		if (isFinishing()) {
-			showToast(msg);
+			showToast(R.string.success_added_video);
 			return;
 		}
 
-		showSuccess(msg);
+		showSuccess();
 	}
 
 	private void showAccountChooser() {
@@ -283,22 +284,18 @@ public class AddActivity extends Activity {
 	}
 
 
-	private void showError(String msg) {
+	private void showError() {
 		findViewById(R.id.progress).setVisibility(View.GONE);
 		findViewById(R.id.success).setVisibility(View.GONE);
 		findViewById(R.id.error).setVisibility(View.VISIBLE);
 		findViewById(R.id.account_list).setVisibility(View.GONE);
-		TextView errorMsg = (TextView) findViewById(R.id.error_msg);
-		errorMsg.setText(msg);
 	}
 
-	private void showSuccess(String msg) {
+	private void showSuccess() {
 		findViewById(R.id.progress).setVisibility(View.GONE);
 		findViewById(R.id.success).setVisibility(View.VISIBLE);
 		findViewById(R.id.error).setVisibility(View.GONE);
 		findViewById(R.id.account_list).setVisibility(View.GONE);
-		TextView successMsg = (TextView) findViewById(R.id.success_msg);
-		successMsg.setText(msg);
 	}
 
 	private void showProgress() {
@@ -308,8 +305,8 @@ public class AddActivity extends Activity {
 		findViewById(R.id.account_list).setVisibility(View.GONE);
 	}
 
-	private void showToast(String text) {
-		Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+	private void showToast(int msgId) {
+		Toast.makeText(this, msgId, Toast.LENGTH_SHORT).show();
 	}
 
 	public void onRetry(View v) {

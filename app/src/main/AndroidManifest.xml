@@ -35,6 +35,7 @@
             android:name=".AddActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_add"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.Add">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>

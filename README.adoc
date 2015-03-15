@@ -9,18 +9,3 @@ License
 -------
 
 This app is licensed under GPL3+
-
-Backlog
--------
-
-* move backlog to github issues ;-)
-* success screen shows video info / thumb
-* google acc chooser: add empty msg
-* google acc chooser: add headline
-* add more languages
-* fancy progress & animation
-* new colors as per mat design spec
-* remove Retrofit
-* remove OkHttp
-* remove Gson
-* rate app

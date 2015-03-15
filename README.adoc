@@ -1,11 +1,19 @@
-= Watch Later
+Watch Later
+===========
 
-Watch Later is an Android app which let's you add videos to your Watch Later list instead of watching them now.
+image:web_hi_res_512.png["app icon",width=128, height=128]
+
+Watch Later is an Android app which lets you add videos to your Watch Later list instead of watching them now.
+
+License
+-------
 
 This app is licensed under GPL3+
 
-== Backlog
+Backlog
+-------
 
+* move backlog to github issues ;-)
 * success screen shows video info / thumb
 * google acc chooser: add empty msg
 * google acc chooser: add headline

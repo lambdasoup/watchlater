@@ -29,7 +29,7 @@
 
     <string name="button_retry">Retry</string>
 
-    <string name="success_added_video">Successfully added video to Watch Later list</string>
+    <string name="success_added_video">Successfully added video</string>
 
     <string name="error_need_account">Cannot add video. Need access to YouTube account.</string>
     <string name="error_other">Cannot add video. Check your Internet connection and try again.</string>

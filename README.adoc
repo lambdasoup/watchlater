@@ -1,7 +1,7 @@
 Watch Later
 ===========
 
-image:web_hi_res_512.png["app icon",width=128, height=128]
+image:https://raw.githubusercontent.com/lambdasoup/watchlater/master/web_hi_res_512.png["app icon",width=128, height=128]
 
 Watch Later is an Android app which lets you add videos to your Watch Later list instead of watching them now.
 

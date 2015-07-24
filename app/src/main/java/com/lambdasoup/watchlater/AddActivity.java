@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -202,20 +201,23 @@ public class AddActivity extends Activity {
 				if (convertView != null) {
 					accountName = (TextView) convertView;
 				} else {
-					accountName = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.item_account, parent, false);
+					accountName = (TextView) getLayoutInflater().inflate(R.layout.item_account, parent, false);
 				}
 				accountName.setText(getItem(position).name);
 				return accountName;
 			}
 		};
-		ListView listView = (ListView) findViewById(R.id.account_list);
+		final ListView listView = (ListView) findViewById(R.id.account_list);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				onAccountChosen(adapter.getItem(position));
+				onAccountChosen(adapter.getItem(position - listView.getHeaderViewsCount()));
 			}
 		});
+		View header = getLayoutInflater().inflate(R.layout.list_header_account_chooser, listView, false);
+		listView.addHeaderView(header);
+
 		showAccountChooser();
 	}
 
@@ -284,7 +286,7 @@ public class AddActivity extends Activity {
 	}
 
 	private void showAccountChooser() {
-		showView(R.id.account_list);
+		showView(R.id.account_chooser);
 	}
 
 	private void showError() {

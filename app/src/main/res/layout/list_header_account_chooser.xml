@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <!--
   ~ Copyright (c) 2015. Maximilian Hille <mh@lambdasoup.com>
   ~
@@ -18,23 +20,13 @@
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources>
-
-    <string name="app_name">Später ansehen</string>
-
-    <string name="title_activity_add">Später ansehen</string>
-    <string name="title_activity_about">Über</string>
-
-    <string name="menu_about">Über</string>
-
-    <string name="button_retry">Wiederholen</string>
-
-    <string name="success_added_video">Video erfolgreich hinzugefügt</string>
-
-    <string name="error_need_account">Fehler beim Hinzufügen: Benötigt Zugriff auf YouTube-Konto.</string>
-    <string name="error_other">Fehler beim Hinzufügen: Überprüfe Deine Internetverbindung!</string>
-    <string name="error_playlist_full">Deine "Später ansehen"-Liste ist bereits voll oder enthält dieses Video bereits</string>
-
-    <string name="choose_account">Konto auswählen</string>
-
-</resources>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:text="@string/choose_account"
+    android:textAllCaps="true"
+    android:textColor="@android:color/white"
+    android:textStyle="bold"
+    tools:showIn="@layout/activity_add"/>

@@ -34,5 +34,6 @@
     <string name="error_need_account">Error adding video: Needs access to your YouTube account</string>
     <string name="error_other">Error adding video: Check your Internet connection and try again</string>
     <string name="error_playlist_full">Your Watch Later playlist is either full or already contains this video</string>
+    <string name="choose_account">Choose account</string>
 
 </resources>

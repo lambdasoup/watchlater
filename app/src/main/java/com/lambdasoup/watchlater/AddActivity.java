@@ -217,6 +217,7 @@ public class AddActivity extends Activity {
 		});
 		View header = getLayoutInflater().inflate(R.layout.list_header_account_chooser, listView, false);
 		listView.addHeaderView(header);
+		listView.setEmptyView(findViewById(R.id.account_chooser_empty));
 
 		showAccountChooser();
 	}

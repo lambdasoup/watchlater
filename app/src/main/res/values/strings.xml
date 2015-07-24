@@ -35,5 +35,6 @@
     <string name="error_other">Error adding video: Check your Internet connection and try again</string>
     <string name="error_playlist_full">Your Watch Later playlist is either full or already contains this video</string>
     <string name="choose_account">Choose account</string>
+    <string name="no_account">No Google accounts found on this device</string>
 
 </resources>

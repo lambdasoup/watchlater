@@ -73,6 +73,16 @@ public class AddActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		setDialogBehaviour();
+
+		setContentView(R.layout.activity_add);
+
+		manager = AccountManager.get(this);
+		setApiAdapter();
+		addToWatchLater();
+	}
+
+	private void setDialogBehaviour() {
 		requestWindowFeature(Window.FEATURE_ACTION_BAR);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND,
 				WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -82,11 +92,6 @@ public class AddActivity extends Activity {
 		params.alpha = 1.0f;
 		params.dimAmount = 0.5f;
 		getWindow().setAttributes(params);
-		setContentView(R.layout.activity_add);
-
-		manager = AccountManager.get(this);
-		setApiAdapter();
-		addToWatchLater();
 	}
 
 	@Override

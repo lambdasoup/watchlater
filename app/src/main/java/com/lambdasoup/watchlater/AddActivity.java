@@ -305,6 +305,10 @@ public class AddActivity extends Activity {
 	private void showView(@IdRes int id) {
 		ViewAnimator animator = (ViewAnimator) findViewById(R.id.animator);
 
+		if (animator.getCurrentView().getId() == id) {
+			return;
+		}
+
 		for (int i = 0; i < animator.getChildCount(); i++) {
 			View child = animator.getChildAt(i);
 			if (child.getId() == id) {

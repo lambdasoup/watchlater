@@ -17,14 +17,6 @@
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-
-
-
-
-
-
 apply plugin: 'com.android.application'
 
 def version_major = 1
@@ -33,7 +25,7 @@ def version_patch = 0
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "22"
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "com.lambdasoup.watchlater"

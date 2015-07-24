@@ -35,12 +35,12 @@ import retrofit.http.POST;
 public interface YoutubeApi {
 
 	@GET("/channels?part=contentDetails&maxResults=50&mine=true")
-	public void listMyChannels(Callback<Channels> cb);
+	void listMyChannels(Callback<Channels> cb);
 
 	@POST("/playlistItems?part=snippet")
-	public void insertPlaylistItem(@Body PlaylistItem playlistItem, Callback<PlaylistItem> cb);
+	void insertPlaylistItem(@Body PlaylistItem playlistItem, Callback<PlaylistItem> cb);
 
-	public static class Channels {
+	class Channels {
 
 		public final List<Channel> items;
 
@@ -49,7 +49,7 @@ public interface YoutubeApi {
 		}
 	}
 
-	public static class PlaylistItem {
+	class PlaylistItem {
 
 		public final Snippet snippet;
 
@@ -58,7 +58,7 @@ public interface YoutubeApi {
 		}
 	}
 
-	public static class Snippet {
+	class Snippet {
 		public final String playlistId;
 		public final ResourceId resourceId;
 
@@ -68,7 +68,7 @@ public interface YoutubeApi {
 		}
 	}
 
-	public static class ResourceId {
+	class ResourceId {
 		@SuppressWarnings("unused")
 		public final String kind = "youtube#video";
 		public final String videoId;
@@ -78,7 +78,7 @@ public interface YoutubeApi {
 		}
 	}
 
-	public static class Channel {
+	class Channel {
 
 		public final ContentDetails contentDetails;
 
@@ -87,7 +87,7 @@ public interface YoutubeApi {
 		}
 	}
 
-	public static class ContentDetails {
+	class ContentDetails {
 
 		public final RelatedPlaylists relatedPlaylists;
 
@@ -96,7 +96,7 @@ public interface YoutubeApi {
 		}
 	}
 
-	public static class RelatedPlaylists {
+	class RelatedPlaylists {
 
 		public final String watchLater;
 

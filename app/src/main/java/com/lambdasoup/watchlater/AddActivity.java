@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,6 +43,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewAnimator;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -282,32 +284,33 @@ public class AddActivity extends Activity {
 	}
 
 	private void showAccountChooser() {
-		findViewById(R.id.progress).setVisibility(View.GONE);
-		findViewById(R.id.success).setVisibility(View.GONE);
-		findViewById(R.id.error).setVisibility(View.GONE);
-		findViewById(R.id.account_list).setVisibility(View.VISIBLE);
+		showView(R.id.account_list);
 	}
 
-
 	private void showError() {
-		findViewById(R.id.progress).setVisibility(View.GONE);
-		findViewById(R.id.success).setVisibility(View.GONE);
-		findViewById(R.id.error).setVisibility(View.VISIBLE);
-		findViewById(R.id.account_list).setVisibility(View.GONE);
+		showView(R.id.error);
 	}
 
 	private void showSuccess() {
-		findViewById(R.id.progress).setVisibility(View.GONE);
-		findViewById(R.id.success).setVisibility(View.VISIBLE);
-		findViewById(R.id.error).setVisibility(View.GONE);
-		findViewById(R.id.account_list).setVisibility(View.GONE);
+		showView(R.id.success);
 	}
 
 	private void showProgress() {
-		findViewById(R.id.progress).setVisibility(View.VISIBLE);
-		findViewById(R.id.success).setVisibility(View.GONE);
-		findViewById(R.id.error).setVisibility(View.GONE);
-		findViewById(R.id.account_list).setVisibility(View.GONE);
+		showView(R.id.progress);
+	}
+
+	private void showView(@IdRes int id) {
+		ViewAnimator animator = (ViewAnimator) findViewById(R.id.animator);
+
+		for (int i = 0; i < animator.getChildCount(); i++) {
+			View child = animator.getChildAt(i);
+			if (child.getId() == id) {
+				animator.setDisplayedChild(i);
+				return;
+			}
+		}
+
+		throw new IllegalArgumentException("animator does not have a child with id " + id);
 	}
 
 	private void showToast(int msgId) {

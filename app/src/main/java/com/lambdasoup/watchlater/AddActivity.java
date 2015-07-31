@@ -29,7 +29,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.annotation.IdRes;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,6 +42,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewAnimator;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -73,6 +74,16 @@ public class AddActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		setDialogBehaviour();
+
+		setContentView(R.layout.activity_add);
+
+		manager = AccountManager.get(this);
+		setApiAdapter();
+		addToWatchLater();
+	}
+
+	private void setDialogBehaviour() {
 		requestWindowFeature(Window.FEATURE_ACTION_BAR);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND,
 				WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -82,11 +93,6 @@ public class AddActivity extends Activity {
 		params.alpha = 1.0f;
 		params.dimAmount = 0.5f;
 		getWindow().setAttributes(params);
-		setContentView(R.layout.activity_add);
-
-		manager = AccountManager.get(this);
-		setApiAdapter();
-		addToWatchLater();
 	}
 
 	@Override
@@ -195,20 +201,24 @@ public class AddActivity extends Activity {
 				if (convertView != null) {
 					accountName = (TextView) convertView;
 				} else {
-					accountName = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.item_account, parent, false);
+					accountName = (TextView) getLayoutInflater().inflate(R.layout.item_account, parent, false);
 				}
 				accountName.setText(getItem(position).name);
 				return accountName;
 			}
 		};
-		ListView listView = (ListView) findViewById(R.id.account_list);
+		final ListView listView = (ListView) findViewById(R.id.account_list);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				onAccountChosen(adapter.getItem(position));
+				onAccountChosen(adapter.getItem(position - listView.getHeaderViewsCount()));
 			}
 		});
+		View header = getLayoutInflater().inflate(R.layout.list_header_account_chooser, listView, false);
+		listView.addHeaderView(header);
+		listView.setEmptyView(findViewById(R.id.account_chooser_empty));
+
 		showAccountChooser();
 	}
 
@@ -277,32 +287,37 @@ public class AddActivity extends Activity {
 	}
 
 	private void showAccountChooser() {
-		findViewById(R.id.progress).setVisibility(View.GONE);
-		findViewById(R.id.success).setVisibility(View.GONE);
-		findViewById(R.id.error).setVisibility(View.GONE);
-		findViewById(R.id.account_list).setVisibility(View.VISIBLE);
+		showView(R.id.account_chooser);
 	}
 
-
 	private void showError() {
-		findViewById(R.id.progress).setVisibility(View.GONE);
-		findViewById(R.id.success).setVisibility(View.GONE);
-		findViewById(R.id.error).setVisibility(View.VISIBLE);
-		findViewById(R.id.account_list).setVisibility(View.GONE);
+		showView(R.id.error);
 	}
 
 	private void showSuccess() {
-		findViewById(R.id.progress).setVisibility(View.GONE);
-		findViewById(R.id.success).setVisibility(View.VISIBLE);
-		findViewById(R.id.error).setVisibility(View.GONE);
-		findViewById(R.id.account_list).setVisibility(View.GONE);
+		showView(R.id.success);
 	}
 
 	private void showProgress() {
-		findViewById(R.id.progress).setVisibility(View.VISIBLE);
-		findViewById(R.id.success).setVisibility(View.GONE);
-		findViewById(R.id.error).setVisibility(View.GONE);
-		findViewById(R.id.account_list).setVisibility(View.GONE);
+		showView(R.id.progress);
+	}
+
+	private void showView(@IdRes int id) {
+		ViewAnimator animator = (ViewAnimator) findViewById(R.id.animator);
+
+		if (animator.getCurrentView().getId() == id) {
+			return;
+		}
+
+		for (int i = 0; i < animator.getChildCount(); i++) {
+			View child = animator.getChildAt(i);
+			if (child.getId() == id) {
+				animator.setDisplayedChild(i);
+				return;
+			}
+		}
+
+		throw new IllegalArgumentException("animator does not have a child with id " + id);
 	}
 
 	private void showToast(int msgId) {

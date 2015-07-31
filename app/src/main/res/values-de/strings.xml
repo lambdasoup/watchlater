@@ -35,4 +35,7 @@
     <string name="error_other">Fehler beim Hinzufügen: Überprüfe Deine Internetverbindung!</string>
     <string name="error_playlist_full">Deine "Später ansehen"-Liste ist bereits voll oder enthält dieses Video bereits</string>
 
+    <string name="choose_account">Konto auswählen</string>
+    <string name="no_account">Keine Google-Konten auf diesem Gerät gefunden</string>
+
 </resources>

@@ -21,6 +21,7 @@ package com.lambdasoup.watchlater.test;
 
 import android.net.Uri;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +36,20 @@ public class MockEndpoint extends NanoHTTPD {
 
 	public MockEndpoint(String hostname, int port) {
 		super(hostname, port);
+	}
+
+	@Override
+	public void start() throws IOException {
+		super.start();
+
+		// let's wait until it's up
+		try {
+			while (!wasStarted()) {
+				Thread.sleep(1);
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void add(String path, String body) {

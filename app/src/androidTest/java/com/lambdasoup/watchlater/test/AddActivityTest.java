@@ -49,9 +49,8 @@ import com.lambdasoup.watchlater.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.After;
-import org.junit.Before;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -75,11 +74,11 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 	private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
 	private MockEndpoint mockEndpoint;
 
-	public AddActivityTest() {
+	public AddActivityTest() throws IOException {
 		super(AddActivity.class);
 	}
 
-	@Before
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		injectInstrumentation(InstrumentationRegistry.getInstrumentation());
@@ -96,21 +95,6 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		accountType.setAccessible(true);
 		accountType.set(AddActivity.class, TEST_ACCOUNT_TYPE);
 
-		// inject mock backend
-		Field endpoint = AddActivity.class.getDeclaredField("YOUTUBE_ENDPOINT");
-		endpoint.setAccessible(true);
-		endpoint.set(AddActivity.class, MOCK_ENDPOINT);
-		mockEndpoint = new MockEndpoint("localhost", 8080);
-		mockEndpoint.start();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@After
-	public void tearDown() throws Exception {
 		// clear accounts
 		AccountManager accountManager = AccountManager.get(getInstrumentation().getContext());
 		//noinspection ResourceType,deprecation
@@ -118,8 +102,21 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		//noinspection ResourceType,deprecation
 		accountManager.removeAccount(ACCOUNT_2, null, null);
 
-		// shut down mock endpoint
+		// inject mock backend
+		Field endpoint = AddActivity.class.getDeclaredField("YOUTUBE_ENDPOINT");
+		endpoint.setAccessible(true);
+		endpoint.set(AddActivity.class, MOCK_ENDPOINT);
+
+		// clear mock handlers
+		mockEndpoint = new MockEndpoint("localhost", 8080);
+		mockEndpoint.start();
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
 		mockEndpoint.stop();
+
+		super.tearDown();
 	}
 
 	private void addAccount(Account account) {

@@ -66,7 +66,7 @@ public class AddActivity extends Activity {
 	@SuppressWarnings("FieldCanBeLocal")
 	private static String YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3";
 	private static String ACCOUNT_TYPE_GOOGLE = "com.google";
-	private static Profiler<Object> OPTIONAL_RETROFIT_PROFILER;
+	private static Profiler<?> OPTIONAL_RETROFIT_PROFILER = null;
 
 	private AccountManager manager;
 	private YoutubeApi api;

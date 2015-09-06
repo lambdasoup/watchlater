@@ -18,23 +18,8 @@
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<manifest
-    package="com.lambdasoup.watchlater"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sharedUserId="com.lambdasoup.watchlater">
+<resources>
 
-    <application>
+    <string name="label_mockaccount">Mock Account</string>
 
-        <activity
-            android:name=".LauncherActivity"
-            android:label="Watch Later - debug">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-
-    </application>
-
-</manifest>
+</resources>

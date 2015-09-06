@@ -60,9 +60,11 @@ import retrofit.converter.GsonConverter;
 
 public class AddActivity extends Activity {
 
-	private static final String ACCOUNT_TYPE_GOOGLE = "com.google";
 	private static final String SCOPE_YOUTUBE = "oauth2:https://www.googleapis.com/auth/youtube";
-
+	// fields are not final to be somewhat accessible for testing to inject other values
+	@SuppressWarnings("FieldCanBeLocal")
+	private static String YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3";
+	private static String ACCOUNT_TYPE_GOOGLE = "com.google";
 	private AccountManager manager;
 	private YoutubeApi api;
 
@@ -167,7 +169,7 @@ public class AddActivity extends Activity {
 			public void run(AccountManagerFuture<Bundle> future) {
 				try {
 					Bundle result = future.getResult();
-					token = result.getString("authtoken");
+					token = result.getString(AccountManager.KEY_AUTHTOKEN);
 					addToWatchLater();
 				} catch (OperationCanceledException e) {
 					onError(ErrorType.NEED_ACCESS);
@@ -239,7 +241,7 @@ public class AddActivity extends Activity {
 						request.addHeader("Authorization", "Bearer " + token);
 					}
 				})
-				.setEndpoint("https://www.googleapis.com/youtube/v3");
+				.setEndpoint(YOUTUBE_ENDPOINT);
 
 		if (BuildConfig.DEBUG) {
 			builder.setLogLevel(RestAdapter.LogLevel.FULL);

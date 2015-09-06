@@ -19,21 +19,30 @@
   -->
 
 <manifest
-    package="com.lambdasoup.watchlater"
+    package="com.lambdasoup.watchlater.test"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sharedUserId="com.lambdasoup.watchlater">
+    android:sharedUserId="com.lambdasoup.watchlater"
+    android:versionCode="1"
+    android:versionName="1.0">
+
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:label="Watch Later tests"
+        android:targetPackage="com.lambdasoup.watchlater"/>
+
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
 
     <application>
 
-        <activity
-            android:name=".LauncherActivity"
-            android:label="Watch Later - debug">
+        <service android:name=".MockAuthenticatorService">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
-        </activity>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator"/>
+        </service>
 
     </application>
 

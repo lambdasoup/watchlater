@@ -19,6 +19,11 @@
 
 package com.lambdasoup.watchlater.test;
 
+import android.net.Uri;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import fi.iki.elonen.NanoHTTPD;
 
 /**
@@ -26,8 +31,24 @@ import fi.iki.elonen.NanoHTTPD;
  */
 public class MockEndpoint extends NanoHTTPD {
 
+	private final Map<String, String> handlers = new HashMap<>();
+
 	public MockEndpoint(String hostname, int port) {
 		super(hostname, port);
 	}
 
+	public void add(String path, String body) {
+		handlers.put(path, body);
+	}
+
+	@Override
+	public Response serve(IHTTPSession session) {
+		Uri uri = Uri.parse(session.getUri());
+		String path = uri.getEncodedPath();
+		if (!handlers.containsKey(path)) {
+			return super.serve(session);
+		}
+
+		return new Response(handlers.get(path));
+	}
 }

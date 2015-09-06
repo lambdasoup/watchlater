@@ -38,18 +38,27 @@ package com.lambdasoup.watchlater.test;/*
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.IdlingResource;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.lambdasoup.watchlater.AddActivity;
 import com.lambdasoup.watchlater.R;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import retrofit.Profiler;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.registerIdlingResources;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -59,7 +68,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  */
 public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivity> {
 
-	private static final String MOCK_ENDPOINT = "http://localhost:8080/lol";
+	private static final String MOCK_ENDPOINT = "http://localhost:8080/";
 	private static final String TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
 
 	private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
@@ -74,6 +83,13 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 	public void setUp() throws Exception {
 		super.setUp();
 		injectInstrumentation(InstrumentationRegistry.getInstrumentation());
+
+		// inject retrofit profiler for espresso idling resource
+		Field retrofitProfiler = AddActivity.class.getDeclaredField("OPTIONAL_RETROFIT_PROFILER");
+		retrofitProfiler.setAccessible(true);
+		RetrofitProfilerIdlingResource retrofitProfilerIdlingResource = new RetrofitProfilerIdlingResource();
+		retrofitProfiler.set(AddActivity.class, retrofitProfilerIdlingResource);
+		registerIdlingResources(retrofitProfilerIdlingResource);
 
 		// inject test account type
 		Field accountType = AddActivity.class.getDeclaredField("ACCOUNT_TYPE_GOOGLE");
@@ -125,6 +141,77 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		getActivity();
 
 		onView(withText(R.string.choose_account)).check(matches(isDisplayed()));
+	}
+
+	public void test_add() throws Exception {
+		// set channel list response
+		{
+			JSONObject json = new JSONObject();
+			JSONArray items = new JSONArray();
+			json.put("items", items);
+			JSONObject channel = new JSONObject();
+			items.put(channel);
+			JSONObject contentDetails = new JSONObject();
+			channel.put("contentDetails", contentDetails);
+			JSONObject relatedPlaylists = new JSONObject();
+			contentDetails.put("relatedPlaylists", relatedPlaylists);
+			String watchLaterId = "45h7394875w3495";
+			relatedPlaylists.put("watchLater", watchLaterId);
+			mockEndpoint.add("/channels", json.toString(8));
+		}
+
+		// set add video to list response
+		{
+			JSONObject json = new JSONObject();
+			mockEndpoint.add("/playlistItems", json.toString(8));
+		}
+
+		// set account
+		addAccount(ACCOUNT_1);
+
+		// set activity arg
+		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/v/8f7h837f4"));
+		setActivityIntent(intent);
+
+		getActivity();
+
+		onView(withText(R.string.success_added_video)).check(matches(isDisplayed()));
+	}
+
+	private static class RetrofitProfilerIdlingResource implements IdlingResource, Profiler<Void> {
+
+		private AtomicInteger requestCount = new AtomicInteger(0);
+		private ResourceCallback idleTransitionCallback;
+
+		@Override
+		public String getName() {
+			return RetrofitProfilerIdlingResource.class.getName();
+		}
+
+		@Override
+		public boolean isIdleNow() {
+			return requestCount.intValue() == 0;
+		}
+
+		@Override
+		public void registerIdleTransitionCallback(ResourceCallback resourceCallback) {
+			this.idleTransitionCallback = resourceCallback;
+		}
+
+		@Override
+		public Void beforeCall() {
+			requestCount.incrementAndGet();
+			return null;
+		}
+
+		@Override
+		public void afterCall(RequestInformation requestInfo, long elapsedTime, int statusCode, Void beforeCallData) {
+			int newRequestCount = requestCount.decrementAndGet();
+
+			if (newRequestCount == 0) {
+				idleTransitionCallback.onTransitionToIdle();
+			}
+		}
 	}
 
 }

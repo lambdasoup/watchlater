@@ -50,6 +50,7 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 
 import retrofit.Callback;
+import retrofit.Profiler;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -65,6 +66,8 @@ public class AddActivity extends Activity {
 	@SuppressWarnings("FieldCanBeLocal")
 	private static String YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3";
 	private static String ACCOUNT_TYPE_GOOGLE = "com.google";
+	private static Profiler<Object> OPTIONAL_RETROFIT_PROFILER;
+
 	private AccountManager manager;
 	private YoutubeApi api;
 
@@ -245,6 +248,9 @@ public class AddActivity extends Activity {
 
 		if (BuildConfig.DEBUG) {
 			builder.setLogLevel(RestAdapter.LogLevel.FULL);
+			if (OPTIONAL_RETROFIT_PROFILER != null) {
+				builder.setProfiler(OPTIONAL_RETROFIT_PROFILER);
+			}
 		}
 
 		RestAdapter adapter = builder.build();

@@ -38,24 +38,33 @@ package com.lambdasoup.watchlater.test;/*
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 import android.test.ActivityInstrumentationTestCase2;
 
 import com.lambdasoup.watchlater.AddActivity;
+import com.lambdasoup.watchlater.R;
 
+import org.junit.After;
 import org.junit.Before;
 
 import java.lang.reflect.Field;
+
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
  * Integration test for the {@link com.lambdasoup.watchlater.AddActivity}
  */
 public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivity> {
 
-	public static final String MOCK_ENDPOINT = "http://localhost:8080/lol";
-	private final static String TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
+	private static final String MOCK_ENDPOINT = "http://localhost:8080/lol";
+	private static final String TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
+
+	private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
+	private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
+	private MockEndpoint mockEndpoint;
 
 	public AddActivityTest() {
 		super(AddActivity.class);
@@ -66,24 +75,17 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		super.setUp();
 		injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
-		// hack app to use test account type
+		// inject test account type
 		Field accountType = AddActivity.class.getDeclaredField("ACCOUNT_TYPE_GOOGLE");
 		accountType.setAccessible(true);
 		accountType.set(AddActivity.class, TEST_ACCOUNT_TYPE);
 
+		// inject mock backend
 		Field endpoint = AddActivity.class.getDeclaredField("YOUTUBE_ENDPOINT");
 		endpoint.setAccessible(true);
 		endpoint.set(AddActivity.class, MOCK_ENDPOINT);
-
-		// create test account
-		AccountManager accountManager = AccountManager.get(getInstrumentation().getContext());
-		Account account = new Account("test account 1", TEST_ACCOUNT_TYPE);
-		//noinspection ResourceType
-		accountManager.addAccountExplicitly(account, null, null);
-
-		MockEndpoint mockEndpoint = new MockEndpoint("localhost", 8080);
+		mockEndpoint = new MockEndpoint("localhost", 8080);
 		mockEndpoint.start();
-
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
@@ -91,18 +93,38 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		}
 	}
 
-	public void test_add() {
-		Intent addIntent = new Intent();
-		addIntent.setData(Uri.parse("https://youtube.com/v/43yw96845"));
-		setActivityIntent(addIntent);
+	@After
+	public void tearDown() throws Exception {
+		// clear accounts
+		AccountManager accountManager = AccountManager.get(getInstrumentation().getContext());
+		//noinspection ResourceType,deprecation
+		accountManager.removeAccount(ACCOUNT_1, null, null);
+		//noinspection ResourceType,deprecation
+		accountManager.removeAccount(ACCOUNT_2, null, null);
+
+		// shut down mock endpoint
+		mockEndpoint.stop();
+	}
+
+	private void addAccount(Account account) {
+		AccountManager accountManager = AccountManager.get(getInstrumentation().getContext());
+		//noinspection ResourceType
+		accountManager.addAccountExplicitly(account, null, null);
+	}
+
+	public void test_noAccount() {
+		getActivity();
+
+		onView(withText(R.string.no_account)).check(matches(isDisplayed()));
+	}
+
+	public void test_multipleAccounts() {
+		addAccount(ACCOUNT_1);
+		addAccount(ACCOUNT_2);
 
 		getActivity();
 
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		onView(withText(R.string.choose_account)).check(matches(isDisplayed()));
 	}
 
 }

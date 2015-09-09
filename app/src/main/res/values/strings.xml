@@ -36,5 +36,9 @@
     <string name="error_playlist_full">Your Watch Later playlist is either full or already contains this video</string>
     <string name="choose_account">Choose account</string>
     <string name="no_account">No Google accounts found on this device</string>
+    <string name="video_example_uris">Some example single video URIs</string>
+    <string name="playlist_example_uris">Some example playlist URIs</string>
+    <string name="non_example_urls">Some non-example URIs</string>
+    <string name="error_not_a_video">This does not seem to be a video. Watchlater cannot add it to your watchlater list. Please try opening it again using another app.</string>
 
 </resources>

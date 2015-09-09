@@ -46,6 +46,7 @@ import android.widget.ViewAnimator;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.lambdasoup.watchlater.YoutubeApi.YouTubeError;
 
 import java.io.IOException;
 
@@ -57,6 +58,8 @@ import retrofit.RetrofitError;
 import retrofit.client.OkClient;
 import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
+
+import static android.net.Uri.*;
 
 
 public class AddActivity extends Activity {
@@ -141,28 +144,52 @@ public class AddActivity extends Activity {
 			return;
 		}
 
-		YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId(getVideoId());
-		YoutubeApi.Snippet snippet = new YoutubeApi.Snippet(playlistId, resourceId);
-		YoutubeApi.PlaylistItem item = new YoutubeApi.PlaylistItem(snippet);
+		try {
+			YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId(getVideoId());
+			YoutubeApi.Snippet snippet = new YoutubeApi.Snippet(playlistId, resourceId);
+			YoutubeApi.PlaylistItem item = new YoutubeApi.PlaylistItem(snippet);
 
-		api.insertPlaylistItem(item, new ErrorHandlingCallback<YoutubeApi.PlaylistItem>() {
-			@Override
-			public void success(YoutubeApi.PlaylistItem playlistItem, Response response) {
-				onSuccess();
-			}
-		});
+			api.insertPlaylistItem(item, new ErrorHandlingCallback<YoutubeApi.PlaylistItem>() {
+				@Override
+				public void success(YoutubeApi.PlaylistItem playlistItem, Response response) {
+					onSuccess();
+				}
+			});
+		} catch (WatchLaterError error) {
+			onError(error.type);
+		}
 	}
 
-	private String getVideoId() {
-		Uri uri = getIntent().getData();
+	private String getVideoId() throws WatchLaterError {
+		return getVideoId(getIntent().getData());
+	}
 
-		// eg. https://www.youtube.com/watch?v=jqxENMKaeCU
+	private String getVideoId(Uri uri) throws WatchLaterError {
+		// e.g. https://www.youtube.com/watch?v=jqxENMKaeCU
 		String videoId = uri.getQueryParameter("v");
 		if (videoId != null) {
 			return videoId;
 		}
 
-		// eg. http://youtu.be/jqxENMKaeCU
+		// e.g.https://www.youtube.com/playlist?list=PLxLNk7y0uwqfXzUjcbVT3UuMjRd7pOv_U
+		videoId = uri.getQueryParameter("list");
+		if (videoId != null) {
+			throw new WatchLaterError(ErrorType.NOT_A_VIDEO);
+		}
+
+		// e.g. http://www.youtube.com/attribution_link?u=/watch%3Fv%3DJ1zNbWJC5aw%26feature%3Dem-subs_digest
+		if (!uri.getPathSegments().isEmpty() && "attribution_link".equals(uri.getPathSegments().get(0))) {
+			String encodedUri = uri.getQueryParameter("u");
+			if (encodedUri != null) {
+				return getVideoId(parse(decode(encodedUri)));
+			} else {
+				throw new WatchLaterError(ErrorType.NOT_A_VIDEO);
+			}
+		}
+
+		// e.g. http://www.youtube.com/v/OdT9z-JjtJk
+		// http://www.youtube.com/embed/UkWd0azv3fQ
+		// http://youtu.be/jqxENMKaeCU
 		return uri.getLastPathSegment();
 	}
 
@@ -270,6 +297,9 @@ public class AddActivity extends Activity {
 			case PLAYLIST_FULL:
 				msgId = R.string.error_playlist_full;
 				break;
+			case NOT_A_VIDEO:
+				msgId = R.string.error_not_a_video;
+				break;
 			default:
 				throw new IllegalArgumentException("unexpected error type: " + type);
 		}
@@ -353,7 +383,15 @@ public class AddActivity extends Activity {
 	}
 
 	private enum ErrorType {
-		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL
+		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO
+	}
+
+	private class WatchLaterError extends Exception {
+		public final ErrorType type;
+
+		public WatchLaterError(ErrorType type) {
+			this.type = type;
+		}
 	}
 
 	private abstract class ErrorHandlingCallback<T> implements Callback<T> {
@@ -364,11 +402,19 @@ public class AddActivity extends Activity {
 				return;
 			}
 
+			YouTubeError youtubeError = (YouTubeError) error.getBodyAs(YouTubeError.class);
+
 			switch (error.getResponse().getStatus()) {
 				case 401:
 					onTokenInvalid();
 					break;
 				case 403:
+					if (youtubeError.error.errors != null
+							&& youtubeError.error.errors.size() >= 1
+							&& "dailyLimitExceededUnreg".equals(youtubeError.error.errors.get(0).reason)) {
+						onTokenInvalid();
+						break;
+					}
 					onError(ErrorType.PLAYLIST_FULL);
 					break;
 				default:

@@ -29,11 +29,46 @@
               android:paddingTop="@dimen/activity_vertical_margin"
               tools:context="com.lambdasoup.watchlater.AddActivity">
 
-    <Button
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onExample"
-        android:text="Add example video"
-        tools:ignore="HardcodedText"/>
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/video_example_uris"
+        android:id="@+id/text_video_example_links" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_video_example_links"
+        android:layout_gravity="center_horizontal"
+        tools:listitem="@android:layout/simple_list_item_1" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/playlist_example_uris"
+        android:id="@+id/text_playlist_example_links" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_playlist_example_links"
+        android:layout_gravity="center_horizontal"
+        tools:listitem="@android:layout/simple_list_item_1" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/non_example_urls"
+        android:id="@+id/text_nonexample_links" />
+
+    <ListView
+        tools:listitem="@android:layout/simple_list_item_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/list_nonexample_links"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

@@ -38,80 +38,70 @@
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.Add">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="*.youtube.com"
-                    android:pathPrefix="/watch"
-                    android:scheme="http"/>
-                <data
-                    android:host="*.youtube.com"
-                    android:pathPrefix="/watch"
-                    android:scheme="https"/>
+                <action android:name="android.intent.action.VIEW">
+                </action>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED">
+                </action>
+                <category android:name="android.intent.category.DEFAULT">
+                </category>
+                <category android:name="android.intent.category.BROWSABLE">
+                </category>
+                <data android:scheme="http">
+                </data>
+                <data android:scheme="https">
+                </data>
+                <data android:host="youtube.com">
+                </data>
+                <data android:host="www.youtube.com">
+                </data>
+                <data android:host="m.youtube.com">
+                </data>
+                <data android:pathPrefix="/watch">
+                </data>
+                <data android:pathPrefix="/attribution_link">
+                </data>
+                <data android:pathPrefix="/v/">
+                </data>
+                <data android:pathPrefix="/e/">
+                </data>
+                <data android:pathPrefix="/embed/">
+                </data>
+                <data android:pathPrefix="/playlist">
+                </data>
             </intent-filter>
-
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="youtube.com"
-                    android:pathPrefix="/watch"
-                    android:scheme="http"/>
-                <data
-                    android:host="youtube.com"
-                    android:pathPrefix="/watch"
-                    android:scheme="https"/>
+                <action android:name="android.intent.action.VIEW">
+                </action>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED">
+                </action>
+                <category android:name="android.intent.category.DEFAULT">
+                </category>
+                <category android:name="android.intent.category.BROWSABLE">
+                </category>
+                <data android:scheme="http">
+                </data>
+                <data android:scheme="https">
+                </data>
+                <data android:host="youtu.be">
+                </data>
+                <data android:pathPrefix="/">
+                </data>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="www.youtube.com"
-                    android:pathPrefix="/v/"
-                    android:scheme="http"/>
-                <data
-                    android:host="www.youtube.com"
-                    android:pathPrefix="/v/"
-                    android:scheme="https"/>
-                <data
-                    android:host="www.youtube.com"
-                    android:pathPrefix="/e/"
-                    android:scheme="http"/>
-                <data
-                    android:host="www.youtube.com"
-                    android:pathPrefix="/e/"
-                    android:scheme="https"/>
-                <data
-                    android:host="www.youtube.com"
-                    android:pathPrefix="/embed/"
-                    android:scheme="http"/>
-                <data
-                    android:host="www.youtube.com"
-                    android:pathPrefix="/embed/"
-                    android:scheme="https"/>
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-
-                <data
-                    android:host="youtu.be"
-                    android:scheme="http"/>
-                <data
-                    android:host="youtu.be"
-                    android:scheme="https"/>
+                <action android:name="android.intent.action.VIEW">
+                </action>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH">
+                </action>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED">
+                </action>
+                <category android:name="android.intent.category.DEFAULT">
+                </category>
+                <category android:name="android.intent.category.BROWSABLE">
+                </category>
+                <data android:scheme="vnd.youtube">
+                </data>
+                <data android:scheme="vnd.youtube.launch">
+                </data>
             </intent-filter>
         </activity>
         <activity

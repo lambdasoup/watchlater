@@ -21,25 +21,57 @@ package com.lambdasoup.watchlater;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import static android.net.Uri.parse;
 
 
 public class LauncherActivity extends Activity {
 
-	private static final Uri EXAMPLE_URI = parse("https://www.youtube.com/watch?v=jqxENMKaeCU");
+	private static final String[] EXAMPLE_URIS = {
+			"https://www.youtube.com/watch?v=jqxENMKaeCU",
+			"https://youtu.be/1qG61X3bkKs",
+			"http://www.youtube.com/attribution_link?u=/watch%3Fv%3DJ1zNbWJC5aw%26feature%3Dem-subs_digest",
+			"http://www.youtube.com/v/OdT9z-JjtJk",
+			"http://www.youtube.com/embed/UkWd0azv3fQ"
+	};
+
+	private static final String[] NONEXAMPLE_URIS = {
+			"https://www.youtube.com/channel/UC2bkHVIDjXS7sgrgjFtzOXQ",
+			"https://www.youtube.com/embed/videoseries?list=PL0INsTTU1k2UO-2-AwomFmAs4nuZU9ht3",
+			"http://www.youtube.com/attribution_link?u=/playlist%3Flist%3DPL0INsTTU1k2UO-2-AwomFmAs4nuZU9ht3%26feature%3Dem-share_playlist_user"
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_launcher);
+
+		populateListView(EXAMPLE_URIS, R.id.list_example_links);
+		populateListView(NONEXAMPLE_URIS, R.id.list_nonexample_links);
 	}
 
-	public void onExample(View v) {
-		startActivity(new Intent(Intent.ACTION_VIEW, EXAMPLE_URI));
+	private void populateListView(final String[] links, final int listViewId) {
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(
+				this,
+				R.layout.list_item_launcher,
+				links);
+
+		ListView listView = (ListView) findViewById(listViewId);
+		listView.setAdapter(adapter);
+
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				startActivity(new Intent(Intent.ACTION_VIEW, parse(links[position])));
+			}
+		});
 	}
+
+
 
 }

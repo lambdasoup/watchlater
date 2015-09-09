@@ -36,5 +36,7 @@
     <string name="error_playlist_full">Your Watch Later playlist is either full or already contains this video</string>
     <string name="choose_account">Choose account</string>
     <string name="no_account">No Google accounts found on this device</string>
+    <string name="example_uris">Some example URIs</string>
+    <string name="non_example_urls">Some non-example URIs</string>
 
 </resources>

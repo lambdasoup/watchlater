@@ -104,4 +104,36 @@ public interface YoutubeApi {
 			this.watchLater = watchLater;
 		}
 	}
+
+	class YouTubeError {
+		public final RootError error;
+
+		public YouTubeError(RootError error) {
+			this.error = error;
+		}
+
+		class RootError {
+			public final int code;
+			public final String message;
+			public final List<ErrorDetail> errors;
+
+			public RootError(int code, String message, List<ErrorDetail> errors) {
+				this.code = code;
+				this.message = message;
+				this.errors = errors;
+			}
+
+			class ErrorDetail {
+				public final String domain;
+				public final String reason;
+				public final String message;
+
+				public ErrorDetail(String domain, String reason, String message) {
+					this.domain = domain;
+					this.reason = reason;
+					this.message = message;
+				}
+			}
+		}
+	}
 }

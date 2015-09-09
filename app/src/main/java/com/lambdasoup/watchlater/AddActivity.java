@@ -46,6 +46,7 @@ import android.widget.ViewAnimator;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.lambdasoup.watchlater.YoutubeApi.YouTubeError;
 
 import java.io.IOException;
 
@@ -364,11 +365,19 @@ public class AddActivity extends Activity {
 				return;
 			}
 
+			YouTubeError youtubeError = (YouTubeError) error.getBodyAs(YouTubeError.class);
+
 			switch (error.getResponse().getStatus()) {
 				case 401:
 					onTokenInvalid();
 					break;
 				case 403:
+					if (youtubeError.error.errors != null
+							&& youtubeError.error.errors.size() >= 1
+							&& "dailyLimitExceededUnreg".equals(youtubeError.error.errors.get(0).reason)) {
+						onTokenInvalid();
+						break;
+					}
 					onError(ErrorType.PLAYLIST_FULL);
 					break;
 				default:

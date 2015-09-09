@@ -32,7 +32,7 @@ import static android.net.Uri.parse;
 
 public class LauncherActivity extends Activity {
 
-	private static final String[] EXAMPLE_URIS = {
+	private static final String[] VIDEO_EXAMPLE_URIS = {
 			"https://www.youtube.com/watch?v=jqxENMKaeCU",
 			"https://youtu.be/1qG61X3bkKs",
 			"http://www.youtube.com/attribution_link?u=/watch%3Fv%3DJ1zNbWJC5aw%26feature%3Dem-subs_digest",
@@ -40,10 +40,14 @@ public class LauncherActivity extends Activity {
 			"http://www.youtube.com/embed/UkWd0azv3fQ"
 	};
 
-	private static final String[] NONEXAMPLE_URIS = {
-			"https://www.youtube.com/channel/UC2bkHVIDjXS7sgrgjFtzOXQ",
+	private static final String[] PLAYLIST_EXAMPLE_URIS = {
 			"https://www.youtube.com/embed/videoseries?list=PL0INsTTU1k2UO-2-AwomFmAs4nuZU9ht3",
-			"http://www.youtube.com/attribution_link?u=/playlist%3Flist%3DPL0INsTTU1k2UO-2-AwomFmAs4nuZU9ht3%26feature%3Dem-share_playlist_user"
+			"http://www.youtube.com/attribution_link?u=/playlist%3Flist%3DPL0INsTTU1k2UO-2-AwomFmAs4nuZU9ht3%26feature%3Dem-share_playlist_user",
+			"https://www.youtube.com/playlist?list=PLxLNk7y0uwqfXzUjcbVT3UuMjRd7pOv_U"
+	};
+
+	private static final String[] NONEXAMPLE_URIS = {
+			"https://www.youtube.com/channel/UC2bkHVIDjXS7sgrgjFtzOXQ"
 	};
 
 	@Override
@@ -51,7 +55,8 @@ public class LauncherActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_launcher);
 
-		populateListView(EXAMPLE_URIS, R.id.list_example_links);
+		populateListView(VIDEO_EXAMPLE_URIS, R.id.list_video_example_links);
+		populateListView(PLAYLIST_EXAMPLE_URIS, R.id.list_playlist_example_links);
 		populateListView(NONEXAMPLE_URIS, R.id.list_nonexample_links);
 	}
 

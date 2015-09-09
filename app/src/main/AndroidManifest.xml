@@ -66,6 +66,8 @@
                 </data>
                 <data android:pathPrefix="/embed/">
                 </data>
+                <data android:pathPrefix="/playlist">
+                </data>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW">

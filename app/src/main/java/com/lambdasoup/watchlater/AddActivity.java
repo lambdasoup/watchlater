@@ -226,6 +226,11 @@ public class AddActivity extends Activity {
 	}
 
 	private void onMultipleAccounts() {
+		final ListView listView = (ListView) findViewById(R.id.account_list);
+		View header = getLayoutInflater().inflate(R.layout.list_header_account_chooser, listView, false);
+		listView.addHeaderView(header);
+		listView.setEmptyView(findViewById(R.id.account_chooser_empty));
+
 		final ArrayAdapter<Account> adapter = new ArrayAdapter<Account>(this, R.layout.item_account, manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE)) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
@@ -239,7 +244,6 @@ public class AddActivity extends Activity {
 				return accountName;
 			}
 		};
-		final ListView listView = (ListView) findViewById(R.id.account_list);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -247,9 +251,6 @@ public class AddActivity extends Activity {
 				onAccountChosen(adapter.getItem(position - listView.getHeaderViewsCount()));
 			}
 		});
-		View header = getLayoutInflater().inflate(R.layout.list_header_account_chooser, listView, false);
-		listView.addHeaderView(header);
-		listView.setEmptyView(findViewById(R.id.account_chooser_empty));
 
 		showAccountChooser();
 	}

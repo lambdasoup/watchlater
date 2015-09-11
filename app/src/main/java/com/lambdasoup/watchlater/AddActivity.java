@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,12 +50,15 @@ import com.google.gson.GsonBuilder;
 import com.lambdasoup.watchlater.YoutubeApi.YouTubeError;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.concurrent.Executor;
 
 import retrofit.Callback;
 import retrofit.Profiler;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
+import retrofit.android.MainThreadExecutor;
 import retrofit.client.OkClient;
 import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
@@ -63,13 +67,15 @@ import static android.net.Uri.*;
 
 
 public class AddActivity extends Activity {
+	private static final String TAG = AddActivity.class.getSimpleName();
 
 	private static final String SCOPE_YOUTUBE = "oauth2:https://www.googleapis.com/auth/youtube";
+
 	// fields are not final to be somewhat accessible for testing to inject other values
 	@SuppressWarnings("FieldCanBeLocal")
 	private static String YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3";
 	private static String ACCOUNT_TYPE_GOOGLE = "com.google";
-	private static Profiler<?> OPTIONAL_RETROFIT_PROFILER = null;
+	private static Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR = null;
 
 	private AccountManager manager;
 	private YoutubeApi api;
@@ -276,8 +282,8 @@ public class AddActivity extends Activity {
 
 		if (BuildConfig.DEBUG) {
 			builder.setLogLevel(RestAdapter.LogLevel.FULL);
-			if (OPTIONAL_RETROFIT_PROFILER != null) {
-				builder.setProfiler(OPTIONAL_RETROFIT_PROFILER);
+			if (OPTIONAL_RETROFIT_HTTP_EXECUTOR != null) {
+				builder.setExecutors(OPTIONAL_RETROFIT_HTTP_EXECUTOR, new MainThreadExecutor());
 			}
 		}
 

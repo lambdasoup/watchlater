@@ -36,6 +36,7 @@ package com.lambdasoup.watchlater.test;/*
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import android.os.Process;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Intent;
@@ -52,12 +53,18 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import retrofit.Profiler;
+import retrofit.RestAdapter;
 
+import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.registerIdlingResources;
+import static android.support.test.espresso.Espresso.unregisterIdlingResources;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
@@ -73,6 +80,7 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 	private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
 	private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
 	private MockEndpoint mockEndpoint;
+	private RetrofitHttpExecutorIdlingResource idlingExecutor;
 
 	public AddActivityTest() throws IOException {
 		super(AddActivity.class);
@@ -84,11 +92,11 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
 		// inject retrofit profiler for espresso idling resource
-		Field retrofitProfiler = AddActivity.class.getDeclaredField("OPTIONAL_RETROFIT_PROFILER");
-		retrofitProfiler.setAccessible(true);
-		RetrofitProfilerIdlingResource retrofitProfilerIdlingResource = new RetrofitProfilerIdlingResource();
-		retrofitProfiler.set(AddActivity.class, retrofitProfilerIdlingResource);
-		registerIdlingResources(retrofitProfilerIdlingResource);
+		Field httpExecutor = AddActivity.class.getDeclaredField("OPTIONAL_RETROFIT_HTTP_EXECUTOR");
+		httpExecutor.setAccessible(true);
+		idlingExecutor = new RetrofitHttpExecutorIdlingResource();
+		httpExecutor.set(AddActivity.class, idlingExecutor);
+		registerIdlingResources(idlingExecutor);
 
 		// inject test account type
 		Field accountType = AddActivity.class.getDeclaredField("ACCOUNT_TYPE_GOOGLE");
@@ -98,9 +106,9 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		// clear accounts
 		AccountManager accountManager = AccountManager.get(getInstrumentation().getContext());
 		//noinspection ResourceType,deprecation
-		accountManager.removeAccount(ACCOUNT_1, null, null);
+		accountManager.removeAccount(ACCOUNT_1, null, null).getResult();
 		//noinspection ResourceType,deprecation
-		accountManager.removeAccount(ACCOUNT_2, null, null);
+		accountManager.removeAccount(ACCOUNT_2, null, null).getResult();
 
 		// inject mock backend
 		Field endpoint = AddActivity.class.getDeclaredField("YOUTUBE_ENDPOINT");
@@ -115,6 +123,7 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 	@Override
 	protected void tearDown() throws Exception {
 		mockEndpoint.stop();
+		unregisterIdlingResources(idlingExecutor);
 
 		super.tearDown();
 	}
@@ -175,19 +184,40 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		onView(withText(R.string.success_added_video)).check(matches(isDisplayed()));
 	}
 
-	private static class RetrofitProfilerIdlingResource implements IdlingResource, Profiler<Void> {
+	private static class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements IdlingResource {
 
-		private AtomicInteger requestCount = new AtomicInteger(0);
-		private ResourceCallback idleTransitionCallback;
+		public static final String IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
+		private final AtomicInteger currentTaskCount = new AtomicInteger(0);
+		private volatile ResourceCallback idleTransitionCallback;
+
+		public RetrofitHttpExecutorIdlingResource() {
+			super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
+					new ThreadFactory() {
+						@Override
+						public Thread newThread(final Runnable r) {
+							return new Thread(new Runnable() {
+								@Override public void run() {
+									Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+									r.run();
+								}
+							}, IDLE_THREAD_NAME);
+						}
+					}
+			);
+		}
 
 		@Override
 		public String getName() {
-			return RetrofitProfilerIdlingResource.class.getName();
+			return RetrofitHttpExecutorIdlingResource.class.getName();
 		}
 
 		@Override
 		public boolean isIdleNow() {
-			return requestCount.intValue() == 0;
+			boolean idle = currentTaskCount.intValue() == 0;
+			if (idle && idleTransitionCallback != null) {
+				idleTransitionCallback.onTransitionToIdle();
+			}
+			return idle;
 		}
 
 		@Override
@@ -196,18 +226,17 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		}
 
 		@Override
-		public Void beforeCall() {
-			requestCount.incrementAndGet();
-			return null;
+		protected void afterExecute(Runnable r, Throwable t) {
+			super.afterExecute(r, t);
+			if (currentTaskCount.decrementAndGet() == 0 && idleTransitionCallback != null) {
+				idleTransitionCallback.onTransitionToIdle();
+			}
 		}
 
 		@Override
-		public void afterCall(RequestInformation requestInfo, long elapsedTime, int statusCode, Void beforeCallData) {
-			int newRequestCount = requestCount.decrementAndGet();
-
-			if (newRequestCount == 0) {
-				idleTransitionCallback.onTransitionToIdle();
-			}
+		public void execute(Runnable command) {
+			currentTaskCount.incrementAndGet();
+			super.execute(command);
 		}
 	}
 

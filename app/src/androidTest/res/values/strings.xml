@@ -20,6 +20,9 @@
 
 <resources>
 
-    <string name="label_mockaccount">Mock Account</string>
+  -<string name="label_mockaccount">Mock Account</string>
 
+  <string name="video_example_uris">Some example single video URIs</string>
+  <string name="playlist_example_uris">Some example playlist URIs</string>
+  <string name="non_example_urls">Some non-example URIs</string>
 </resources>

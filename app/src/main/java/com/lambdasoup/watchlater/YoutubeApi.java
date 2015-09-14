@@ -22,6 +22,7 @@ package com.lambdasoup.watchlater;
 import java.util.List;
 
 import retrofit.Callback;
+import retrofit.RetrofitError;
 import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
@@ -136,4 +137,68 @@ public interface YoutubeApi {
 			}
 		}
 	}
+
+	enum ErrorType {
+		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO, INVALID_TOKEN, VIDEO_NOT_FOUND, ALREADY_IN_PLAYLIST
+	}
+
+	abstract class ErrorTranslatingCallback<T> implements Callback<T> {
+
+		public static final String DAILY_LIMIT_EXCEEDED_UNREG = "dailyLimitExceededUnreg";
+		public static final String VIDEO_ALREADY_IN_PLAYLIST = "videoAlreadyInPlaylist";
+		public static final String PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos";
+		public static final String VIDEO_NOT_FOUND = "videoNotFound";
+
+		@Override
+		final public void failure(RetrofitError error) {
+			failure(translateError(error));
+		}
+
+		protected abstract void failure(ErrorType errorType);
+
+		public static ErrorType translateError(RetrofitError error) {
+			if (error.getResponse() == null) {
+				return ErrorType.NETWORK;
+			}
+
+			YouTubeError youtubeError = (YouTubeError) error.getBodyAs(YouTubeError.class);
+
+			String errorDetail = "";
+			if (youtubeError.error.errors != null
+					&& youtubeError.error.errors.size() >= 1) {
+				errorDetail = youtubeError.error.errors.get(0).reason;
+			}
+
+			switch (error.getResponse().getStatus()) {
+				case 401:
+					return ErrorType.INVALID_TOKEN;
+				case 403:
+					switch (errorDetail) {
+						case DAILY_LIMIT_EXCEEDED_UNREG:
+							return ErrorType.INVALID_TOKEN;
+						case PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS:
+							return ErrorType.PLAYLIST_FULL;
+					}
+					return ErrorType.NEED_ACCESS;
+				case 404:
+					switch (errorDetail) {
+						case VIDEO_NOT_FOUND:
+							return ErrorType.VIDEO_NOT_FOUND;
+					}
+					return ErrorType.OTHER;
+				case 409:
+					switch (errorDetail) {
+						case VIDEO_ALREADY_IN_PLAYLIST:
+							return ErrorType.ALREADY_IN_PLAYLIST;
+					}
+					return ErrorType.OTHER;
+
+				default:
+					return ErrorType.OTHER;
+			}
+		}
+	}
+
+
+
 }

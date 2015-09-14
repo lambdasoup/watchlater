@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -47,14 +46,14 @@ import android.widget.ViewAnimator;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.lambdasoup.watchlater.YoutubeApi.ErrorTranslatingCallback;
+import com.lambdasoup.watchlater.YoutubeApi.ErrorType;
 import com.lambdasoup.watchlater.YoutubeApi.YouTubeError;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 import retrofit.Callback;
-import retrofit.Profiler;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -63,7 +62,8 @@ import retrofit.client.OkClient;
 import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
 
-import static android.net.Uri.*;
+import static android.net.Uri.decode;
+import static android.net.Uri.parse;
 
 
 public class AddActivity extends Activity {
@@ -307,6 +307,12 @@ public class AddActivity extends Activity {
 			case NOT_A_VIDEO:
 				msgId = R.string.error_not_a_video;
 				break;
+			case ALREADY_IN_PLAYLIST:
+				msgId = R.string.error_already_in_playlist;
+				break;
+			case VIDEO_NOT_FOUND:
+				msgId = R.string.error_video_not_found;
+				break;
 			default:
 				throw new IllegalArgumentException("unexpected error type: " + type);
 		}
@@ -389,45 +395,26 @@ public class AddActivity extends Activity {
 		addToWatchLater();
 	}
 
-	private enum ErrorType {
-		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO
-	}
+
 
 	private class WatchLaterError extends Exception {
-		public final ErrorType type;
+		public final YoutubeApi.ErrorType type;
 
-		public WatchLaterError(ErrorType type) {
+		public WatchLaterError(YoutubeApi.ErrorType type) {
 			this.type = type;
 		}
 	}
 
-	private abstract class ErrorHandlingCallback<T> implements Callback<T> {
+	private abstract class ErrorHandlingCallback<T> extends ErrorTranslatingCallback<T> {
 		@Override
-		public void failure(RetrofitError error) {
-			if (error.getResponse() == null) {
-				onError(ErrorType.NETWORK);
-				return;
-			}
-
-			YouTubeError youtubeError = (YouTubeError) error.getBodyAs(YouTubeError.class);
-
-			switch (error.getResponse().getStatus()) {
-				case 401:
+		public void failure(ErrorType errorType) {
+			switch (errorType) {
+				case INVALID_TOKEN:
 					onTokenInvalid();
 					break;
-				case 403:
-					if (youtubeError.error.errors != null
-							&& youtubeError.error.errors.size() >= 1
-							&& "dailyLimitExceededUnreg".equals(youtubeError.error.errors.get(0).reason)) {
-						onTokenInvalid();
-						break;
-					}
-					onError(ErrorType.PLAYLIST_FULL);
-					break;
 				default:
-					onError(ErrorType.OTHER);
+					onError(errorType);
 			}
-
 		}
 	}
 

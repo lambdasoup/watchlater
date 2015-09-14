@@ -20,12 +20,20 @@
 package com.lambdasoup.watchlater;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.List;
 
 import static android.net.Uri.parse;
 
@@ -55,28 +63,136 @@ public class LauncherActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_launcher);
 
-		populateListView(VIDEO_EXAMPLE_URIS, R.id.list_video_example_links);
-		populateListView(PLAYLIST_EXAMPLE_URIS, R.id.list_playlist_example_links);
-		populateListView(NONEXAMPLE_URIS, R.id.list_nonexample_links);
-	}
+		ListView listView = (ListView) findViewById(R.id.list);
+		final FlatGroupAdapter adapter = new FlatGroupAdapter(
+				getApplicationContext(),
+				new FlatGroupAdapter.Group(R.string.video_example_uris, VIDEO_EXAMPLE_URIS),
+				new FlatGroupAdapter.Group(R.string.playlist_example_uris, PLAYLIST_EXAMPLE_URIS),
+				new FlatGroupAdapter.Group(R.string.non_example_urls, NONEXAMPLE_URIS)
 
-	private void populateListView(final String[] links, final int listViewId) {
-		ArrayAdapter<String> adapter = new ArrayAdapter<>(
-				this,
-				R.layout.list_item_launcher,
-				links);
-
-		ListView listView = (ListView) findViewById(listViewId);
+		);
 		listView.setAdapter(adapter);
-
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				startActivity(new Intent(Intent.ACTION_VIEW, parse(links[position])));
+				FlatGroupAdapter.ItemInfo itemInfo = adapter.getItem(position);
+				if (itemInfo.isHeader()) {
+					return;
+				}
+				startActivity(new Intent(Intent.ACTION_VIEW, parse(itemInfo.item)));
 			}
 		});
 	}
 
+	private static class FlatGroupAdapter extends BaseAdapter {
+		private final Group[] groups;
+		private final Context context;
 
+		FlatGroupAdapter(Context context, Group... groups) {
+			this.context = context;
+			this.groups = groups;
+		}
 
+		@Override
+		public int getCount() {
+			int count = 0;
+			for (Group group : groups) {
+				count += group.getFlatLength();
+			}
+			return count;
+		}
+
+		@Override
+		public ItemInfo getItem(int position) {
+			GroupPosition groupPosition = getGroupPosition(position);
+			if (groupPosition.position == GroupPosition.HEADER_POSITION) {
+				return new ItemInfo(groups[groupPosition.group].headerId, null);
+			} else {
+				return new ItemInfo(null, groups[groupPosition.group].data[groupPosition.position]);
+			}
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+			ItemInfo itemInfo = getItem(position);
+			if (itemInfo.isHeader()) {
+				View rowView = inflater.inflate(R.layout.list_header_launcher, parent, false);
+				TextView textView = (TextView) rowView.findViewById(R.id.text);
+				textView.setText(itemInfo.headerId);
+				return rowView;
+			} else {
+				View rowView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+				TextView textView = (TextView) rowView.findViewById(android.R.id.text1);
+				textView.setText(itemInfo.item);
+				return rowView;
+			}
+		}
+
+		@Override
+		public boolean isEnabled(int position) {
+			return getGroupPosition(position).position != GroupPosition.HEADER_POSITION;
+		}
+
+		private GroupPosition getGroupPosition(int flatPosition) {
+			int aboveCurrentGroup = 0;
+			for (int groupId = 0; groupId < groups.length; groupId++) {
+				if (flatPosition < aboveCurrentGroup + groups[groupId].getFlatLength()) {
+					return new GroupPosition(groupId, flatPosition - aboveCurrentGroup - 1);
+				}
+				aboveCurrentGroup += groups[groupId].getFlatLength();
+			}
+			throw new IllegalArgumentException("position must be in [0, getCount())");
+		}
+
+		private static class GroupPosition {
+			public static final int HEADER_POSITION = -1;
+
+			public final int group;
+			public final int position;
+
+			private GroupPosition(int group, int position) {
+				this.group = group;
+				this.position = position;
+			}
+		}
+
+		public static class Group {
+			public final int headerId;
+			public final String[] data;
+
+			private Group(int headerId, String[] data) {
+				this.headerId = headerId;
+				this.data = data;
+			}
+
+			public int getFlatLength() {
+				return data.length + 1;
+			}
+		}
+
+		public static class ItemInfo {
+			public final Integer headerId;
+			public final String item;
+
+			private ItemInfo(Integer headerId, String item) {
+				if (headerId == null && item == null
+						|| headerId != null && item != null) {
+					throw new IllegalArgumentException("Exactly one of header and item must be null.");
+				}
+				this.headerId = headerId;
+				this.item = item;
+			}
+
+			public boolean isHeader() {
+				return headerId != null;
+			}
+		}
+	}
 }

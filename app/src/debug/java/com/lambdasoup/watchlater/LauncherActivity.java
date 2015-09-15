@@ -64,7 +64,7 @@ public class LauncherActivity extends Activity {
 		setContentView(R.layout.activity_launcher);
 
 		ListView listView = (ListView) findViewById(R.id.list);
-		final FlatGroupAdapter adapter = new FlatGroupAdapter(
+		FlatGroupAdapter adapter = new FlatGroupAdapter(
 				getApplicationContext(),
 				new FlatGroupAdapter.Group(R.string.video_example_uris, VIDEO_EXAMPLE_URIS),
 				new FlatGroupAdapter.Group(R.string.playlist_example_uris, PLAYLIST_EXAMPLE_URIS),
@@ -75,22 +75,43 @@ public class LauncherActivity extends Activity {
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				FlatGroupAdapter.ItemInfo itemInfo = adapter.getItem(position);
-				if (itemInfo.isHeader()) {
-					return;
-				}
-				startActivity(new Intent(Intent.ACTION_VIEW, parse(itemInfo.item)));
+				String item = (String) parent.getAdapter().getItem(position);
+				startActivity(new Intent(Intent.ACTION_VIEW, parse(item)));
 			}
 		});
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		((ListView) findViewById(R.id.list)).setAdapter(null);
+	}
+
 	private static class FlatGroupAdapter extends BaseAdapter {
+		static final int VIEW_TYPE_HEADER = 0;
+		static final int VIEW_TYPE_ITEM = 1;
+
 		private final Group[] groups;
 		private final Context context;
 
 		FlatGroupAdapter(Context context, Group... groups) {
 			this.context = context;
 			this.groups = groups;
+		}
+
+		@Override
+		public int getItemViewType(int position) {
+			GroupPosition groupPosition = getGroupPosition(position);
+			if (groupPosition.position == GroupPosition.HEADER_POSITION) {
+				return VIEW_TYPE_HEADER;
+			} else {
+				return VIEW_TYPE_ITEM;
+			}
+		}
+
+		@Override
+		public int getViewTypeCount() {
+			return 2;
 		}
 
 		@Override
@@ -103,12 +124,12 @@ public class LauncherActivity extends Activity {
 		}
 
 		@Override
-		public ItemInfo getItem(int position) {
+		public Object getItem(int position) {
 			GroupPosition groupPosition = getGroupPosition(position);
 			if (groupPosition.position == GroupPosition.HEADER_POSITION) {
-				return new ItemInfo(groups[groupPosition.group].headerId, null);
+				return groups[groupPosition.group].headerId;
 			} else {
-				return new ItemInfo(null, groups[groupPosition.group].data[groupPosition.position]);
+				return groups[groupPosition.group].data[groupPosition.position];
 			}
 		}
 
@@ -119,19 +140,34 @@ public class LauncherActivity extends Activity {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View rowView = convertView;
+			if (rowView == null) {
+				LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				switch (getItemViewType(position)) {
+					case VIEW_TYPE_HEADER:
+						rowView = inflater.inflate(R.layout.list_header_launcher, parent, false);
+						break;
+					case VIEW_TYPE_ITEM:
+						rowView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+						break;
+					default:
+						throw new RuntimeException("unexpected ItemViewType " + getItemViewType(position) + " for position " + position);
+				}
+			}
 
-			ItemInfo itemInfo = getItem(position);
-			if (itemInfo.isHeader()) {
-				View rowView = inflater.inflate(R.layout.list_header_launcher, parent, false);
-				TextView textView = (TextView) rowView.findViewById(R.id.text);
-				textView.setText(itemInfo.headerId);
-				return rowView;
-			} else {
-				View rowView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
-				TextView textView = (TextView) rowView.findViewById(android.R.id.text1);
-				textView.setText(itemInfo.item);
-				return rowView;
+			switch (getItemViewType(position)) {
+				case VIEW_TYPE_HEADER: {
+					TextView textView = (TextView) rowView.findViewById(R.id.text);
+					textView.setText((int) getItem(position));
+					return rowView;
+				}
+				case VIEW_TYPE_ITEM: {
+					TextView textView = (TextView) rowView.findViewById(android.R.id.text1);
+					textView.setText((String) getItem(position));
+					return rowView;
+				}
+				default:
+					throw new RuntimeException("unexpected ItemViewType " + getItemViewType(position) + " for position " + position);
 			}
 		}
 
@@ -174,24 +210,6 @@ public class LauncherActivity extends Activity {
 
 			public int getFlatLength() {
 				return data.length + 1;
-			}
-		}
-
-		public static class ItemInfo {
-			public final Integer headerId;
-			public final String item;
-
-			private ItemInfo(Integer headerId, String item) {
-				if (headerId == null && item == null
-						|| headerId != null && item != null) {
-					throw new IllegalArgumentException("Exactly one of header and item must be null.");
-				}
-				this.headerId = headerId;
-				this.item = item;
-			}
-
-			public boolean isHeader() {
-				return headerId != null;
 			}
 		}
 	}

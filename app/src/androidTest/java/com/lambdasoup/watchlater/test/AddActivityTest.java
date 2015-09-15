@@ -47,6 +47,8 @@ import android.test.ActivityInstrumentationTestCase2;
 
 import com.lambdasoup.watchlater.AddActivity;
 import com.lambdasoup.watchlater.R;
+import com.squareup.okhttp.mockwebserver.MockResponse;
+import com.squareup.okhttp.mockwebserver.MockWebServer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -59,7 +61,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import retrofit.RestAdapter;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 import static android.support.test.espresso.Espresso.onView;
@@ -74,13 +75,13 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  */
 public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivity> {
 
-	private static final String MOCK_ENDPOINT = "http://localhost:8080/";
 	private static final String TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
 
 	private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
 	private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
-	private MockEndpoint mockEndpoint;
+
 	private RetrofitHttpExecutorIdlingResource idlingExecutor;
+    private MockWebServer mockWebServer;
 
 	public AddActivityTest() throws IOException {
 		super(AddActivity.class);
@@ -91,7 +92,10 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		super.setUp();
 		injectInstrumentation(InstrumentationRegistry.getInstrumentation());
 
-		// inject retrofit profiler for espresso idling resource
+        mockWebServer = new MockWebServer();
+        mockWebServer.start(8080);
+
+		// inject retrofit http executor for espresso idling resource
 		Field httpExecutor = AddActivity.class.getDeclaredField("OPTIONAL_RETROFIT_HTTP_EXECUTOR");
 		httpExecutor.setAccessible(true);
 		idlingExecutor = new RetrofitHttpExecutorIdlingResource();
@@ -113,16 +117,12 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		// inject mock backend
 		Field endpoint = AddActivity.class.getDeclaredField("YOUTUBE_ENDPOINT");
 		endpoint.setAccessible(true);
-		endpoint.set(AddActivity.class, MOCK_ENDPOINT);
-
-		// clear mock handlers
-		mockEndpoint = new MockEndpoint("localhost", 8080);
-		mockEndpoint.start();
+		endpoint.set(AddActivity.class, mockWebServer.url("/").toString());
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
-		mockEndpoint.stop();
+		mockWebServer.shutdown();
 		unregisterIdlingResources(idlingExecutor);
 
 		super.tearDown();
@@ -149,7 +149,7 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		onView(withText(R.string.choose_account)).check(matches(isDisplayed()));
 	}
 
-	public void test_add() throws Exception {
+	public void test_add_success() throws Exception {
 		// set channel list response
 		{
 			JSONObject json = new JSONObject();
@@ -163,13 +163,19 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 			contentDetails.put("relatedPlaylists", relatedPlaylists);
 			String watchLaterId = "45h7394875w3495";
 			relatedPlaylists.put("watchLater", watchLaterId);
-			mockEndpoint.add("/channels", json.toString(8));
+
+            MockResponse response = new MockResponse();
+            response.setBody(json.toString(8));
+            mockWebServer.enqueue(response);
 		}
 
 		// set add video to list response
 		{
 			JSONObject json = new JSONObject();
-			mockEndpoint.add("/playlistItems", json.toString(8));
+
+            MockResponse response = new MockResponse();
+            response.setBody(json.toString(8));
+            mockWebServer.enqueue(response);
 		}
 
 		// set account
@@ -184,6 +190,59 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		onView(withText(R.string.success_added_video)).check(matches(isDisplayed()));
 	}
 
+	public void test_add_already_in_playlist() throws Exception {
+		// set channel list response
+		{
+			JSONObject json = new JSONObject();
+			JSONArray items = new JSONArray();
+			json.put("items", items);
+			JSONObject channel = new JSONObject();
+			items.put(channel);
+			JSONObject contentDetails = new JSONObject();
+			channel.put("contentDetails", contentDetails);
+			JSONObject relatedPlaylists = new JSONObject();
+			contentDetails.put("relatedPlaylists", relatedPlaylists);
+			String watchLaterId = "45h7394875w3495";
+			relatedPlaylists.put("watchLater", watchLaterId);
+
+            MockResponse response = new MockResponse();
+            response.setBody(json.toString(8));
+            mockWebServer.enqueue(response);
+		}
+
+		// set add video to list response
+		{
+            JSONObject error0 = new JSONObject();
+            error0.put("domain", "youtube.playlistItem");
+            error0.put("reason", "videoAlreadyInPlaylist");
+            error0.put("message", "Video already in playlist.");
+            JSONArray errors = new JSONArray();
+            errors.put(error0);
+            JSONObject error = new JSONObject();
+            error.put("errors", errors);
+            error.put("code", 409);
+            error.put("message", "Video already in playlist.");
+            JSONObject json = new JSONObject();
+            json.put("error", error);
+
+            MockResponse response = new MockResponse();
+            response.setBody(json.toString(8));
+            response.setStatus("HTTP/1.1 409 Conflict");
+            mockWebServer.enqueue(response);
+		}
+
+		// set account
+		addAccount(ACCOUNT_1);
+
+		// set activity arg
+		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/v/8f7h837f4"));
+		setActivityIntent(intent);
+
+		getActivity();
+
+		onView(withText(R.string.error_already_in_playlist)).check(matches(isDisplayed()));
+	}
+
 	private static class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements IdlingResource {
 
 		public static final String IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
@@ -192,18 +251,19 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 
 		public RetrofitHttpExecutorIdlingResource() {
 			super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
-					new ThreadFactory() {
-						@Override
-						public Thread newThread(final Runnable r) {
-							return new Thread(new Runnable() {
-								@Override public void run() {
-									Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
-									r.run();
-								}
-							}, IDLE_THREAD_NAME);
-						}
-					}
-			);
+                    new ThreadFactory() {
+                        @Override
+                        public Thread newThread(final Runnable r) {
+                            return new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+                                    r.run();
+                                }
+                            }, IDLE_THREAD_NAME);
+                        }
+                    }
+            );
 		}
 
 		@Override

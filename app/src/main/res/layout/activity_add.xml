@@ -48,6 +48,15 @@
             android:layout_centerInParent="true"
             android:text="@string/success_added_video"/>
 
+        <Button
+            android:id="@+id/button_open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:onClick="onOpenWithYoutube"
+            android:text="@string/button_open"/>
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -64,6 +73,7 @@
             tools:text="Could not query moon crater list"/>
 
         <Button
+            android:id="@+id/button_retry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

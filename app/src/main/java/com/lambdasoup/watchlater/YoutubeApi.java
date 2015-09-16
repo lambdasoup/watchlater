@@ -139,7 +139,7 @@ public interface YoutubeApi {
 	}
 
 	enum ErrorType {
-		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO, INVALID_TOKEN, VIDEO_NOT_FOUND, ALREADY_IN_PLAYLIST
+		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO, INVALID_TOKEN, VIDEO_NOT_FOUND, ALREADY_IN_PLAYLIST;
 	}
 
 	abstract class ErrorTranslatingCallback<T> implements Callback<T> {

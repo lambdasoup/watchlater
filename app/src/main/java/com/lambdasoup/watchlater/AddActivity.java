@@ -26,6 +26,7 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,15 +50,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.lambdasoup.watchlater.YoutubeApi.ErrorTranslatingCallback;
 import com.lambdasoup.watchlater.YoutubeApi.ErrorType;
-import com.lambdasoup.watchlater.YoutubeApi.YouTubeError;
 
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
-import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
 import retrofit.android.MainThreadExecutor;
 import retrofit.client.OkClient;
 import retrofit.client.Response;
@@ -64,6 +63,8 @@ import retrofit.converter.GsonConverter;
 
 import static android.net.Uri.decode;
 import static android.net.Uri.parse;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 
 public class AddActivity extends Activity {
@@ -161,16 +162,16 @@ public class AddActivity extends Activity {
 					onSuccess();
 				}
 			});
-		} catch (WatchLaterError error) {
+		} catch (WatchlaterException error) {
 			onError(error.type);
 		}
 	}
 
-	private String getVideoId() throws WatchLaterError {
+	private String getVideoId() throws WatchlaterException {
 		return getVideoId(getIntent().getData());
 	}
 
-	private String getVideoId(Uri uri) throws WatchLaterError {
+	private String getVideoId(Uri uri) throws WatchlaterException {
 		// e.g. https://www.youtube.com/watch?v=jqxENMKaeCU
 		String videoId = uri.getQueryParameter("v");
 		if (videoId != null) {
@@ -180,7 +181,7 @@ public class AddActivity extends Activity {
 		// e.g.https://www.youtube.com/playlist?list=PLxLNk7y0uwqfXzUjcbVT3UuMjRd7pOv_U
 		videoId = uri.getQueryParameter("list");
 		if (videoId != null) {
-			throw new WatchLaterError(ErrorType.NOT_A_VIDEO);
+			throw new WatchlaterException(ErrorType.NOT_A_VIDEO);
 		}
 
 		// e.g. http://www.youtube.com/attribution_link?u=/watch%3Fv%3DJ1zNbWJC5aw%26feature%3Dem-subs_digest
@@ -189,7 +190,7 @@ public class AddActivity extends Activity {
 			if (encodedUri != null) {
 				return getVideoId(parse(decode(encodedUri)));
 			} else {
-				throw new WatchLaterError(ErrorType.NOT_A_VIDEO);
+				throw new WatchlaterException(ErrorType.NOT_A_VIDEO);
 			}
 		}
 
@@ -293,25 +294,32 @@ public class AddActivity extends Activity {
 
 	private void onError(ErrorType type) {
 		int msgId;
+		boolean withRetry;
 		switch (type) {
 			case NEED_ACCESS:
 				msgId = R.string.error_need_account;
+				withRetry = true;
 				break;
 			case OTHER:
 			case NETWORK:
 				msgId = R.string.error_other;
+				withRetry = true;
 				break;
 			case PLAYLIST_FULL:
 				msgId = R.string.error_playlist_full;
+				withRetry = true;
 				break;
 			case NOT_A_VIDEO:
 				msgId = R.string.error_not_a_video;
+				withRetry = false;
 				break;
 			case ALREADY_IN_PLAYLIST:
 				msgId = R.string.error_already_in_playlist;
+				withRetry = false;
 				break;
 			case VIDEO_NOT_FOUND:
 				msgId = R.string.error_video_not_found;
+				withRetry = false;
 				break;
 			default:
 				throw new IllegalArgumentException("unexpected error type: " + type);
@@ -324,6 +332,9 @@ public class AddActivity extends Activity {
 
 		TextView errorMsg = (TextView) findViewById(R.id.error_msg);
 		errorMsg.setText(msgId);
+
+		Button retryButton = (Button) findViewById(R.id.button_retry);
+		retryButton.setVisibility(withRetry ? VISIBLE : GONE);
 
 		showError();
 	}
@@ -353,6 +364,8 @@ public class AddActivity extends Activity {
 		showView(R.id.progress);
 	}
 
+	private void stopProgress() {  }
+
 	private void showView(@IdRes int id) {
 		ViewAnimator animator = (ViewAnimator) findViewById(R.id.animator);
 
@@ -379,6 +392,20 @@ public class AddActivity extends Activity {
 		addToWatchLater();
 	}
 
+	public void onOpenWithYoutube(View v) {
+		showProgress();
+		try {
+			Intent intent = new Intent()
+					.setData(getIntent().getData())
+					.setPackage("com.google.android.youtube");
+			startActivity(intent);
+		} catch (ActivityNotFoundException e) {
+			showToast(R.string.error_youtube_player_missing);
+		}
+		stopProgress();
+
+	};
+
 	private void setPlaylistIdAndRetry() {
 		api.listMyChannels(new ErrorHandlingCallback<YoutubeApi.Channels>() {
 			@Override
@@ -395,12 +422,10 @@ public class AddActivity extends Activity {
 		addToWatchLater();
 	}
 
+	private class WatchlaterException extends Exception {
+		public final ErrorType type;
 
-
-	private class WatchLaterError extends Exception {
-		public final YoutubeApi.ErrorType type;
-
-		public WatchLaterError(YoutubeApi.ErrorType type) {
+		public WatchlaterException(ErrorType type) {
 			this.type = type;
 		}
 	}
@@ -417,5 +442,6 @@ public class AddActivity extends Activity {
 			}
 		}
 	}
+
 
 }

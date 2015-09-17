@@ -21,8 +21,6 @@ package com.lambdasoup.watchlater;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
@@ -30,7 +28,9 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,13 +38,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewAnimator;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -63,14 +60,13 @@ import retrofit.converter.GsonConverter;
 
 import static android.net.Uri.decode;
 import static android.net.Uri.parse;
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 
 public class AddActivity extends Activity {
 	private static final String TAG = AddActivity.class.getSimpleName();
 
 	private static final String SCOPE_YOUTUBE = "oauth2:https://www.googleapis.com/auth/youtube";
+
 
 	// fields are not final to be somewhat accessible for testing to inject other values
 	@SuppressWarnings("FieldCanBeLocal")
@@ -81,9 +77,17 @@ public class AddActivity extends Activity {
 	private AccountManager manager;
 	private YoutubeApi api;
 
+	private WatchlaterDialogContent mainContent;
+
+	private static final String KEY_ACCOUNT = "com.lambdasoup.watchlater_account";
+	private static final String KEY_TOKEN = "com.lambdasoup.watchlater_token";
+	private static final String KEY_PLAYLIST_ID = "com.lambdasoup.watchlater_playlistId";
+	private static final String KEY_RESULT = "com.lambdasoup.watchlater_result";
+
 	private Account account;
 	private String token;
 	private String playlistId;
+	private WatchlaterResult result;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,9 +97,27 @@ public class AddActivity extends Activity {
 
 		setContentView(R.layout.activity_add);
 
+		mainContent = (WatchlaterDialogContent) findViewById(R.id.progress_animator);
+
 		manager = AccountManager.get(this);
 		setApiAdapter();
-		addToWatchLater();
+
+		if (savedInstanceState != null) {
+			token = savedInstanceState.getString(KEY_TOKEN);
+			playlistId = savedInstanceState.getString(KEY_PLAYLIST_ID);
+			account = savedInstanceState.getParcelable(KEY_ACCOUNT);
+			result = savedInstanceState.getParcelable(KEY_RESULT);
+		}
+		addToWatchLaterAndShow();
+	}
+
+	@Override
+	protected void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString(KEY_TOKEN, token);
+		outState.putString(KEY_PLAYLIST_ID, playlistId);
+		outState.putParcelable(KEY_ACCOUNT, account);
+		outState.putParcelable(KEY_RESULT, result);
 	}
 
 	private void setDialogBehaviour() {
@@ -132,9 +154,13 @@ public class AddActivity extends Activity {
 		startActivity(new Intent(this, AboutActivity.class));
 	}
 
-	private void addToWatchLater() {
-
-		showProgress();
+	private void addToWatchLaterAndShow() {
+		if (result != null) {
+			// we're done!
+			result.apply(success -> showSuccess(success), error -> showError(error));
+			return;
+		}
+		// still work to do and things to try
 
 		if (account == null) {
 			setGoogleAccountAndRetry();
@@ -151,21 +177,11 @@ public class AddActivity extends Activity {
 			return;
 		}
 
-		try {
-			YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId(getVideoId());
-			YoutubeApi.Snippet snippet = new YoutubeApi.Snippet(playlistId, resourceId);
-			YoutubeApi.PlaylistItem item = new YoutubeApi.PlaylistItem(snippet);
-
-			api.insertPlaylistItem(item, new ErrorHandlingCallback<YoutubeApi.PlaylistItem>() {
-				@Override
-				public void success(YoutubeApi.PlaylistItem playlistItem, Response response) {
-					onSuccess();
-				}
-			});
-		} catch (WatchlaterException error) {
-			onError(error.type);
+		if (result == null) {
+			insertPlaylistItem();
 		}
 	}
+
 
 	private String getVideoId() throws WatchlaterException {
 		return getVideoId(getIntent().getData());
@@ -201,25 +217,23 @@ public class AddActivity extends Activity {
 	}
 
 	private void setAuthTokenAndRetry() {
-		manager.getAuthToken(account, SCOPE_YOUTUBE, null, this, new AccountManagerCallback<Bundle>() {
-			@Override
-			public void run(AccountManagerFuture<Bundle> future) {
-				try {
-					Bundle result = future.getResult();
-					token = result.getString(AccountManager.KEY_AUTHTOKEN);
-					addToWatchLater();
-				} catch (OperationCanceledException e) {
-					onError(ErrorType.NEED_ACCESS);
-				} catch (IOException e) {
-					onError(ErrorType.NETWORK);
-				} catch (AuthenticatorException e) {
-					onError(ErrorType.OTHER);
-				}
-			}
-		}, null);
+		mainContent.showProgress();
+		manager.getAuthToken(account, SCOPE_YOUTUBE, null, this, future -> {
+            try {
+                token = future.getResult().getString(AccountManager.KEY_AUTHTOKEN);
+				addToWatchLaterAndShow();
+            } catch (OperationCanceledException e) {
+                onResult(WatchlaterResult.error(ErrorType.NEED_ACCESS));
+            } catch (IOException e) {
+				onResult(WatchlaterResult.error(ErrorType.NETWORK));
+            } catch (AuthenticatorException e) {
+				onResult(WatchlaterResult.error(ErrorType.OTHER));
+            }
+        }, null);
 	}
 
 	private void setGoogleAccountAndRetry() {
+		mainContent.showProgress();
 		Account[] accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE);
 
 		if (accounts.length != 1) {
@@ -228,8 +242,7 @@ public class AddActivity extends Activity {
 		}
 
 		this.account = accounts[0];
-
-		addToWatchLater();
+		addToWatchLaterAndShow();
 	}
 
 	private void onMultipleAccounts() {
@@ -252,19 +265,40 @@ public class AddActivity extends Activity {
 			}
 		};
 		listView.setAdapter(adapter);
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				onAccountChosen(adapter.getItem(position - listView.getHeaderViewsCount()));
-			}
-		});
+		listView.setOnItemClickListener((parent, view, position, id) ->
+				onAccountChosen(adapter.getItem(position - listView.getHeaderViewsCount()))
+				);
 
-		showAccountChooser();
+		mainContent.showAccountChooser();
 	}
 
 	private void onAccountChosen(Account account) {
 		this.account = account;
-		addToWatchLater();
+		addToWatchLaterAndShow();
+	}
+
+
+	private void insertPlaylistItem() {
+		mainContent.showProgress();
+		try {
+			YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId(getVideoId());
+			YoutubeApi.Snippet snippet = new YoutubeApi.Snippet(playlistId, resourceId);
+			YoutubeApi.PlaylistItem item = new YoutubeApi.PlaylistItem(snippet);
+
+			api.insertPlaylistItem(item, new ErrorHandlingCallback<YoutubeApi.PlaylistItem>() {
+				@Override
+				public void success(YoutubeApi.PlaylistItem playlistItem, Response response) {
+					onResult(WatchlaterResult.success());
+				}
+			});
+		} catch (WatchlaterException error) {
+			onResult(WatchlaterResult.error(error.type));
+		}
+	}
+
+	private void onResult(WatchlaterResult result) {
+		this.result = result;
+		addToWatchLaterAndShow();
 	}
 
 	private void setApiAdapter() {
@@ -292,108 +326,35 @@ public class AddActivity extends Activity {
 		api = adapter.create(YoutubeApi.class);
 	}
 
-	private void onError(ErrorType type) {
-		int msgId;
-		boolean withRetry;
-		switch (type) {
-			case NEED_ACCESS:
-				msgId = R.string.error_need_account;
-				withRetry = true;
-				break;
-			case OTHER:
-			case NETWORK:
-				msgId = R.string.error_other;
-				withRetry = true;
-				break;
-			case PLAYLIST_FULL:
-				msgId = R.string.error_playlist_full;
-				withRetry = true;
-				break;
-			case NOT_A_VIDEO:
-				msgId = R.string.error_not_a_video;
-				withRetry = false;
-				break;
-			case ALREADY_IN_PLAYLIST:
-				msgId = R.string.error_already_in_playlist;
-				withRetry = false;
-				break;
-			case VIDEO_NOT_FOUND:
-				msgId = R.string.error_video_not_found;
-				withRetry = false;
-				break;
-			default:
-				throw new IllegalArgumentException("unexpected error type: " + type);
-		}
-
+	private void showError(ErrorResult errorResult) {
 		if (isFinishing()) {
-			showToast(msgId);
+			showToast(errorResult.msgId);
 			return;
 		}
 
-		TextView errorMsg = (TextView) findViewById(R.id.error_msg);
-		errorMsg.setText(msgId);
-
-		Button retryButton = (Button) findViewById(R.id.button_retry);
-		retryButton.setVisibility(withRetry ? VISIBLE : GONE);
-
-		showError();
+		mainContent.showError(errorResult);
 	}
 
-	private void onSuccess() {
+	private void showSuccess(SuccessResult successResult) {
 		if (isFinishing()) {
 			showToast(R.string.success_added_video);
 			return;
 		}
-
-		showSuccess();
+		mainContent.showSuccess();
 	}
 
-	private void showAccountChooser() {
-		showView(R.id.account_chooser);
-	}
 
-	private void showError() {
-		showView(R.id.error);
-	}
-
-	private void showSuccess() {
-		showView(R.id.success);
-	}
-
-	private void showProgress() {
-		showView(R.id.progress);
-	}
-
-	private void stopProgress() {  }
-
-	private void showView(@IdRes int id) {
-		ViewAnimator animator = (ViewAnimator) findViewById(R.id.animator);
-
-		if (animator.getCurrentView().getId() == id) {
-			return;
-		}
-
-		for (int i = 0; i < animator.getChildCount(); i++) {
-			View child = animator.getChildAt(i);
-			if (child.getId() == id) {
-				animator.setDisplayedChild(i);
-				return;
-			}
-		}
-
-		throw new IllegalArgumentException("animator does not have a child with id " + id);
-	}
 
 	private void showToast(int msgId) {
 		Toast.makeText(this, msgId, Toast.LENGTH_SHORT).show();
 	}
 
 	public void onRetry(View v) {
-		addToWatchLater();
+		addToWatchLaterAndShow();
 	}
 
 	public void onOpenWithYoutube(View v) {
-		showProgress();
+		mainContent.showProgress();
 		try {
 			Intent intent = new Intent()
 					.setData(getIntent().getData())
@@ -402,16 +363,17 @@ public class AddActivity extends Activity {
 		} catch (ActivityNotFoundException e) {
 			showToast(R.string.error_youtube_player_missing);
 		}
-		stopProgress();
+		mainContent.showCurrentResultView();
 
 	};
 
 	private void setPlaylistIdAndRetry() {
+		mainContent.showProgress();
 		api.listMyChannels(new ErrorHandlingCallback<YoutubeApi.Channels>() {
 			@Override
 			public void success(YoutubeApi.Channels channels, Response response) {
 				playlistId = channels.items.get(0).contentDetails.relatedPlaylists.watchLater;
-				addToWatchLater();
+				addToWatchLaterAndShow();
 			}
 		});
 	}
@@ -419,8 +381,9 @@ public class AddActivity extends Activity {
 	private void onTokenInvalid() {
 		manager.invalidateAuthToken(account.type, token);
 		token = null;
-		addToWatchLater();
+		addToWatchLaterAndShow();
 	}
+
 
 	private class WatchlaterException extends Exception {
 		public final ErrorType type;
@@ -438,10 +401,159 @@ public class AddActivity extends Activity {
 					onTokenInvalid();
 					break;
 				default:
-					onError(errorType);
+					onResult(WatchlaterResult.error(errorType));
 			}
 		}
 	}
 
+	static class WatchlaterResult implements Parcelable {
+		private final SuccessResult success;
+		private final ErrorResult error;
 
+		private WatchlaterResult(SuccessResult success, ErrorResult error) {
+			if ((success == null) == (error == null)) {
+				throw new IllegalArgumentException("Exactly one of success, error must be null");
+			}
+			this.success = success;
+			this.error = error;
+		}
+
+		boolean isSuccess() {
+			return success != null;
+		}
+
+		boolean isError() {
+			return error != null;
+		}
+
+		interface VoidFunction<T> {
+			void apply(T t);
+		}
+
+		void apply(VoidFunction<SuccessResult> onSuccess, VoidFunction<ErrorResult> onError) {
+			if (isSuccess()) {
+				onSuccess.apply(success);
+			} else {
+				onError.apply(error);
+			}
+		}
+
+		static WatchlaterResult success() {
+			return new WatchlaterResult(new SuccessResult(), null);
+		}
+
+		static WatchlaterResult error(ErrorType errorType) {
+			return new WatchlaterResult(null, ErrorResult.fromErrorType(errorType));
+		}
+
+		@Override
+		public String toString() {
+			if (isSuccess()) {
+				return "WatchlaterResult " + success;
+			} else {
+				return "WatchlaterResult " + error;
+			}
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			dest.writeParcelable(this.success, 0);
+			dest.writeInt(this.error == null ? -1 : this.error.ordinal());
+		}
+
+		protected WatchlaterResult(Parcel in) {
+			this.success = in.readParcelable(SuccessResult.class.getClassLoader());
+			int tmpError = in.readInt();
+			this.error = tmpError == -1 ? null : ErrorResult.values()[tmpError];
+		}
+
+		public static final Creator<WatchlaterResult> CREATOR = new Creator<WatchlaterResult>() {
+			public WatchlaterResult createFromParcel(Parcel source) {
+				return new WatchlaterResult(source);
+			}
+
+			public WatchlaterResult[] newArray(int size) {
+				return new WatchlaterResult[size];
+			}
+		};
+	}
+
+
+	static class SuccessResult implements Parcelable {
+		private SuccessResult() {
+			// TODO: contain state about title, description, etc
+		}
+
+
+		@Override
+		public String toString() {
+			return "SuccessResult{}";
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+		}
+
+		protected SuccessResult(Parcel in) {
+		}
+
+		public static final Creator<SuccessResult> CREATOR = new Creator<SuccessResult>() {
+			public SuccessResult createFromParcel(Parcel source) {
+				return new SuccessResult(source);
+			}
+
+			public SuccessResult[] newArray(int size) {
+				return new SuccessResult[size];
+			}
+		};
+	}
+
+	enum ErrorResult {
+		ALREADY_IN_PLAYLIST(R.string.error_already_in_playlist, false),
+		NEED_ACCESS (R.string.error_need_account, true),
+		NOT_A_VIDEO (R.string.error_not_a_video, false),
+		OTHER(R.string.error_other, true),
+		PLAYLIST_FULL(R.string.error_playlist_full, true),
+		VIDEO_NOT_FOUND (R.string.error_video_not_found, false);
+
+		final int msgId;
+		final boolean allowRetry;
+
+		ErrorResult(int msgId, boolean allowRetry) {
+			this.allowRetry = allowRetry;
+			this.msgId = msgId;
+		}
+
+		static ErrorResult fromErrorType(ErrorType errorType) {
+			switch (errorType) {
+				case ALREADY_IN_PLAYLIST:
+					return ALREADY_IN_PLAYLIST;
+				case NEED_ACCESS:
+					return NEED_ACCESS;
+				case NOT_A_VIDEO:
+					return NOT_A_VIDEO;
+				case OTHER:
+				case NETWORK:
+					return OTHER;
+				case PLAYLIST_FULL:
+					return PLAYLIST_FULL;
+				case VIDEO_NOT_FOUND:
+					return VIDEO_NOT_FOUND;
+				default:
+					throw new IllegalArgumentException("Unexpected error type: " + errorType);
+			}
+		}
+
+
+	}
 }

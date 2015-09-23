@@ -40,5 +40,7 @@
     <string name="error_already_in_playlist">Das Video war bereits in deiner "Später ansehen"-Liste.</string>
     <string name="error_not_a_video">Dieser Link scheint kein Video zu sein. Watchlater kann ihn nicht deiner "Später ansehen"-Liste hinzufügen. Bitte versuche, ihn mit einer anderen App zu öffnen.</string>
     <string name="error_video_not_found">Konnte das Video nicht deiner "Später Ansehen"-Liste hinzufügen: Diese ist voll.</string>
+    <string name="error_youtube_player_missing">Kann die Youtube-App nicht öffnen; ist wahrscheinlich nicht installiert.</string>
+    <string name="menu_open">Öffnen mit Youtube</string>
 
 </resources>

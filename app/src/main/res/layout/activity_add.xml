@@ -37,85 +37,62 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
 
+
     <RelativeLayout
-        android:id="@+id/result"
+        android:id="@+id/success"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <com.lambdasoup.watchlater.AddressableViewAnimator
-            android:id="@+id/result_animator"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:inAnimation="@android:anim/fade_in"
-            android:outAnimation="@android:anim/fade_out">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/success_added_video"/>
 
-            <RelativeLayout
-                android:id="@+id/success"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    </RelativeLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/success_added_video"/>
+    <RelativeLayout
+        android:id="@+id/error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/error"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/error_msg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    tools:text="Could not query moon crater list"/>
-
-                <Button
-                    android:id="@+id/button_retry"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
-                    android:onClick="onRetry"
-                    android:text="@string/button_retry"/>
-
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/account_chooser"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ListView
-                    android:id="@+id/account_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
-
-                <TextView
-                    android:id="@+id/account_chooser_empty"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:text="@string/no_account"/>
-
-            </LinearLayout>
-
-        </com.lambdasoup.watchlater.AddressableViewAnimator>
+        <TextView
+            android:id="@+id/error_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            tools:text="Could not query moon crater list"/>
 
         <Button
-            android:id="@+id/button_open"
+            android:id="@+id/button_retry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:onClick="onOpenWithYoutube"
-            android:text="@string/button_open"/>
+            android:onClick="onRetry"
+            android:text="@string/button_retry"/>
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/account_chooser"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/account_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/account_chooser_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/no_account"/>
+
+    </LinearLayout>
+
 </com.lambdasoup.watchlater.WatchlaterDialogContent>

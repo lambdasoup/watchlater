@@ -145,6 +145,9 @@ public class AddActivity extends Activity {
 			case R.id.menu_about:
 				showAbout();
 				return true;
+			case R.id.menu_open_with_youtube:
+				openWithYoutube();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
@@ -156,8 +159,8 @@ public class AddActivity extends Activity {
 
 	private void addToWatchLaterAndShow() {
 		if (result != null) {
-			// we're done!
-			result.apply(success -> showSuccess(success), error -> showError(error));
+			// we're done, there will be no retry of this method
+			result.apply(this::showSuccess, this::showError);
 			return;
 		}
 		// still work to do and things to try
@@ -177,9 +180,7 @@ public class AddActivity extends Activity {
 			return;
 		}
 
-		if (result == null) {
-			insertPlaylistItem();
-		}
+		insertPlaylistItemAndRetry();
 	}
 
 
@@ -233,7 +234,6 @@ public class AddActivity extends Activity {
 	}
 
 	private void setGoogleAccountAndRetry() {
-		mainContent.showProgress();
 		Account[] accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE);
 
 		if (accounts.length != 1) {
@@ -278,7 +278,7 @@ public class AddActivity extends Activity {
 	}
 
 
-	private void insertPlaylistItem() {
+	private void insertPlaylistItemAndRetry() {
 		mainContent.showProgress();
 		try {
 			YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId(getVideoId());
@@ -350,11 +350,11 @@ public class AddActivity extends Activity {
 	}
 
 	public void onRetry(View v) {
+		result = null;
 		addToWatchLaterAndShow();
 	}
 
-	public void onOpenWithYoutube(View v) {
-		mainContent.showProgress();
+	public void openWithYoutube() {
 		try {
 			Intent intent = new Intent()
 					.setData(getIntent().getData())
@@ -363,7 +363,6 @@ public class AddActivity extends Activity {
 		} catch (ActivityNotFoundException e) {
 			showToast(R.string.error_youtube_player_missing);
 		}
-		mainContent.showCurrentResultView();
 
 	};
 

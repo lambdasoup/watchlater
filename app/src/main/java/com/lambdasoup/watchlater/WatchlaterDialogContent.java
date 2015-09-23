@@ -20,7 +20,6 @@
 package com.lambdasoup.watchlater;
 
 import android.content.Context;
-import android.support.annotation.IdRes;
 import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.TextView;
@@ -39,12 +38,10 @@ public class WatchlaterDialogContent extends AddressableViewAnimator {
         super(context, attrs);
     }
 
-    void showAccountChooser() {	showResultView(R.id.account_chooser);	}
+    void showAccountChooser() {	switchToView(R.id.account_chooser); }
 
 
-    void showProgress() {
-        showMain(R.id.progress);
-    }
+    void showProgress() { switchToView(R.id.progress); }
 
 
     void showError(ErrorResult errorResult) {
@@ -54,24 +51,9 @@ public class WatchlaterDialogContent extends AddressableViewAnimator {
         Button retryButton = (Button) findViewById(R.id.button_retry);
         retryButton.setVisibility(errorResult.allowRetry ? VISIBLE : GONE);
 
-        showResultView(R.id.error);
+        switchToView(R.id.error);
     }
 
-    void showSuccess() {
-        showResultView(R.id.success);
-    }
+    void showSuccess() { switchToView(R.id.success); }
 
-    void showCurrentResultView() {
-        showMain(R.id.result);
-    }
-
-    private void showResultView(@IdRes int id) {
-        AddressableViewAnimator resultAnimator = (AddressableViewAnimator) findViewById(R.id.result_animator);
-        resultAnimator.switchToView(id);
-        showCurrentResultView();
-    }
-
-    private void showMain(@IdRes int id) {
-        switchToView(id);
-    }
 }

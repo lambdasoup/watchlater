@@ -150,6 +150,9 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 	}
 
 	public void test_add_success() throws Exception {
+		String testDescription = "Description for the Test video";
+		String testTitle = "Test Title";
+
 		// set channel list response
 		{
 			JSONObject json = new JSONObject();
@@ -164,14 +167,18 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 			String watchLaterId = "45h7394875w3495";
 			relatedPlaylists.put("watchLater", watchLaterId);
 
-            MockResponse response = new MockResponse();
-            response.setBody(json.toString(8));
-            mockWebServer.enqueue(response);
+			MockResponse response = new MockResponse();
+			response.setBody(json.toString(8));
+			mockWebServer.enqueue(response);
 		}
 
 		// set add video to list response
 		{
 			JSONObject json = new JSONObject();
+
+			JSONObject snippet = new JSONObject();
+			snippet.put("title", testTitle);
+			snippet.put("description", testDescription);
 
             MockResponse response = new MockResponse();
             response.setBody(json.toString(8));
@@ -188,6 +195,8 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 		getActivity();
 
 		onView(withText(R.string.success_added_video)).check(matches(isDisplayed()));
+		onView(withText(testTitle)).check(matches(isDisplayed()));
+		onView(withText(testDescription)).check(matches(isDisplayed()));
 	}
 
 	public void test_add_already_in_playlist() throws Exception {

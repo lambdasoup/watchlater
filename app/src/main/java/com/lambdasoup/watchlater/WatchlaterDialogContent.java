@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.lambdasoup.watchlater.AddActivity.ErrorResult;
+import com.lambdasoup.watchlater.AddActivity.SuccessResult;
 
 /**
  * Created by stroke on 17.09.15.
@@ -54,6 +55,14 @@ public class WatchlaterDialogContent extends AddressableViewAnimator {
         switchToView(R.id.error);
     }
 
-    void showSuccess() { switchToView(R.id.success); }
+    void showSuccess(SuccessResult successResult) {
+        TextView title = (TextView) findViewById(R.id.success_title);
+        title.setText(successResult.title);
+
+        TextView description = (TextView) findViewById(R.id.success_description);
+        description.setText(successResult.description);
+
+        switchToView(R.id.success);
+    }
 
 }

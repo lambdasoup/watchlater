@@ -22,7 +22,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="256dp"
+    android:layout_height="256sp"
     android:inAnimation="@android:anim/fade_in"
     android:outAnimation="@android:anim/fade_out"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -38,18 +38,38 @@
         android:layout_gravity="center"/>
 
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/success"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:text="@string/success_added_video"/>
 
-    </RelativeLayout>
+        <TextView
+            android:id="@+id/success_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title: The movie with the giant super long title to end all titles and fill so much space you won't believe it"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/vertical_text_sep"/>
+
+        <TextView
+            android:id="@+id/success_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="This masterpiece of online video entertainment uses cutting edge paint animations and a splashy kitchenware soundscape to evoke deep feelings of transient text production and content filling. It will keep you entertained for as long as you can stand it, and never let you go. Thus, it needs to go on for just a little bit more to fill some  more space and extend in it, too."
+            android:maxLines="8"
+            android:ellipsize="end"
+            android:layout_marginTop="@dimen/vertical_text_sep"/>
+
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/error"

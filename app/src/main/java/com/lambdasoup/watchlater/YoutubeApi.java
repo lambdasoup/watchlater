@@ -62,10 +62,14 @@ public interface YoutubeApi {
 	class Snippet {
 		public final String playlistId;
 		public final ResourceId resourceId;
+		public final String title;
+		public final String description;
 
-		public Snippet(String playlistId, ResourceId resourceId) {
+		public Snippet(String playlistId, ResourceId resourceId, String title, String description) {
 			this.playlistId = playlistId;
 			this.resourceId = resourceId;
+			this.title = title;
+			this.description = description;
 		}
 	}
 

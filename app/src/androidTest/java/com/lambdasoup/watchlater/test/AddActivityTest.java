@@ -179,6 +179,7 @@ public class AddActivityTest extends ActivityInstrumentationTestCase2<AddActivit
 			JSONObject snippet = new JSONObject();
 			snippet.put("title", testTitle);
 			snippet.put("description", testDescription);
+			json.put("snippet", snippet);
 
             MockResponse response = new MockResponse();
             response.setBody(json.toString(8));

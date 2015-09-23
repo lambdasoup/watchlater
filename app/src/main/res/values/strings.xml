@@ -40,5 +40,7 @@
 
     <string name="choose_account">Choose account</string>
     <string name="no_account">No Google accounts found on this device</string>
+    <string name="menu_open">Open with Youtube</string>
+    <string name="error_youtube_player_missing">Cannot launch the Youtube app: it  is probably not installed on your device.</string>
 
 </resources>

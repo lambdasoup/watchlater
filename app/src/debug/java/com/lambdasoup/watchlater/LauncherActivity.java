@@ -20,20 +20,17 @@
 package com.lambdasoup.watchlater;
 
 import android.app.Activity;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import java.util.List;
 
 import static android.net.Uri.parse;
 
@@ -203,7 +200,7 @@ public class LauncherActivity extends Activity {
 			public final int headerId;
 			public final String[] data;
 
-			private Group(int headerId, String[] data) {
+			private Group(@StringRes int headerId, String[] data) {
 				this.headerId = headerId;
 				this.data = data;
 			}

@@ -282,13 +282,13 @@ public class AddActivity extends Activity {
 		mainContent.showProgress();
 		try {
 			YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId(getVideoId());
-			YoutubeApi.Snippet snippet = new YoutubeApi.Snippet(playlistId, resourceId);
+			YoutubeApi.Snippet snippet = new YoutubeApi.Snippet(playlistId, resourceId, null, null);
 			YoutubeApi.PlaylistItem item = new YoutubeApi.PlaylistItem(snippet);
 
 			api.insertPlaylistItem(item, new ErrorHandlingCallback<YoutubeApi.PlaylistItem>() {
 				@Override
 				public void success(YoutubeApi.PlaylistItem playlistItem, Response response) {
-					onResult(WatchlaterResult.success());
+					onResult(WatchlaterResult.success(playlistItem.snippet.title, playlistItem.snippet.description));
 				}
 			});
 		} catch (WatchlaterException error) {
@@ -340,7 +340,7 @@ public class AddActivity extends Activity {
 			showToast(R.string.success_added_video);
 			return;
 		}
-		mainContent.showSuccess();
+		mainContent.showSuccess(successResult);
 	}
 
 
@@ -437,8 +437,8 @@ public class AddActivity extends Activity {
 			}
 		}
 
-		static WatchlaterResult success() {
-			return new WatchlaterResult(new SuccessResult(), null);
+		static WatchlaterResult success(String title, String description) {
+			return new WatchlaterResult(new SuccessResult(title, description), null);
 		}
 
 		static WatchlaterResult error(ErrorType errorType) {
@@ -484,15 +484,23 @@ public class AddActivity extends Activity {
 
 
 	static class SuccessResult implements Parcelable {
-		private SuccessResult() {
-			// TODO: contain state about title, description, etc
+		final String title;
+		final String description;
+
+		SuccessResult(String title, String description) {
+			this.title = title;
+			this.description = description;
 		}
 
 
 		@Override
 		public String toString() {
-			return "SuccessResult{}";
+			return "SuccessResult{" +
+					"title='" + title + '\'' +
+					", description='" + description + '\'' +
+					'}';
 		}
+
 
 		@Override
 		public int describeContents() {
@@ -501,9 +509,13 @@ public class AddActivity extends Activity {
 
 		@Override
 		public void writeToParcel(Parcel dest, int flags) {
+			dest.writeString(this.title);
+			dest.writeString(this.description);
 		}
 
 		protected SuccessResult(Parcel in) {
+			this.title = in.readString();
+			this.description = in.readString();
 		}
 
 		public static final Creator<SuccessResult> CREATOR = new Creator<SuccessResult>() {
@@ -519,13 +531,13 @@ public class AddActivity extends Activity {
 
 	enum ErrorResult {
 		ALREADY_IN_PLAYLIST(R.string.error_already_in_playlist, false),
-		NEED_ACCESS (R.string.error_need_account, true),
-		NOT_A_VIDEO (R.string.error_not_a_video, false),
+		NEED_ACCESS(R.string.error_need_account, true),
+		NOT_A_VIDEO(R.string.error_not_a_video, false),
 		OTHER(R.string.error_other, true),
 		PLAYLIST_FULL(R.string.error_playlist_full, true),
-		VIDEO_NOT_FOUND (R.string.error_video_not_found, false);
+		VIDEO_NOT_FOUND(R.string.error_video_not_found, false);
 
-		final int msgId;
+		final int     msgId;
 		final boolean allowRetry;
 
 		ErrorResult(int msgId, boolean allowRetry) {

@@ -51,7 +51,6 @@ import com.lambdasoup.watchlater.YoutubeApi.ErrorType;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
-import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.android.MainThreadExecutor;
 import retrofit.client.OkClient;
@@ -307,12 +306,7 @@ public class AddActivity extends Activity {
 		RestAdapter.Builder builder = new RestAdapter.Builder()
 				.setClient(new OkClient())
 				.setConverter(new GsonConverter(gson))
-				.setRequestInterceptor(new RequestInterceptor() {
-					@Override
-					public void intercept(RequestFacade request) {
-						request.addHeader("Authorization", "Bearer " + token);
-					}
-				})
+				.setRequestInterceptor(request -> request.addHeader("Authorization", "Bearer " + token))
 				.setEndpoint(YOUTUBE_ENDPOINT);
 
 		if (BuildConfig.DEBUG) {

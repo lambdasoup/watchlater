@@ -86,6 +86,7 @@ public class AddActivityTest  {
 
 	private        RetrofitHttpExecutorIdlingResource idlingExecutor;
 	private static MockWebServer                      mockWebServer;
+	private static RestfulDispatcher restfulDispatcher;
 
 	@Rule
 	public ActivityTestRule<AddActivity> activityTestRule = new ActivityTestRule<AddActivity>(AddActivity.class, false, false) {
@@ -98,7 +99,9 @@ public class AddActivityTest  {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		restfulDispatcher = new RestfulDispatcher();
 		mockWebServer = new MockWebServer();
+		mockWebServer.setDispatcher(restfulDispatcher);
 		mockWebServer.start(8080);
 	}
 
@@ -133,6 +136,7 @@ public class AddActivityTest  {
 	@After
 	public void tearDown() throws Exception {
 		unregisterIdlingResources(idlingExecutor);
+		restfulDispatcher.clear();
 	}
 
 	@AfterClass
@@ -184,7 +188,7 @@ public class AddActivityTest  {
 
 			MockResponse response = new MockResponse();
 			response.setBody(json.toString(8));
-			mockWebServer.enqueue(response);
+			restfulDispatcher.registerResponse("/channels?part=contentDetails&maxResults=50&mine=true", response);
 		}
 
 		// set add video to list response
@@ -198,7 +202,7 @@ public class AddActivityTest  {
 
             MockResponse response = new MockResponse();
             response.setBody(json.toString(8));
-            mockWebServer.enqueue(response);
+			restfulDispatcher.registerResponse("/playlistItems?part=snippet", response);
 		}
 
 		// set account
@@ -231,7 +235,7 @@ public class AddActivityTest  {
 
             MockResponse response = new MockResponse();
             response.setBody(json.toString(8));
-            mockWebServer.enqueue(response);
+			restfulDispatcher.registerResponse("/channels?part=contentDetails&maxResults=50&mine=true", response);
 		}
 
 		// set add video to list response
@@ -252,7 +256,7 @@ public class AddActivityTest  {
             MockResponse response = new MockResponse();
             response.setBody(json.toString(8));
             response.setStatus("HTTP/1.1 409 Conflict");
-            mockWebServer.enqueue(response);
+			restfulDispatcher.registerResponse("/playlistItems?part=snippet", response);
 		}
 
 		// set account

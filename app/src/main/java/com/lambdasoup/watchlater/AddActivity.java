@@ -72,24 +72,25 @@ public class AddActivity extends Activity {
 
 	// fields are not final to be somewhat accessible for testing to inject other values
 	@SuppressWarnings("FieldCanBeLocal")
-	private static String YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3";
-	private static String ACCOUNT_TYPE_GOOGLE = "com.google";
+	private static String   YOUTUBE_ENDPOINT                = "https://www.googleapis.com/youtube/v3";
+	private static String   ACCOUNT_TYPE_GOOGLE             = "com.google";
 	private static Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR = null;
 
 	private AccountManager manager;
-	private YoutubeApi api;
+	private YoutubeApi     api;
 
 	private WatchlaterDialogContent mainContent;
 
-	private static final String KEY_ACCOUNT = "com.lambdasoup.watchlater_account";
-	private static final String KEY_TOKEN = "com.lambdasoup.watchlater_token";
+	private static final String KEY_ACCOUNT     = "com.lambdasoup.watchlater_account";
+	private static final String KEY_TOKEN       = "com.lambdasoup.watchlater_token";
 	private static final String KEY_PLAYLIST_ID = "com.lambdasoup.watchlater_playlistId";
-	private static final String KEY_RESULT = "com.lambdasoup.watchlater_result";
+	private static final String KEY_RESULT      = "com.lambdasoup.watchlater_result";
 
-	private Account account;
-	private String token;
-	private String playlistId;
+	private Account          account;
+	private String           token;
+	private String           playlistId;
 	private WatchlaterResult result;
+	private boolean          tokenRetried;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -375,8 +376,12 @@ public class AddActivity extends Activity {
 	}
 
 	private void onTokenInvalid() {
+		if (tokenRetried) {
+			onResult(WatchlaterResult.error(ErrorType.NEED_ACCESS));
+		}
 		manager.invalidateAuthToken(account.type, token);
 		token = null;
+		tokenRetried = true;
 		addToWatchLaterAndShow();
 	}
 

@@ -208,9 +208,8 @@ public class AddActivityTest  {
 		// set account
 		addAccount(ACCOUNT_1);
 
-		// set activity arg
-		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/v/8f7h837f4"));
-		activityTestRule.launchActivity(intent);
+		// launch activity
+		activityTestRule.launchActivity(null);
 
 		onView(withText(R.string.success_added_video)).check(matches(isDisplayed()));
 		onView(withText(testTitle)).check(matches(isDisplayed()));
@@ -262,11 +261,40 @@ public class AddActivityTest  {
 		// set account
 		addAccount(ACCOUNT_1);
 
-		// set activity arg
-		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/v/8f7h837f4"));
-		activityTestRule.launchActivity(intent);
+		// launch activity
+		activityTestRule.launchActivity(null);
 
 		onView(withText(R.string.error_already_in_playlist)).check(matches(isDisplayed()));
+	}
+
+	@Test
+	public void authFail() throws Exception {
+		// set channel list response
+		{
+			JSONObject error0 = new JSONObject();
+			error0.put("domain", "youtube.playlistItem");
+			error0.put("reason", "dailyLimitExceededUnreg");
+			JSONArray errors = new JSONArray();
+			errors.put(error0);
+			JSONObject error = new JSONObject();
+			error.put("errors", errors);
+			error.put("code", 403);
+			JSONObject json = new JSONObject();
+			json.put("error", error);
+
+			MockResponse response = new MockResponse();
+			response.setBody(json.toString(8));
+			response.setStatus("HTTP/1.1 403 Forbidden");
+			restfulDispatcher.registerResponse("/channels?part=contentDetails&maxResults=50&mine=true", response);
+		}
+		// set account
+		addAccount(ACCOUNT_1);
+
+		// launch activity
+		activityTestRule.launchActivity(null);
+
+		onView(withText(R.string.error_need_account)).check(matches(isDisplayed()));
+
 	}
 
 }

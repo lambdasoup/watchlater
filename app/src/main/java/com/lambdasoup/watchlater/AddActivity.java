@@ -251,7 +251,7 @@ public class AddActivity extends Activity {
 	private void onMultipleAccounts() {
 		final ListView listView = (ListView) findViewById(R.id.account_list);
 		View header = getLayoutInflater().inflate(R.layout.list_header_account_chooser, listView, false);
-		listView.addHeaderView(header);
+		listView.addHeaderView(header, null, false); // header should not be selectable
 		listView.setEmptyView(findViewById(R.id.account_chooser_empty));
 
 		final ArrayAdapter<Account> adapter = new ArrayAdapter<Account>(this, R.layout.item_account, manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE)) {

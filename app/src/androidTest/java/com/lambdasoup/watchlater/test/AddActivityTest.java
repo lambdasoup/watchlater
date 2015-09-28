@@ -44,6 +44,8 @@ import android.accounts.AccountManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.ViewInteraction;
+import android.support.test.espresso.action.ViewActions;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -164,7 +166,11 @@ public class AddActivityTest  {
 
 		activityTestRule.launchActivity(null);
 
-		onView(withText(R.string.choose_account)).check(matches(isDisplayed()));
+		ViewInteraction accountChooserHeader = onView(withText(R.string.choose_account));
+		accountChooserHeader.check(matches(isDisplayed()));
+		accountChooserHeader.perform(ViewActions.click());
+		accountChooserHeader.check(matches(isDisplayed()));
+
 	}
 
 	@Test

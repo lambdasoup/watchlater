@@ -36,22 +36,22 @@ import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
  * Created by stroke on 23.09.15.
  */
 class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements IdlingResource {
+	private static final String TAG = "RetrofitIdlingResource";
+	public static final String IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
 
-	public static final String        IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
 	private final       AtomicInteger currentTaskCount = new AtomicInteger(0);
 	private volatile ResourceCallback idleTransitionCallback;
 
+
 	public RetrofitHttpExecutorIdlingResource() {
-		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
+		// imitate the retrofit 1.9.1 default http executor properties
+		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
 				new ThreadFactory() {
 					@Override
 					public Thread newThread(final Runnable r) {
-						return new Thread(new Runnable() {
-							@Override
-							public void run() {
-								android.os.Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
-								r.run();
-							}
+						return new Thread(() -> {
+							android.os.Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+							r.run();
 						}, IDLE_THREAD_NAME);
 					}
 				}
@@ -84,6 +84,7 @@ class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements I
 			idleTransitionCallback.onTransitionToIdle();
 		}
 	}
+
 
 	@Override
 	public void execute(Runnable command) {

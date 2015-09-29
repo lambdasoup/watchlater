@@ -28,7 +28,6 @@ import com.squareup.okhttp.mockwebserver.Dispatcher;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
-import java.net.HttpURLConnection;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RestfulDispatcher extends Dispatcher {
 	private static final String TAG = "RestfulDispatcher";
+	public static final String STATUS_NOT_FOUND = "HTTP/1.1 404 Not Found";
 	protected final ConcurrentHashMap<String, MockResponse> responses = new ConcurrentHashMap<>();
 
 	/**
@@ -57,15 +57,19 @@ public class RestfulDispatcher extends Dispatcher {
 		final String requestLine = request.getRequestLine();
 		if (requestLine != null && requestLine.equals("GET /favicon.ico HTTP/1.1")) {
 			System.out.println("served " + requestLine);
-			return new MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND);
+			return new MockResponse().setStatus(STATUS_NOT_FOUND);
 		}
 
 		MockResponse response = responses.get(request.getPath());
 		if (response == null) {
 			Log.d(TAG, "No canned response available for path " + request.getPath());
-			response = new MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND);
+			response = getFailureResponse();
 		}
 		return response;
+	}
+
+	protected MockResponse getFailureResponse() {
+		return new MockResponse().setStatus(STATUS_NOT_FOUND);
 	}
 
 	/**

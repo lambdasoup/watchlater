@@ -22,6 +22,8 @@
 
 package com.lambdasoup.watchlater;
 
+import android.util.Log;
+
 import java.util.List;
 
 import retrofit.Callback;
@@ -37,6 +39,7 @@ import retrofit.http.POST;
  * Created by mh on 22.02.15.
  */
 public interface YoutubeApi {
+	 String TAG = "YoutubeApi";
 
 	@GET("/channels?part=contentDetails&maxResults=50&mine=true")
 	void listMyChannels(Callback<Channels> cb);
@@ -169,6 +172,10 @@ public interface YoutubeApi {
 			}
 
 			YouTubeError youtubeError = (YouTubeError) error.getBodyAs(YouTubeError.class);
+			if (youtubeError == null) {
+				Log.d(TAG, "Expected a youtube api error response, got instead: " + error);
+				return ErrorType.OTHER;
+			}
 
 			String errorDetail = "";
 			if (youtubeError.error.errors != null

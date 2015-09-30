@@ -36,10 +36,10 @@
 
     <string name="error_need_account">Fehler beim Hinzufügen: Benötigt Zugriff auf YouTube-Konto.</string>
     <string name="error_other">Fehler beim Hinzufügen: Überprüfe Deine Internetverbindung!</string>
-    <string name="error_playlist_full">Deine "Später ansehen"-Liste ist bereits voll oder enthält dieses Video bereits</string>
+    <string name="error_playlist_full">Deine "Später ansehen"-Liste ist bereits voll oder enthält dieses Video bereits.</string>
 
     <string name="choose_account">Konto auswählen</string>
-    <string name="no_account">Keine Google-Konten auf diesem Gerät gefunden</string>
+    <string name="no_account">Keine Google-Konten auf diesem Gerät gefunden.</string>
     <string name="error_already_in_playlist">Das Video war bereits in deiner "Später ansehen"-Liste.</string>
     <string name="error_not_a_video">Dieser Link scheint kein Video zu sein. Watchlater kann ihn nicht deiner "Später ansehen"-Liste hinzufügen. Bitte versuche, ihn mit einer anderen App zu öffnen.</string>
     <string name="error_video_not_found">Konnte das Video nicht deiner "Später Ansehen"-Liste hinzufügen: Diese ist voll.</string>

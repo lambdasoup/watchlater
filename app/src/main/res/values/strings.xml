@@ -34,15 +34,15 @@
 
     <string name="success_added_video">Successfully added video</string>
 
-    <string name="error_need_account">Error adding video: Needs access to your YouTube account</string>
-    <string name="error_other">Error adding video: Check your Internet connection and try again</string>
-    <string name="error_playlist_full">Your Watch Later playlist is full</string>
+    <string name="error_need_account">Error adding video: Needs access to your YouTube account.</string>
+    <string name="error_other">Error adding video: Check your Internet connection and try again.</string>
+    <string name="error_playlist_full">Your Watch Later playlist is full.</string>
     <string name="error_not_a_video">This does not seem to be a video. Watchlater cannot add it to your Watch Later playlist. Please try opening it again using another app.</string>
-    <string name="error_already_in_playlist">This video was already in your Watch Later playlist</string>
-    <string name="error_video_not_found">Could not add video to your Watch Later playlist: The video does not exist anymore</string>
+    <string name="error_already_in_playlist">This video was already in your Watch Later playlist.</string>
+    <string name="error_video_not_found">Could not add video to your Watch Later playlist: The video does not exist anymore.</string>
 
     <string name="choose_account">Choose account</string>
-    <string name="no_account">No Google accounts found on this device</string>
+    <string name="no_account">No Google accounts found on this device.</string>
     <string name="menu_open">Open with Youtube</string>
     <string name="error_youtube_player_missing">Cannot launch the Youtube app: it  is probably not installed on your device.</string>
 

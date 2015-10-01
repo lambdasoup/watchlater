@@ -48,5 +48,6 @@
     <string name="asset_prefix">de</string>
     <string name="menu_help">Hilfe</string>
     <string name="title_activity_help">Hilfe</string>
+    <string name="error_permission_required_accounts">Die Später ansehen-App benötigt deine Erlaubnis, um auf die auf deinem Gerät konfigurierten Konten zuzugreifen, damit sie auf deinen Youtube-Account zugreifen kann, ohne dein Passwort zu kennen.</string>
 
 </resources>

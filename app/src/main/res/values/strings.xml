@@ -48,5 +48,6 @@
     <string name="error_youtube_player_missing">Cannot launch the Youtube app: it  is probably not installed on your device.</string>
     <string name="menu_help">Help</string>
     <string name="title_activity_help">Help</string>
+    <string name="error_permission_required_accounts">Watchlater needs your permission to access the accounts configured on your device, so that it can access your Youtube account without knowing your password.</string>
 
 </resources>

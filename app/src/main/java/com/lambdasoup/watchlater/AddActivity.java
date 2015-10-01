@@ -26,10 +26,13 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -70,7 +73,9 @@ import static android.net.Uri.parse;
 public class AddActivity extends Activity {
 	private static final String TAG = AddActivity.class.getSimpleName();
 
-	private static final String SCOPE_YOUTUBE = "oauth2:https://www.googleapis.com/auth/youtube";
+	private static final String SCOPE_YOUTUBE                    = "oauth2:https://www.googleapis.com/auth/youtube";
+	private static final String PERMISSION_GET_ACCOUNTS          = "android.permission.GET_ACCOUNTS";
+	private static final int    PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
 
 
 	// fields are not final to be somewhat accessible for testing to inject other values
@@ -200,6 +205,40 @@ public class AddActivity extends Activity {
 		insertPlaylistItemAndRetry();
 	}
 
+	private boolean supportsRuntimePermissions() {
+		return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
+	}
+
+
+	@TargetApi(23)
+	private boolean hasAccountsPermission() {
+		return checkSelfPermission(PERMISSION_GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED;
+	}
+
+	@TargetApi(23)
+	private void tryAcquireAccountsPermission() {
+		requestPermissions(new String[]{PERMISSION_GET_ACCOUNTS}, PERMISSIONS_REQUEST_GET_ACCOUNTS);
+		mainContent.showProgress();
+	}
+
+	@TargetApi(23)
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		switch (requestCode) {
+			case PERMISSIONS_REQUEST_GET_ACCOUNTS: {
+				if (grantResults.length > 0
+						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					addToWatchLaterAndShow();
+				} else {
+					onResult(WatchlaterResult.error(ErrorType.PERMISSION_REQUIRED_ACCOUNTS));
+				}
+				break;
+			}
+			default: {
+				throw new RuntimeException("Unexpected permission request code: " + requestCode);
+			}
+		}
+	}
 
 	private String getVideoId() throws WatchlaterException {
 		return getVideoId(getIntent().getData());
@@ -251,6 +290,12 @@ public class AddActivity extends Activity {
 	}
 
 	private void setGoogleAccountAndRetry() {
+		if (supportsRuntimePermissions()) {
+			if (!hasAccountsPermission()) {
+				tryAcquireAccountsPermission();
+				return;
+			}
+		}
 		Account[] accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE);
 
 		if (accounts.length != 1) {
@@ -261,6 +306,8 @@ public class AddActivity extends Activity {
 		this.account = accounts[0];
 		addToWatchLaterAndShow();
 	}
+
+
 
 	private void onMultipleAccounts() {
 		final ListView listView = (ListView) findViewById(R.id.account_list);
@@ -584,6 +631,7 @@ public class AddActivity extends Activity {
 		NEED_ACCESS(R.string.error_need_account, true),
 		NOT_A_VIDEO(R.string.error_not_a_video, false),
 		OTHER(R.string.error_other, true),
+		PERMISSION_REQUIRED_ACCOUNTS(R.string.error_permission_required_accounts, true),
 		PLAYLIST_FULL(R.string.error_playlist_full, true),
 		VIDEO_NOT_FOUND(R.string.error_video_not_found, false);
 
@@ -606,6 +654,8 @@ public class AddActivity extends Activity {
 				case OTHER:
 				case NETWORK:
 					return OTHER;
+				case PERMISSION_REQUIRED_ACCOUNTS:
+					return PERMISSION_REQUIRED_ACCOUNTS;
 				case PLAYLIST_FULL:
 					return PLAYLIST_FULL;
 				case VIDEO_NOT_FOUND:

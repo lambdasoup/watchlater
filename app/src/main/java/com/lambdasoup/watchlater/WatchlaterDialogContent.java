@@ -24,10 +24,8 @@ package com.lambdasoup.watchlater;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Button;
 import android.widget.TextView;
 
-import com.lambdasoup.watchlater.AddActivity.ErrorResult;
 import com.lambdasoup.watchlater.AddActivity.SuccessResult;
 
 /**
@@ -48,23 +46,11 @@ public class WatchlaterDialogContent extends AddressableViewAnimator {
     void showProgress() { switchToView(R.id.progress); }
 
 
-    void showError(ErrorResult errorResult) {
-        TextView errorMsg = (TextView) findViewById(R.id.error_msg);
-        errorMsg.setText(errorResult.msgId);
-
-        Button retryButton = (Button) findViewById(R.id.button_retry);
-        retryButton.setVisibility(errorResult.allowRetry ? VISIBLE : GONE);
-
-        switchToView(R.id.error);
+    void showError() {
+       switchToView(R.id.error);
     }
 
-    void showSuccess(SuccessResult successResult) {
-        TextView title = (TextView) findViewById(R.id.success_title);
-        title.setText(successResult.title);
-
-        TextView description = (TextView) findViewById(R.id.success_description);
-        description.setText(successResult.description);
-
+    void showSuccess() {
         switchToView(R.id.success);
     }
 

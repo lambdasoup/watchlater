@@ -27,14 +27,14 @@ import android.os.Bundle;
 import android.webkit.WebView;
 
 
-public class AboutActivity extends Activity {
+public class HelpActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		WebView webView = new WebView(this);
-		webView.loadUrl("file:///android_asset/html/about.html");
+		webView.loadUrl("file:///android_asset/html/" + getString(R.string.asset_prefix) + "/youtube_channel_help.html");
 		setContentView(webView);
 	}
 

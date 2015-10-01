@@ -34,6 +34,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,6 +43,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +54,7 @@ import com.lambdasoup.watchlater.YoutubeApi.ErrorTranslatingCallback;
 import com.lambdasoup.watchlater.YoutubeApi.ErrorType;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 
 import retrofit.RestAdapter;
@@ -81,14 +84,16 @@ public class AddActivity extends Activity {
 
 	private WatchlaterDialogContent mainContent;
 
-	private static final String KEY_ACCOUNT     = "com.lambdasoup.watchlater_account";
-	private static final String KEY_TOKEN       = "com.lambdasoup.watchlater_token";
-	private static final String KEY_PLAYLIST_ID = "com.lambdasoup.watchlater_playlistId";
-	private static final String KEY_RESULT      = "com.lambdasoup.watchlater_result";
+	private static final String KEY_ACCOUNT       = "com.lambdasoup.watchlater_account";
+	private static final String KEY_TOKEN         = "com.lambdasoup.watchlater_token";
+	private static final String KEY_PLAYLIST_ID   = "com.lambdasoup.watchlater_playlistId";
+	private static final String KEY_CHANNEL_TITLE = "com.lambdasoup.watchlater_channelTitle";
+	private static final String KEY_RESULT        = "com.lambdasoup.watchlater_result";
 
 	private Account          account;
 	private String           token;
 	private String           playlistId;
+	private String           channelTitle;
 	private WatchlaterResult result;
 	private boolean          tokenRetried;
 
@@ -109,6 +114,7 @@ public class AddActivity extends Activity {
 			token = savedInstanceState.getString(KEY_TOKEN);
 			playlistId = savedInstanceState.getString(KEY_PLAYLIST_ID);
 			account = savedInstanceState.getParcelable(KEY_ACCOUNT);
+			channelTitle = savedInstanceState.getString(KEY_CHANNEL_TITLE);
 			result = savedInstanceState.getParcelable(KEY_RESULT);
 		}
 		addToWatchLaterAndShow();
@@ -120,6 +126,7 @@ public class AddActivity extends Activity {
 		outState.putString(KEY_TOKEN, token);
 		outState.putString(KEY_PLAYLIST_ID, playlistId);
 		outState.putParcelable(KEY_ACCOUNT, account);
+		outState.putString(KEY_CHANNEL_TITLE, channelTitle);
 		outState.putParcelable(KEY_RESULT, result);
 	}
 
@@ -148,6 +155,9 @@ public class AddActivity extends Activity {
 			case R.id.menu_about:
 				showAbout();
 				return true;
+			case R.id.menu_help:
+				showHelp();
+				return true;
 			case R.id.menu_open_with_youtube:
 				openWithYoutube();
 				return true;
@@ -158,6 +168,10 @@ public class AddActivity extends Activity {
 
 	private void showAbout() {
 		startActivity(new Intent(this, AboutActivity.class));
+	}
+
+	private void showHelp() {
+		startActivity(new Intent(this, HelpActivity.class));
 	}
 
 	private void addToWatchLaterAndShow() {
@@ -223,17 +237,17 @@ public class AddActivity extends Activity {
 	private void setAuthTokenAndRetry() {
 		mainContent.showProgress();
 		manager.getAuthToken(account, SCOPE_YOUTUBE, null, this, future -> {
-            try {
-                token = future.getResult().getString(AccountManager.KEY_AUTHTOKEN);
+			try {
+				token = future.getResult().getString(AccountManager.KEY_AUTHTOKEN);
 				addToWatchLaterAndShow();
-            } catch (OperationCanceledException e) {
-                onResult(WatchlaterResult.error(ErrorType.NEED_ACCESS));
-            } catch (IOException e) {
+			} catch (OperationCanceledException e) {
+				onResult(WatchlaterResult.error(ErrorType.NEED_ACCESS));
+			} catch (IOException e) {
 				onResult(WatchlaterResult.error(ErrorType.NETWORK));
-            } catch (AuthenticatorException e) {
+			} catch (AuthenticatorException e) {
 				onResult(WatchlaterResult.error(ErrorType.OTHER));
-            }
-        }, null);
+			}
+		}, null);
 	}
 
 	private void setGoogleAccountAndRetry() {
@@ -269,8 +283,8 @@ public class AddActivity extends Activity {
 		};
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener((parent, view, position, id) ->
-				onAccountChosen(adapter.getItem(position - listView.getHeaderViewsCount()))
-				);
+						onAccountChosen(adapter.getItem(position - listView.getHeaderViewsCount()))
+		);
 
 		mainContent.showAccountChooser();
 	}
@@ -284,8 +298,8 @@ public class AddActivity extends Activity {
 	private void insertPlaylistItemAndRetry() {
 		mainContent.showProgress();
 		try {
-			YoutubeApi.ResourceId resourceId = new YoutubeApi.ResourceId(getVideoId());
-			YoutubeApi.Snippet snippet = new YoutubeApi.Snippet(playlistId, resourceId, null, null);
+			YoutubeApi.PlaylistItem.Snippet.ResourceId resourceId = new YoutubeApi.PlaylistItem.Snippet.ResourceId(getVideoId());
+			YoutubeApi.PlaylistItem.Snippet snippet = new YoutubeApi.PlaylistItem.Snippet(playlistId, resourceId, null, null);
 			YoutubeApi.PlaylistItem item = new YoutubeApi.PlaylistItem(snippet);
 
 			api.insertPlaylistItem(item, new ErrorHandlingCallback<YoutubeApi.PlaylistItem>() {
@@ -324,27 +338,55 @@ public class AddActivity extends Activity {
 		api = adapter.create(YoutubeApi.class);
 	}
 
+	private CharSequence withChannelTitle(@StringRes int msgId) {
+		return String.format(
+				Locale.getDefault(),
+				getResources().getString(msgId),
+				channelTitle);
+	}
+
 	private void showError(ErrorResult errorResult) {
+		CharSequence msg = withChannelTitle(errorResult.msgId);
 		if (isFinishing()) {
-			showToast(errorResult.msgId);
+			showToast(msg);
 			return;
 		}
 
-		mainContent.showError(errorResult);
+		TextView errorMsg = (TextView) findViewById(R.id.error_msg);
+		errorMsg.setText(msg);
+
+		Button retryButton = (Button) findViewById(R.id.button_retry);
+		retryButton.setVisibility(errorResult.allowRetry ? View.VISIBLE : View.GONE);
+
+		mainContent.showError();
 	}
 
 	private void showSuccess(SuccessResult successResult) {
+		CharSequence msg = withChannelTitle(R.string.success_added_video);
 		if (isFinishing()) {
-			showToast(R.string.success_added_video);
+			showToast(msg);
 			return;
 		}
-		mainContent.showSuccess(successResult);
+
+		TextView successMsg = (TextView) findViewById(R.id.success_msg);
+		successMsg.setText(msg);
+
+		TextView title = (TextView) findViewById(R.id.success_title);
+		title.setText(successResult.title);
+
+		TextView description = (TextView) findViewById(R.id.success_description);
+		description.setText(successResult.description);
+
+
+		mainContent.showSuccess();
 	}
 
+	private void showToast(@StringRes int msgId) {
+		showToast(getResources().getText(msgId));
+	}
 
-
-	private void showToast(int msgId) {
-		Toast.makeText(this, msgId, Toast.LENGTH_SHORT).show();
+	private void showToast(CharSequence msg) {
+		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 	}
 
 	public void onRetry(View v) {
@@ -362,7 +404,9 @@ public class AddActivity extends Activity {
 			showToast(R.string.error_youtube_player_missing);
 		}
 
-	};
+	}
+
+	;
 
 	private void setPlaylistIdAndRetry() {
 		mainContent.showProgress();
@@ -370,6 +414,10 @@ public class AddActivity extends Activity {
 			@Override
 			public void success(YoutubeApi.Channels channels, Response response) {
 				playlistId = channels.items.get(0).contentDetails.relatedPlaylists.watchLater;
+				channelTitle = channels.items.get(0).snippet.title;
+				if (channelTitle == null || channelTitle.isEmpty()) {
+					channelTitle = account.name;
+				}
 				addToWatchLaterAndShow();
 			}
 		});
@@ -409,7 +457,7 @@ public class AddActivity extends Activity {
 
 	static class WatchlaterResult implements Parcelable {
 		private final SuccessResult success;
-		private final ErrorResult error;
+		private final ErrorResult   error;
 
 		private WatchlaterResult(SuccessResult success, ErrorResult error) {
 			if ((success == null) == (error == null)) {

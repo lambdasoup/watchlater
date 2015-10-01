@@ -41,80 +41,86 @@ import retrofit.http.POST;
 public interface YoutubeApi {
 	 String TAG = "YoutubeApi";
 
-	@GET("/channels?part=contentDetails&maxResults=50&mine=true")
+	@GET("/channels?part=contentDetails,snippet&maxResults=50&mine=true")
 	void listMyChannels(Callback<Channels> cb);
 
 	@POST("/playlistItems?part=snippet")
 	void insertPlaylistItem(@Body PlaylistItem playlistItem, Callback<PlaylistItem> cb);
 
 	class Channels {
-
 		public final List<Channel> items;
 
 		public Channels(List<Channel> items) {
 			this.items = items;
 		}
+
+		static class Channel {
+			public final Snippet snippet;
+			public final ContentDetails contentDetails;
+
+			public Channel(Snippet snippet, ContentDetails contentDetails) {
+				this.snippet = snippet;
+				this.contentDetails = contentDetails;
+			}
+
+			static class ContentDetails {
+				public final RelatedPlaylists relatedPlaylists;
+
+				public ContentDetails(RelatedPlaylists relatedPlaylists) {
+					this.relatedPlaylists = relatedPlaylists;
+				}
+
+				static class RelatedPlaylists {
+					public final String watchLater;
+
+					public RelatedPlaylists(String watchLater) {
+						this.watchLater = watchLater;
+					}
+				}
+			}
+
+			static class Snippet {
+				public final String title;
+
+				public Snippet(String title) {
+					this.title = title;
+				}
+			}
+		}
 	}
 
 	class PlaylistItem {
-
 		public final Snippet snippet;
 
 		public PlaylistItem(Snippet snippet) {
 			this.snippet = snippet;
 		}
-	}
 
-	class Snippet {
-		public final String playlistId;
-		public final ResourceId resourceId;
-		public final String title;
-		public final String description;
+		static class Snippet {
+			public final String playlistId;
+			public final ResourceId resourceId;
+			public final String title;
+			public final String description;
 
-		public Snippet(String playlistId, ResourceId resourceId, String title, String description) {
-			this.playlistId = playlistId;
-			this.resourceId = resourceId;
-			this.title = title;
-			this.description = description;
+			public Snippet(String playlistId, ResourceId resourceId, String title, String description) {
+				this.playlistId = playlistId;
+				this.resourceId = resourceId;
+				this.title = title;
+				this.description = description;
+			}
+
+			static class ResourceId {
+				@SuppressWarnings("unused")
+				public final String kind = "youtube#video";
+				public final String videoId;
+
+				public ResourceId(String videoId) {
+					this.videoId = videoId;
+				}
+			}
 		}
 	}
 
-	class ResourceId {
-		@SuppressWarnings("unused")
-		public final String kind = "youtube#video";
-		public final String videoId;
-
-		public ResourceId(String videoId) {
-			this.videoId = videoId;
-		}
-	}
-
-	class Channel {
-
-		public final ContentDetails contentDetails;
-
-		public Channel(ContentDetails contentDetails) {
-			this.contentDetails = contentDetails;
-		}
-	}
-
-	class ContentDetails {
-
-		public final RelatedPlaylists relatedPlaylists;
-
-		public ContentDetails(RelatedPlaylists relatedPlaylists) {
-			this.relatedPlaylists = relatedPlaylists;
-		}
-	}
-
-	class RelatedPlaylists {
-
-		public final String watchLater;
-
-		public RelatedPlaylists(String watchLater) {
-			this.watchLater = watchLater;
-		}
-	}
 
 	class YouTubeError {
 		public final RootError error;

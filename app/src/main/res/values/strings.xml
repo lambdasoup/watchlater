@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015. Maximilian Hille <mh@lambdasoup.com>
+  ~ Copyright (c) 2015.
+  ~
+  ~  Maximilian Hille <mh@lambdasoup.com>
+  ~ Juliane Lehmann <jl@lambdasoup.com>
   ~
   ~ This file is part of Watch Later.
   ~
@@ -18,7 +21,8 @@
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="asset_prefix">default</string>
 
     <string name="app_name">Watch Later</string>
 
@@ -29,12 +33,21 @@
 
     <string name="button_retry">Try again</string>
 
-    <string name="success_added_video">Successfully added video</string>
+    <string name="success_added_video">Successfully added video to Watch Later playlist of <xliff:g id="channel_title" example="Jane Smith">%1$s</xliff:g></string>
 
-    <string name="error_need_account">Error adding video: Needs access to your YouTube account</string>
-    <string name="error_other">Error adding video: Check your Internet connection and try again</string>
-    <string name="error_playlist_full">Your Watch Later playlist is either full or already contains this video</string>
+    <string name="error_need_account">Error adding video: Needs access to your YouTube account.</string>
+    <string name="error_other">Error adding video: Check your Internet connection and try again.</string>
+    <string name="error_playlist_full">The Watch Later playlist of <xliff:g id="channel_title" example="Jane Smith">%1$s</xliff:g> is full.</string>
+    <string name="error_not_a_video">This does not seem to be a video. Watchlater cannot add it to your Watch Later playlist. Please try opening it again using another app.</string>
+    <string name="error_already_in_playlist">This video was already in the Watch Later playlist of <xliff:g id="channel_title" example="Jane Smith">%1$s</xliff:g>.</string>
+    <string name="error_video_not_found">Could not add video to your Watch Later playlist: The video does not exist anymore.</string>
+
     <string name="choose_account">Choose account</string>
-    <string name="no_account">No Google accounts found on this device</string>
+    <string name="no_account">No Google accounts found on this device.</string>
+    <string name="menu_open">Open with Youtube</string>
+    <string name="error_youtube_player_missing">Cannot launch the Youtube app: it  is probably not installed on your device.</string>
+    <string name="menu_help">Help</string>
+    <string name="title_activity_help">Help</string>
+    <string name="error_permission_required_accounts">Watchlater needs your permission to access the accounts configured on your device, so that it can access your Youtube account without knowing your password.</string>
 
 </resources>

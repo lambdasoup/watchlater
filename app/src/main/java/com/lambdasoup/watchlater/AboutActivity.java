@@ -1,5 +1,8 @@
 /*
- * Copyright (c) 2015. Maximilian Hille <mh@lambdasoup.com>
+ * Copyright (c) 2015.
+ *
+ *  Maximilian Hille <mh@lambdasoup.com>
+ * Juliane Lehmann <jl@lambdasoup.com>
  *
  * This file is part of Watch Later.
  *
@@ -31,7 +34,7 @@ public class AboutActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		WebView webView = new WebView(this);
-		webView.loadUrl("file:///android_asset/about.html");
+		webView.loadUrl("file:///android_asset/html/about.html");
 		setContentView(webView);
 	}
 

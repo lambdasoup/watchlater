@@ -1,5 +1,8 @@
 <!--
-  ~ Copyright (c) 2015. Maximilian Hille <mh@lambdasoup.com>
+  ~ Copyright (c) 2015.
+  ~
+  ~  Maximilian Hille <mh@lambdasoup.com>
+  ~ Juliane Lehmann <jl@lambdasoup.com>
   ~
   ~ This file is part of Watch Later.
   ~
@@ -23,5 +26,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="dialog_width">320dp</dimen>
+  <dimen name="vertical_text_sep">6sp</dimen>
 
 </resources>

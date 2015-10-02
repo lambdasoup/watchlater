@@ -22,3 +22,6 @@
 -keepattributes *Annotation*
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.examples.android.model.** { *; }
+
+# retrolambda
+-dontwarn java.lang.invoke.*

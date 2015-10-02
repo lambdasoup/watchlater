@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015. Maximilian Hille <mh@lambdasoup.com>
+  ~ Copyright (c) 2015.
+  ~
+  ~  Maximilian Hille <mh@lambdasoup.com>
+  ~ Juliane Lehmann <jl@lambdasoup.com>
   ~
   ~ This file is part of Watch Later.
   ~
@@ -20,7 +23,8 @@
 
 <manifest
     package="com.lambdasoup.watchlater"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sharedUserId="com.lambdasoup.watchlater">
 
     <application>
 

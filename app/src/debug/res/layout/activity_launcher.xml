@@ -1,5 +1,8 @@
 <!--
-  ~ Copyright (c) 2015. Maximilian Hille <mh@lambdasoup.com>
+  ~ Copyright (c) 2015.
+  ~
+  ~  Maximilian Hille <mh@lambdasoup.com>
+  ~ Juliane Lehmann <jl@lambdasoup.com>
   ~
   ~ This file is part of Watch Later.
   ~
@@ -28,12 +31,11 @@
               android:paddingRight="@dimen/activity_horizontal_margin"
               android:paddingTop="@dimen/activity_vertical_margin"
               tools:context="com.lambdasoup.watchlater.AddActivity">
-
-    <Button
-        android:layout_width="wrap_content"
+    <ListView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onExample"
-        android:text="Add example video"
-        tools:ignore="HardcodedText"/>
+        android:id="@+id/list"
+        android:layout_gravity="center_horizontal"
+        tools:listitem="@android:layout/simple_list_item_1" />
 
 </LinearLayout>

@@ -27,4 +27,7 @@
 -dontwarn java.lang.invoke.*
 
 # android m doesn't have apache anymore
--dontwarn org.apache.http
+-dontwarn org.apache.http.**
+-dontwarn android.net.http.AndroidHttpClient
+-dontwarn retrofit.android.AndroidApacheClient
+-dontwarn retrofit.client.ApacheClient**

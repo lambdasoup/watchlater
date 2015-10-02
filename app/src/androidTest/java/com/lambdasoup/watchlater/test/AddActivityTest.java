@@ -83,24 +83,20 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @RunWith(AndroidJUnit4.class)
 public class AddActivityTest  {
 
-	private static final String TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
-
-	private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
-	private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
-	public static final String CHANNEL_TITLE = "Testi Testsdottir";
-
-	private        RetrofitHttpExecutorIdlingResource idlingExecutor;
-	private static MockWebServer                      mockWebServer;
-	private static RestfulDispatcher                  restfulDispatcher;
-
+	public static final  String  CHANNEL_TITLE     = "Testi Testsdottir";
+	private static final String  TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
+	private static final Account ACCOUNT_1         = new Account("test account 1", TEST_ACCOUNT_TYPE);
+	private static final Account ACCOUNT_2         = new Account("test account 2", TEST_ACCOUNT_TYPE);
+	private static MockWebServer     mockWebServer;
+	private static RestfulDispatcher restfulDispatcher;
 	@Rule
 	public ActivityTestRule<AddActivity> activityTestRule = new ActivityTestRule<AddActivity>(AddActivity.class, false, false) {
 		@Override
 		protected Intent getActivityIntent() {
-			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/v/8f7h837f4"));
-			return intent;
+			return new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/v/8f7h837f4"));
 		}
 	};
+	private RetrofitHttpExecutorIdlingResource idlingExecutor;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -108,6 +104,11 @@ public class AddActivityTest  {
 		mockWebServer = new MockWebServer();
 		mockWebServer.setDispatcher(restfulDispatcher);
 		mockWebServer.start(8080);
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		mockWebServer.shutdown();
 	}
 
 	@Before
@@ -142,11 +143,6 @@ public class AddActivityTest  {
 	public void tearDown() throws Exception {
 		unregisterIdlingResources(idlingExecutor);
 		restfulDispatcher.clear();
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		mockWebServer.shutdown();
 	}
 
 	private void addAccount(Account account) {

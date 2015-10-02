@@ -71,30 +71,23 @@ import static android.net.Uri.parse;
 
 
 public class AddActivity extends Activity {
-	private static final String TAG = AddActivity.class.getSimpleName();
 
 	private static final String SCOPE_YOUTUBE                    = "oauth2:https://www.googleapis.com/auth/youtube";
 	private static final String PERMISSION_GET_ACCOUNTS          = "android.permission.GET_ACCOUNTS";
 	private static final int    PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
-
-
-	// fields are not final to be somewhat accessible for testing to inject other values
-	@SuppressWarnings("FieldCanBeLocal")
-	private static String   YOUTUBE_ENDPOINT                = "https://www.googleapis.com/youtube/v3";
-	private static String   ACCOUNT_TYPE_GOOGLE             = "com.google";
-	private static Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR = null;
-
-	private AccountManager manager;
-	private YoutubeApi     api;
-
-	private WatchlaterDialogContent mainContent;
-
 	private static final String KEY_ACCOUNT       = "com.lambdasoup.watchlater_account";
 	private static final String KEY_TOKEN         = "com.lambdasoup.watchlater_token";
 	private static final String KEY_PLAYLIST_ID   = "com.lambdasoup.watchlater_playlistId";
 	private static final String KEY_CHANNEL_TITLE = "com.lambdasoup.watchlater_channelTitle";
 	private static final String KEY_RESULT        = "com.lambdasoup.watchlater_result";
-
+	// fields are not final to be somewhat accessible for testing to inject other values
+	@SuppressWarnings("FieldCanBeLocal")
+	private static String   YOUTUBE_ENDPOINT                = "https://www.googleapis.com/youtube/v3";
+	private static String   ACCOUNT_TYPE_GOOGLE             = "com.google";
+	private static Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR = null;
+	private AccountManager          manager;
+	private YoutubeApi              api;
+	private WatchlaterDialogContent mainContent;
 	private Account          account;
 	private String           token;
 	private String           playlistId;
@@ -223,7 +216,7 @@ public class AddActivity extends Activity {
 
 	@TargetApi(23)
 	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		switch (requestCode) {
 			case PERMISSIONS_REQUEST_GET_ACCOUNTS: {
 				if (grantResults.length > 0
@@ -453,8 +446,6 @@ public class AddActivity extends Activity {
 
 	}
 
-	;
-
 	private void setPlaylistIdAndRetry() {
 		mainContent.showProgress();
 		api.listMyChannels(new ErrorHandlingCallback<YoutubeApi.Channels>() {
@@ -480,151 +471,6 @@ public class AddActivity extends Activity {
 		addToWatchLaterAndShow();
 	}
 
-
-	private class WatchlaterException extends Exception {
-		public final ErrorType type;
-
-		public WatchlaterException(ErrorType type) {
-			this.type = type;
-		}
-	}
-
-	private abstract class ErrorHandlingCallback<T> extends ErrorTranslatingCallback<T> {
-		@Override
-		public void failure(ErrorType errorType) {
-			switch (errorType) {
-				case INVALID_TOKEN:
-					onTokenInvalid();
-					break;
-				default:
-					onResult(WatchlaterResult.error(errorType));
-			}
-		}
-	}
-
-	static class WatchlaterResult implements Parcelable {
-		private final SuccessResult success;
-		private final ErrorResult   error;
-
-		private WatchlaterResult(SuccessResult success, ErrorResult error) {
-			if ((success == null) == (error == null)) {
-				throw new IllegalArgumentException("Exactly one of success, error must be null");
-			}
-			this.success = success;
-			this.error = error;
-		}
-
-		boolean isSuccess() {
-			return success != null;
-		}
-
-		boolean isError() {
-			return error != null;
-		}
-
-		interface VoidFunction<T> {
-			void apply(T t);
-		}
-
-		void apply(VoidFunction<SuccessResult> onSuccess, VoidFunction<ErrorResult> onError) {
-			if (isSuccess()) {
-				onSuccess.apply(success);
-			} else {
-				onError.apply(error);
-			}
-		}
-
-		static WatchlaterResult success(String title, String description) {
-			return new WatchlaterResult(new SuccessResult(title, description), null);
-		}
-
-		static WatchlaterResult error(ErrorType errorType) {
-			return new WatchlaterResult(null, ErrorResult.fromErrorType(errorType));
-		}
-
-		@Override
-		public String toString() {
-			if (isSuccess()) {
-				return "WatchlaterResult " + success;
-			} else {
-				return "WatchlaterResult " + error;
-			}
-		}
-
-		@Override
-		public int describeContents() {
-			return 0;
-		}
-
-		@Override
-		public void writeToParcel(Parcel dest, int flags) {
-			dest.writeParcelable(this.success, 0);
-			dest.writeInt(this.error == null ? -1 : this.error.ordinal());
-		}
-
-		protected WatchlaterResult(Parcel in) {
-			this.success = in.readParcelable(SuccessResult.class.getClassLoader());
-			int tmpError = in.readInt();
-			this.error = tmpError == -1 ? null : ErrorResult.values()[tmpError];
-		}
-
-		public static final Creator<WatchlaterResult> CREATOR = new Creator<WatchlaterResult>() {
-			public WatchlaterResult createFromParcel(Parcel source) {
-				return new WatchlaterResult(source);
-			}
-
-			public WatchlaterResult[] newArray(int size) {
-				return new WatchlaterResult[size];
-			}
-		};
-	}
-
-
-	static class SuccessResult implements Parcelable {
-		final String title;
-		final String description;
-
-		SuccessResult(String title, String description) {
-			this.title = title;
-			this.description = description;
-		}
-
-
-		@Override
-		public String toString() {
-			return "SuccessResult{" +
-					"title='" + title + '\'' +
-					", description='" + description + '\'' +
-					'}';
-		}
-
-
-		@Override
-		public int describeContents() {
-			return 0;
-		}
-
-		@Override
-		public void writeToParcel(Parcel dest, int flags) {
-			dest.writeString(this.title);
-			dest.writeString(this.description);
-		}
-
-		protected SuccessResult(Parcel in) {
-			this.title = in.readString();
-			this.description = in.readString();
-		}
-
-		public static final Creator<SuccessResult> CREATOR = new Creator<SuccessResult>() {
-			public SuccessResult createFromParcel(Parcel source) {
-				return new SuccessResult(source);
-			}
-
-			public SuccessResult[] newArray(int size) {
-				return new SuccessResult[size];
-			}
-		};
-	}
 
 	enum ErrorResult {
 		ALREADY_IN_PLAYLIST(R.string.error_already_in_playlist, false),
@@ -666,5 +512,143 @@ public class AddActivity extends Activity {
 		}
 
 
+	}
+
+	static class WatchlaterResult implements Parcelable {
+		public static final Creator<WatchlaterResult> CREATOR = new Creator<WatchlaterResult>() {
+			public WatchlaterResult createFromParcel(Parcel source) {
+				return new WatchlaterResult(source);
+			}
+
+			public WatchlaterResult[] newArray(int size) {
+				return new WatchlaterResult[size];
+			}
+		};
+		private final SuccessResult success;
+		private final ErrorResult   error;
+
+		private WatchlaterResult(SuccessResult success, ErrorResult error) {
+			if ((success == null) == (error == null)) {
+				throw new IllegalArgumentException("Exactly one of success, error must be null");
+			}
+			this.success = success;
+			this.error = error;
+		}
+
+		protected WatchlaterResult(Parcel in) {
+			this.success = in.readParcelable(SuccessResult.class.getClassLoader());
+			int tmpError = in.readInt();
+			this.error = tmpError == -1 ? null : ErrorResult.values()[tmpError];
+		}
+
+		static WatchlaterResult success(String title, String description) {
+			return new WatchlaterResult(new SuccessResult(title, description), null);
+		}
+
+		static WatchlaterResult error(ErrorType errorType) {
+			return new WatchlaterResult(null, ErrorResult.fromErrorType(errorType));
+		}
+
+		boolean isSuccess() {
+			return success != null;
+		}
+
+		void apply(VoidFunction<SuccessResult> onSuccess, VoidFunction<ErrorResult> onError) {
+			if (isSuccess()) {
+				onSuccess.apply(success);
+			} else {
+				onError.apply(error);
+			}
+		}
+
+		@Override
+		public String toString() {
+			if (isSuccess()) {
+				return "WatchlaterResult " + success;
+			} else {
+				return "WatchlaterResult " + error;
+			}
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			dest.writeParcelable(this.success, 0);
+			dest.writeInt(this.error == null ? -1 : this.error.ordinal());
+		}
+
+		interface VoidFunction<T> {
+			void apply(T t);
+		}
+	}
+
+	static class SuccessResult implements Parcelable {
+		public static final Creator<SuccessResult> CREATOR = new Creator<SuccessResult>() {
+			public SuccessResult createFromParcel(Parcel source) {
+				return new SuccessResult(source);
+			}
+
+			public SuccessResult[] newArray(int size) {
+				return new SuccessResult[size];
+			}
+		};
+		final String title;
+		final String description;
+
+
+		SuccessResult(String title, String description) {
+			this.title = title;
+			this.description = description;
+		}
+
+
+		protected SuccessResult(Parcel in) {
+			this.title = in.readString();
+			this.description = in.readString();
+		}
+
+		@Override
+		public String toString() {
+			return "SuccessResult{" +
+					"title='" + title + '\'' +
+					", description='" + description + '\'' +
+					'}';
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			dest.writeString(this.title);
+			dest.writeString(this.description);
+		}
+	}
+
+	private class WatchlaterException extends Exception {
+		public final ErrorType type;
+
+		public WatchlaterException(ErrorType type) {
+			this.type = type;
+		}
+	}
+
+	private abstract class ErrorHandlingCallback<T> extends ErrorTranslatingCallback<T> {
+		@Override
+		public void failure(ErrorType errorType) {
+			switch (errorType) {
+				case INVALID_TOKEN:
+					onTokenInvalid();
+					break;
+				default:
+					onResult(WatchlaterResult.error(errorType));
+			}
+		}
 	}
 }

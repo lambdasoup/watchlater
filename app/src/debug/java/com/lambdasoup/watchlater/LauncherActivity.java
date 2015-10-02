@@ -30,7 +30,6 @@ import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -72,12 +71,9 @@ public class LauncherActivity extends Activity {
 
 		);
 		listView.setAdapter(adapter);
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				String item = (String) parent.getAdapter().getItem(position);
-				startActivity(new Intent(Intent.ACTION_VIEW, parse(item)));
-			}
+		listView.setOnItemClickListener((parent, view, position, id) -> {
+			String item = (String) parent.getAdapter().getItem(position);
+			startActivity(new Intent(Intent.ACTION_VIEW, parse(item)));
 		});
 	}
 

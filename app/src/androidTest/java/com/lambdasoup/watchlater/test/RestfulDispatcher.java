@@ -30,19 +30,14 @@ import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Created by stroke on 25.09.15.
- */
 public class RestfulDispatcher extends Dispatcher {
-	private static final String TAG = "RestfulDispatcher";
 	public static final String STATUS_NOT_FOUND = "HTTP/1.1 404 Not Found";
+	private static final String TAG = "RestfulDispatcher";
 	protected final ConcurrentHashMap<String, MockResponse> responses = new ConcurrentHashMap<>();
 
 	/**
 	 * Registers a canned response for a particular full path. Request method and all other info
 	 * will be ignored for matching.
-	 * @param path
-	 * @param response
 	 */
 	public void registerResponse(String path, MockResponse response) {
 		MockResponse prevValue = responses.put(path, response);

@@ -22,6 +22,7 @@
 
 package com.lambdasoup.watchlater.test;
 
+import android.support.annotation.NonNull;
 import android.support.test.espresso.IdlingResource;
 
 import java.util.concurrent.SynchronousQueue;
@@ -32,13 +33,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
-/**
- * Created by stroke on 23.09.15.
- */
 class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements IdlingResource {
-	private static final String TAG = "RetrofitIdlingResource";
 	public static final String IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
-
+	private static final String TAG = "RetrofitIdlingResource";
 	private final       AtomicInteger currentTaskCount = new AtomicInteger(0);
 	private volatile ResourceCallback idleTransitionCallback;
 
@@ -48,7 +45,7 @@ class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements I
 		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
 				new ThreadFactory() {
 					@Override
-					public Thread newThread(final Runnable r) {
+					public Thread newThread(@NonNull final Runnable r) {
 						return new Thread(() -> {
 							android.os.Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
 							r.run();

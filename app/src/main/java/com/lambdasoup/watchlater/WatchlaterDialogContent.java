@@ -24,9 +24,6 @@ package com.lambdasoup.watchlater;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.TextView;
-
-import com.lambdasoup.watchlater.AddActivity.SuccessResult;
 
 /**
  * Created by stroke on 17.09.15.

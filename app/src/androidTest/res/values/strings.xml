@@ -23,6 +23,6 @@
 
 <resources>
 
-  -<string name="label_mockaccount">Mock Account</string>
+  <string name="label_mockaccount">Mock Account</string>
 
 </resources>

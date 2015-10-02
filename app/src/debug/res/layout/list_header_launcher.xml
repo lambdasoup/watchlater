@@ -21,15 +21,17 @@
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView
+    android:id="@+id/text"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:id="@+id/text"
-    android:text="Group header"
-    android:textColor="@android:color/white"
-    android:textStyle="bold"
+    android:clickable="false"
     android:gravity="center"
     android:textAllCaps="true"
-    android:clickable="false">
+    android:textColor="@android:color/white"
+    android:textStyle="bold"
+    tools:text="Group header">
 
 </TextView>

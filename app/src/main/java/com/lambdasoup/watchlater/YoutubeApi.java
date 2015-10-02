@@ -47,6 +47,10 @@ public interface YoutubeApi {
 	@POST("/playlistItems?part=snippet")
 	void insertPlaylistItem(@Body PlaylistItem playlistItem, Callback<PlaylistItem> cb);
 
+	enum ErrorType {
+		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO, INVALID_TOKEN, VIDEO_NOT_FOUND, ALREADY_IN_PLAYLIST, PERMISSION_REQUIRED_ACCOUNTS
+	}
+
 	class Channels {
 		public final List<Channel> items;
 
@@ -121,7 +125,6 @@ public interface YoutubeApi {
 		}
 	}
 
-
 	class YouTubeError {
 		public final RootError error;
 
@@ -154,23 +157,12 @@ public interface YoutubeApi {
 		}
 	}
 
-	enum ErrorType {
-		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO, INVALID_TOKEN, VIDEO_NOT_FOUND, ALREADY_IN_PLAYLIST, PERMISSION_REQUIRED_ACCOUNTS;
-	}
-
 	abstract class ErrorTranslatingCallback<T> implements Callback<T> {
 
 		public static final String DAILY_LIMIT_EXCEEDED_UNREG = "dailyLimitExceededUnreg";
 		public static final String VIDEO_ALREADY_IN_PLAYLIST = "videoAlreadyInPlaylist";
 		public static final String PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos";
 		public static final String VIDEO_NOT_FOUND = "videoNotFound";
-
-		@Override
-		final public void failure(RetrofitError error) {
-			failure(translateError(error));
-		}
-
-		protected abstract void failure(ErrorType errorType);
 
 		public static ErrorType translateError(RetrofitError error) {
 			if (error.getResponse() == null) {
@@ -217,6 +209,13 @@ public interface YoutubeApi {
 					return ErrorType.OTHER;
 			}
 		}
+
+		@Override
+		final public void failure(RetrofitError error) {
+			failure(translateError(error));
+		}
+
+		protected abstract void failure(ErrorType errorType);
 	}
 
 

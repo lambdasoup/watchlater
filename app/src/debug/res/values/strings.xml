@@ -22,7 +22,7 @@
   -->
 
 <resources>
-    <string name="video_example_uris">Some example single video URIs</string>
-    <string name="playlist_example_uris">Some example playlist URIs</string>
-    <string name="non_example_urls">Some non-example URIs</string>
+  <string name="video_example_uris" translatable="false">Some example single video URIs</string>
+  <string name="playlist_example_uris" translatable="false">Some example playlist URIs</string>
+  <string name="non_example_urls" translatable="false">Some non-example URIs</string>
 </resources>

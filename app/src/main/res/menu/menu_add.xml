@@ -29,7 +29,7 @@
         android:id="@+id/menu_open_with_youtube"
         android:showAsAction="ifRoom"
         android:title="@string/menu_open"
-        android:icon="@mipmap/ic_play_circle_outline_white_36dp"
+        android:icon="@drawable/ic_play_circle_outline_white_36dp"
         />
 
     <item

@@ -56,6 +56,7 @@ import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -66,6 +67,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.lang.reflect.Field;
+import java.util.Locale;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.registerIdlingResources;
@@ -85,10 +87,11 @@ public class AddActivityTest  {
 
 	private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
 	private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
+	public static final String CHANNEL_TITLE = "Testi Testsdottir";
 
 	private        RetrofitHttpExecutorIdlingResource idlingExecutor;
 	private static MockWebServer                      mockWebServer;
-	private static RestfulDispatcher restfulDispatcher;
+	private static RestfulDispatcher                  restfulDispatcher;
 
 	@Rule
 	public ActivityTestRule<AddActivity> activityTestRule = new ActivityTestRule<AddActivity>(AddActivity.class, false, false) {
@@ -152,6 +155,10 @@ public class AddActivityTest  {
 		accountManager.addAccountExplicitly(account, null, null);
 	}
 
+	private String fillChannelTitle(int msgId) {
+		return String.format(Locale.US, activityTestRule.getActivity().getResources().getString(msgId), CHANNEL_TITLE);
+	}
+
 	@Test
 	public void noAccount() throws Exception {
 		activityTestRule.launchActivity(null);
@@ -179,23 +186,7 @@ public class AddActivityTest  {
 		String testTitle = "Test Title";
 
 		// set channel list response
-		{
-			JSONObject json = new JSONObject();
-			JSONArray items = new JSONArray();
-			json.put("items", items);
-			JSONObject channel = new JSONObject();
-			items.put(channel);
-			JSONObject contentDetails = new JSONObject();
-			channel.put("contentDetails", contentDetails);
-			JSONObject relatedPlaylists = new JSONObject();
-			contentDetails.put("relatedPlaylists", relatedPlaylists);
-			String watchLaterId = "45h7394875w3495";
-			relatedPlaylists.put("watchLater", watchLaterId);
-
-			MockResponse response = new MockResponse();
-			response.setBody(json.toString(8));
-			restfulDispatcher.registerResponse("/channels?part=contentDetails&maxResults=50&mine=true", response);
-		}
+		registerChannelListResponse();
 
 		// set add video to list response
 		{
@@ -206,8 +197,8 @@ public class AddActivityTest  {
 			snippet.put("description", testDescription);
 			json.put("snippet", snippet);
 
-            MockResponse response = new MockResponse();
-            response.setBody(json.toString(8));
+			MockResponse response = new MockResponse();
+			response.setBody(json.toString(8));
 			restfulDispatcher.registerResponse("/playlistItems?part=snippet", response);
 		}
 
@@ -217,31 +208,15 @@ public class AddActivityTest  {
 		// launch activity
 		activityTestRule.launchActivity(null);
 
-		onView(withText(R.string.success_added_video)).check(matches(isDisplayed()));
+		onView(withText(fillChannelTitle(R.string.success_added_video))).check(matches(isDisplayed()));
 		onView(withText(testTitle)).check(matches(isDisplayed()));
 		onView(withText(testDescription)).check(matches(isDisplayed()));
 	}
 
 	@Test
 	public void addAlreadyInPlaylist() throws Exception {
-		// set channel list response
-		{
-			JSONObject json = new JSONObject();
-			JSONArray items = new JSONArray();
-			json.put("items", items);
-			JSONObject channel = new JSONObject();
-			items.put(channel);
-			JSONObject contentDetails = new JSONObject();
-			channel.put("contentDetails", contentDetails);
-			JSONObject relatedPlaylists = new JSONObject();
-			contentDetails.put("relatedPlaylists", relatedPlaylists);
-			String watchLaterId = "45h7394875w3495";
-			relatedPlaylists.put("watchLater", watchLaterId);
+		registerChannelListResponse();
 
-            MockResponse response = new MockResponse();
-            response.setBody(json.toString(8));
-			restfulDispatcher.registerResponse("/channels?part=contentDetails&maxResults=50&mine=true", response);
-		}
 
 		// set add video to list response
 		{
@@ -270,7 +245,31 @@ public class AddActivityTest  {
 		// launch activity
 		activityTestRule.launchActivity(null);
 
-		onView(withText(R.string.error_already_in_playlist)).check(matches(isDisplayed()));
+		onView(withText(fillChannelTitle(R.string.error_already_in_playlist))).check(matches(isDisplayed()));
+	}
+
+	private void registerChannelListResponse() throws JSONException {
+		// set channel list response
+		{
+			JSONObject json = new JSONObject();
+			JSONArray items = new JSONArray();
+			json.put("items", items);
+			JSONObject channel = new JSONObject();
+			items.put(channel);
+			JSONObject contentDetails = new JSONObject();
+			channel.put("contentDetails", contentDetails);
+			JSONObject relatedPlaylists = new JSONObject();
+			contentDetails.put("relatedPlaylists", relatedPlaylists);
+			String watchLaterId = "45h7394875w3495";
+			relatedPlaylists.put("watchLater", watchLaterId);
+			JSONObject snippet = new JSONObject();
+			channel.put("snippet", snippet);
+			snippet.put("title", CHANNEL_TITLE);
+
+            MockResponse response = new MockResponse();
+            response.setBody(json.toString(8));
+			restfulDispatcher.registerResponse("/channels?part=contentDetails,snippet&maxResults=50&mine=true", response);
+		}
 	}
 
 	@Test
@@ -291,7 +290,7 @@ public class AddActivityTest  {
 			MockResponse response = new MockResponse();
 			response.setBody(json.toString(8));
 			response.setStatus("HTTP/1.1 403 Forbidden");
-			restfulDispatcher.registerResponse("/channels?part=contentDetails&maxResults=50&mine=true", response);
+			restfulDispatcher.registerResponse("/channels?part=contentDetails,snippet&maxResults=50&mine=true", response);
 		}
 		// set account
 		addAccount(ACCOUNT_1);
@@ -299,7 +298,7 @@ public class AddActivityTest  {
 		// launch activity
 		activityTestRule.launchActivity(null);
 
-		onView(withText(R.string.error_need_account)).check(matches(isDisplayed()));
+		onView(withText(fillChannelTitle(R.string.error_need_account))).check(matches(isDisplayed()));
 
 	}
 

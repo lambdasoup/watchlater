@@ -25,3 +25,6 @@
 
 # retrolambda
 -dontwarn java.lang.invoke.*
+
+# android m doesn't have apache anymore
+-dontwarn org.apache.http

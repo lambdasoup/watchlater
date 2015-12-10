@@ -44,10 +44,26 @@
 
     <string name="choose_account">Choose account</string>
     <string name="no_account">No Google accounts found on this device.</string>
-    <string name="menu_open">Open with Youtube</string>
-    <string name="error_youtube_player_missing">Cannot launch the Youtube app: it  is probably not installed on your device.</string>
+    <string name="menu_open">Open with YouTube</string>
+    <string name="error_youtube_player_missing">Cannot launch the YouTube app: it is probably not installed on your device.</string>
     <string name="menu_help">Help</string>
     <string name="title_activity_help">Help</string>
-    <string name="error_permission_required_accounts">Watchlater needs your permission to access the accounts configured on your device, so that it can access your Youtube account without knowing your password.</string>
-
+    <string name="error_permission_required_accounts">Watch Later needs your permission to access the accounts configured on your device, so that it can access your YouTube account without knowing your password.</string>
+    <string name="explanation">Watch Later is an alternative app to open YouTube links with. Opening a link places it automatically in your watchlater list. If the YouTube app is your default app for opening youtube links, this cannot work. You probably want to choose each time between opening with Watch Later and opening with YouTube. Try out your settings right now by pressing the \"Example\" button below!</string>
+    <string name="button_example">Example</string>
+    <string name="button_settings_youtube">YouTube settings</string>
+    <string name="no_youtube_settings_activity">Could not open settings for YouTube. Sorry.</string>
+    <string name="button_settings_watchlater">Watch Later settings</string>
+    <string name="no_watchlater_settings_activity">Could not open settings for the Watch Later application. Sorry.</string>
+    <string name="button_settings_all_apps">Application settings</string>
+    <string name="no_app_settings_activity">Could not open your application settings. Sorry.</string>
+    <string name="defaults_advice_adjust_both">You should adjust the \"Open by default\" settings for both YouTube and Watch Later. Clear the defaults so that they are not set as default.</string>
+    <string name="defaults_advice_ok">Your configuration is fine, everything should work!</string>
+    <string name="defaults_advice_youtube_choice_missing">Your defaults settings for Watch Later are fine. The YouTube app seems to be missing. You should make sure that it is installed.</string>
+    <string name="defaults_advice_watchlater_choice_missing">Your defaults settings for YouTube are fine. Something seems to be wrong with the defaults settings for Watch Later, or maybe some other app for displaying YouTube content.</string>
+    <string name="defaults_advice_both_choice_missing">Something seems to be wrong with the defaults settings for Watch Later and YouTube, or maybe some other app for displaying YouTube content.</string>
+    <string name="defaults_advice_youtube_default">You should adjust the \"Open by default\" settings for the YouTube app. Clear the defaults so that it is not set as default.</string>
+    <string name="defaults_advice_watchlater_default">You should adjust the \"Open by default\" settings for the Watch Later app. Clear the defaults so that it is not set as default.</string>
+    <string name="defaults_advice_other_app_default">You should adjust the \"Open by default\" settings for the %1$s app. Clear the defaults so that it is not set as default.</string>
+    <string name="no_youtube_installed">YouTube is not installed</string>
 </resources>

@@ -37,7 +37,7 @@ import android.widget.TextView;
 import static android.net.Uri.parse;
 
 
-public class LauncherActivity extends Activity {
+public class DebugLauncherActivity extends Activity {
 
 	private static final String[] VIDEO_EXAMPLE_URIS = {
 			"https://www.youtube.com/watch?v=jqxENMKaeCU",
@@ -60,7 +60,7 @@ public class LauncherActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_launcher);
+		setContentView(R.layout.activity_debug_launcher);
 
 		ListView listView = (ListView) findViewById(R.id.list);
 		FlatGroupAdapter adapter = new FlatGroupAdapter(

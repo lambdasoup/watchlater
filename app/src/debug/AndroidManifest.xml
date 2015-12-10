@@ -28,15 +28,15 @@
 
     <application>
 
-        <activity
-            android:name=".LauncherActivity"
+        <!--activity
+            android:name=".DebugLauncherActivity"
             android:label="Watch Later - debug">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
+        </activity-->
 
     </application>
 

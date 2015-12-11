@@ -65,5 +65,5 @@
     <string name="defaults_advice_youtube_default">You should adjust the \"Open by default\" settings for the YouTube app. Clear the defaults so that it is not set as default.</string>
     <string name="defaults_advice_watchlater_default">You should adjust the \"Open by default\" settings for the Watch Later app. Clear the defaults so that it is not set as default.</string>
     <string name="defaults_advice_other_app_default">You should adjust the \"Open by default\" settings for the %1$s app. Clear the defaults so that it is not set as default.</string>
-    <string name="no_youtube_installed">YouTube is not installed</string>
+    <string name="no_youtube_installed">The YouTube app is not installed.</string>
 </resources>

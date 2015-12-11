@@ -50,4 +50,21 @@
     <string name="title_activity_help">Hilfe</string>
     <string name="error_permission_required_accounts">Die Später ansehen-App benötigt deine Erlaubnis, um auf die auf deinem Gerät konfigurierten Konten zuzugreifen, damit sie auf deinen Youtube-Account zugreifen kann, ohne dein Passwort zu kennen.</string>
 
+    <string name="explanation">Später Ansehen ist eine alternative App, um YouTube-Links zu öffnen und dabei automatisch der "Später ansehen"-Liste hinzuzufügen. Wenn die YouTube-App deine Standard-App zum Öffnen von YouTube-Links ist, kann das nicht funktionieren. Wahrscheinlich möchtest du jedesmal wählen, ob du YouTube oder Später Ansehen verwenden möchtest. Probier es aus, indem du unten auf "Beispiel" drückst!</string>
+    <string name="button_example">Beispiel</string>
+    <string name="button_settings_youtube">YouTube-Einstellungen</string>
+    <string name="no_youtube_settings_activity">Konnte die YouTube-Einstellungen nicht öffnen. Sorry.</string>
+    <string name="button_settings_watchlater">Später Ansehen-Einstellungen</string>
+    <string name="no_watchlater_settings_activity">Konnte die Später Ansehen-Einstellungen nicht öffnen. Sorry.</string>
+    <string name="button_settings_all_apps">Apps-Einstellungen</string>
+    <string name="no_app_settings_activity">Konnte die Apps-Einstellungen nicht öffnen. Sorry.</string>
+    <string name="defaults_advice_adjust_both">Du solltest die "Standardmäßig öffnen"-Einstellungen für YouTube und Später Ansehen ändern. Setze die Aktionen auf Standard zurück, so dass beide Apps nicht als Standard eingestellt sind.</string>
+    <string name="defaults_advice_ok">Deine Einstellungen sind in Ordnung, alles sollte funktionieren!</string>
+    <string name="defaults_advice_youtube_choice_missing">Die "Standardmäßig öffnen"-Einstellungen für Später Ansehen sind in Ordnung. Die YouTube-App scheint zu fehlen. Du solltest sicherstellen, dass sie installiert ist.</string>
+    <string name="defaults_advice_watchlater_choice_missing">Die "Standardmäßig öffnen"-Einstellungen für YouTube sind in Ordnung. Irgendetwas scheint nicht in Ordnung zu sein mit den Einstellungen für Später Ansehen, oder vielleicht denen irgendeiner anderen App für YouTube-Videos.</string>
+    <string name="defaults_advice_both_choice_missing">Irgendetwas scheint nicht in Ordnung zu sein mit den Einstellungen für Später Ansehen und YouTube, oder vielleicht denen irgendeiner anderen App für YouTube-Videos.</string>
+    <string name="defaults_advice_youtube_default">Du solltest die "Standardmäßig öffnen"-Einstellungen für die YouTube-App ändern. Setze die Aktionen auf Standard zurück, so dass sie nicht als Standard eingestellt ist.</string>
+    <string name="defaults_advice_watchlater_default">Du solltest die "Standardmäßig öffnen"-Einstellungen für die Später Ansehen-App ändern. Setze die Aktionen auf Standard zurück, so dass sie nicht als Standard eingestellt ist.</string>
+    <string name="defaults_advice_other_app_default">Du solltest die "Standardmäßig öffnen"-Einstellungen für die %1$s-App ändern. Setze die Aktionen auf Standard zurück, so dass sie nicht als Standard eingestellt ist.</string>
+    <string name="no_youtube_installed">Die YouTube-App ist nicht installiert.</string>
 </resources>

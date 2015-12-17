@@ -23,21 +23,20 @@
 package com.lambdasoup.watchlater;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.view.MenuItem;
-import android.webkit.WebView;
 
-
-public class AboutActivity extends UpAsBackActivity {
-
+/**
+ * Created by jl on 16.12.15.
+ */
+public abstract class UpAsBackActivity extends Activity {
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		WebView webView = new WebView(this);
-		webView.loadUrl("file:///android_asset/html/about.html");
-		setContentView(webView);
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				finish();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
-
-
 }

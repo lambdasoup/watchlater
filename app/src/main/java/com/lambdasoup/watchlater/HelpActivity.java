@@ -27,7 +27,7 @@ import android.os.Bundle;
 import android.webkit.WebView;
 
 
-public class HelpActivity extends Activity {
+public class HelpActivity extends UpAsBackActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

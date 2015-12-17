@@ -32,6 +32,10 @@ public class LauncherActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
+
+        if (getFragmentManager().findFragmentByTag(MainActivityMenuFragment.TAG) == null) {
+            getFragmentManager().beginTransaction().add(MainActivityMenuFragment.newInstance(), MainActivityMenuFragment.TAG).commit();
+        }
     }
 
     @Override

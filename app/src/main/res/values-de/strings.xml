@@ -39,7 +39,7 @@
     <string name="error_playlist_full">Die "Später ansehen"-Liste von <xliff:g id="channel_title" example="Jane Smith">%1$s</xliff:g> ist bereits voll.</string>
 
     <string name="choose_account">Konto auswählen</string>
-    <string name="no_account">Keine Google-Konten auf diesem Gerät gefunden.</string>
+    <string name="error_no_account">Keine Google-Konten auf diesem Gerät gefunden.</string>
     <string name="error_already_in_playlist">Das Video war bereits in der "Später ansehen"-Liste von <xliff:g id="channel_title" example="Jane Smith">%1$s</xliff:g>.</string>
     <string name="error_not_a_video">Dieser Link scheint kein Video zu sein. Watchlater kann ihn nicht deiner "Später ansehen"-Liste hinzufügen. Bitte versuche, ihn mit einer anderen App zu öffnen.</string>
     <string name="error_video_not_found">Konnte das Video nicht deiner "Später Ansehen"-Liste hinzufügen: Das Video existiert nicht mehr.</string>
@@ -67,4 +67,11 @@
     <string name="defaults_advice_watchlater_default">Du solltest die "Standardmäßig öffnen"-Einstellungen für die Später Ansehen-App ändern. Setze die Aktionen auf Standard zurück, so dass sie nicht als Standard eingestellt ist.</string>
     <string name="defaults_advice_other_app_default">Du solltest die "Standardmäßig öffnen"-Einstellungen für die %1$s-App ändern. Setze die Aktionen auf Standard zurück, so dass sie nicht als Standard eingestellt ist.</string>
     <string name="no_youtube_installed">Die YouTube-App ist nicht installiert.</string>
+    <string name="always_use_this_account">Immer dieses Konto verwenden</string>
+    <string name="pref_youtube_accounts">YouTube-Konten</string>
+    <string name="pref_default_account_name_title">Kontoauswahl zurücksetzen</string>
+    <string name="pref_default_account_name_no_default">Kein Account zum immer Verwenden ausgewählt.</string>
+    <string name="pref_default_account_name_summary">Immer %1$s verwenden.</string>
+    <string name="menu_settings">Einstellungen</string>
+    <string name="title_activity_settings">Einstellungen</string>
 </resources>

@@ -30,12 +30,14 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.Menu;
@@ -47,6 +49,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,32 +71,33 @@ import retrofit.converter.GsonConverter;
 
 import static android.net.Uri.decode;
 import static android.net.Uri.parse;
+import static com.lambdasoup.watchlater.SettingsActivity.PREF_KEY_DEFAULT_ACCOUNT_NAME;
 
 
 public class AddActivity extends Activity {
 
-	private static final String SCOPE_YOUTUBE                    = "oauth2:https://www.googleapis.com/auth/youtube";
-	private static final String PERMISSION_GET_ACCOUNTS          = "android.permission.GET_ACCOUNTS";
-	private static final int    PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
-	private static final String KEY_ACCOUNT       = "com.lambdasoup.watchlater_account";
-	private static final String KEY_TOKEN         = "com.lambdasoup.watchlater_token";
-	private static final String KEY_PLAYLIST_ID   = "com.lambdasoup.watchlater_playlistId";
-	private static final String KEY_CHANNEL_TITLE = "com.lambdasoup.watchlater_channelTitle";
-	private static final String KEY_RESULT        = "com.lambdasoup.watchlater_result";
+	private static final String   SCOPE_YOUTUBE                    = "oauth2:https://www.googleapis.com/auth/youtube";
+	private static final String   PERMISSION_GET_ACCOUNTS          = "android.permission.GET_ACCOUNTS";
+	private static final int      PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
+	private static final String   KEY_ACCOUNT                      = "com.lambdasoup.watchlater_account";
+	private static final String   KEY_TOKEN                        = "com.lambdasoup.watchlater_token";
+	private static final String   KEY_PLAYLIST_ID                  = "com.lambdasoup.watchlater_playlistId";
+	private static final String   KEY_CHANNEL_TITLE                = "com.lambdasoup.watchlater_channelTitle";
+	private static final String   KEY_RESULT                       = "com.lambdasoup.watchlater_result";
 	// fields are not final to be somewhat accessible for testing to inject other values
 	@SuppressWarnings("FieldCanBeLocal")
-	private static String   YOUTUBE_ENDPOINT                = "https://www.googleapis.com/youtube/v3";
-	private static String   ACCOUNT_TYPE_GOOGLE             = "com.google";
-	private static Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR = null;
+	private static       String   YOUTUBE_ENDPOINT                 = "https://www.googleapis.com/youtube/v3";
+	private static       String   ACCOUNT_TYPE_GOOGLE              = "com.google";
+	private static       Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR  = null;
 	private AccountManager          manager;
 	private YoutubeApi              api;
 	private WatchlaterDialogContent mainContent;
-	private Account          account;
-	private String           token;
-	private String           playlistId;
-	private String           channelTitle;
-	private WatchlaterResult result;
-	private boolean          tokenRetried;
+	private Account                 account;
+	private String                  token;
+	private String                  playlistId;
+	private String                  channelTitle;
+	private WatchlaterResult        result;
+	private boolean                 tokenRetried;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +118,10 @@ public class AddActivity extends Activity {
 			account = savedInstanceState.getParcelable(KEY_ACCOUNT);
 			channelTitle = savedInstanceState.getString(KEY_CHANNEL_TITLE);
 			result = savedInstanceState.getParcelable(KEY_RESULT);
+		}
+
+		if (getFragmentManager().findFragmentByTag(MainActivityMenuFragment.TAG) == null) {
+			getFragmentManager().beginTransaction().add(MainActivityMenuFragment.newInstance(), MainActivityMenuFragment.TAG).commit();
 		}
 		addToWatchLaterAndShow();
 	}
@@ -150,12 +158,6 @@ public class AddActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.menu_about:
-				showAbout();
-				return true;
-			case R.id.menu_help:
-				showHelp();
-				return true;
 			case R.id.menu_open_with_youtube:
 				openWithYoutube();
 				return true;
@@ -164,13 +166,6 @@ public class AddActivity extends Activity {
 		}
 	}
 
-	private void showAbout() {
-		startActivity(new Intent(this, AboutActivity.class));
-	}
-
-	private void showHelp() {
-		startActivity(new Intent(this, HelpActivity.class));
-	}
 
 	private void addToWatchLaterAndShow() {
 		if (result != null) {
@@ -291,24 +286,38 @@ public class AddActivity extends Activity {
 		}
 		Account[] accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE);
 
-		if (accounts.length != 1) {
+		if (accounts.length == 0) {
+			onResult(WatchlaterResult.error(ErrorType.NO_ACCOUNT));
+			return;
+		} else if (accounts.length != 1) {
 			onMultipleAccounts();
 			return;
 		}
 
-		this.account = accounts[0];
-		addToWatchLaterAndShow();
+		onAccountChosen(accounts[0]);
 	}
 
 
-
 	private void onMultipleAccounts() {
-		final ListView listView = (ListView) findViewById(R.id.account_list);
-		View header = getLayoutInflater().inflate(R.layout.list_header_account_chooser, listView, false);
-		listView.addHeaderView(header, null, false); // header should not be selectable
-		listView.setEmptyView(findViewById(R.id.account_chooser_empty));
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String defaultAccountName = prefs.getString(PREF_KEY_DEFAULT_ACCOUNT_NAME, null);
+		Account[] accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE);
+		for (Account account : accounts) {
+			if (account.name.equals(defaultAccountName)) {
+				onAccountChosen(account);
+				return;
+			}
+		}
 
-		final ArrayAdapter<Account> adapter = new ArrayAdapter<Account>(this, R.layout.item_account, manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE)) {
+		// no account set as default or default account not available any more
+		if (defaultAccountName != null) { // out of date default account
+			prefs.edit().remove(PREF_KEY_DEFAULT_ACCOUNT_NAME).apply();
+		}
+
+
+		final ListView listView = (ListView) findViewById(R.id.account_list);
+
+		final ArrayAdapter<Account> adapter = new ArrayAdapter<Account>(this, R.layout.item_account, accounts) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				TextView accountName;
@@ -322,18 +331,28 @@ public class AddActivity extends Activity {
 			}
 		};
 		listView.setAdapter(adapter);
-		listView.setOnItemClickListener((parent, view, position, id) ->
-						onAccountChosen(adapter.getItem(position - listView.getHeaderViewsCount()))
+		listView.setOnItemClickListener(
+				(parent, view, position, id) -> findViewById(R.id.button_add_with_selected_account).setEnabled(true)
 		);
 
 		mainContent.showAccountChooser();
 	}
 
+	public void onMultiAccountDone(View view) {
+		ListView accountsList = (ListView) findViewById(R.id.account_list);
+		Account account = (Account) accountsList.getAdapter().getItem(accountsList.getCheckedItemPosition());
+
+		if (((CheckBox) findViewById(R.id.checkbox_always_use_selected_account)).isChecked()) {
+			PreferenceManager.getDefaultSharedPreferences(this).edit().putString(PREF_KEY_DEFAULT_ACCOUNT_NAME, account.name).apply();
+		}
+		onAccountChosen(account);
+	}
+
+
 	private void onAccountChosen(Account account) {
 		this.account = account;
 		addToWatchLaterAndShow();
 	}
-
 
 	private void insertPlaylistItemAndRetry() {
 		mainContent.showProgress();
@@ -479,7 +498,8 @@ public class AddActivity extends Activity {
 		OTHER(R.string.error_other, true),
 		PERMISSION_REQUIRED_ACCOUNTS(R.string.error_permission_required_accounts, true),
 		PLAYLIST_FULL(R.string.error_playlist_full, true),
-		VIDEO_NOT_FOUND(R.string.error_video_not_found, false);
+		VIDEO_NOT_FOUND(R.string.error_video_not_found, false),
+		NO_ACCOUNT(R.string.error_no_account, true);
 
 		final int     msgId;
 		final boolean allowRetry;
@@ -495,6 +515,8 @@ public class AddActivity extends Activity {
 					return ALREADY_IN_PLAYLIST;
 				case NEED_ACCESS:
 					return NEED_ACCESS;
+				case NO_ACCOUNT:
+					return NO_ACCOUNT;
 				case NOT_A_VIDEO:
 					return NOT_A_VIDEO;
 				case OTHER:

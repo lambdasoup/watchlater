@@ -59,10 +59,12 @@
                 </action>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED">
                 </action>
+
                 <category android:name="android.intent.category.DEFAULT">
                 </category>
                 <category android:name="android.intent.category.BROWSABLE">
                 </category>
+
                 <data android:scheme="http">
                 </data>
                 <data android:scheme="https">
@@ -91,10 +93,12 @@
                 </action>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED">
                 </action>
+
                 <category android:name="android.intent.category.DEFAULT">
                 </category>
                 <category android:name="android.intent.category.BROWSABLE">
                 </category>
+
                 <data android:scheme="http">
                 </data>
                 <data android:scheme="https">
@@ -111,10 +115,12 @@
                 </action>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED">
                 </action>
+
                 <category android:name="android.intent.category.DEFAULT">
                 </category>
                 <category android:name="android.intent.category.BROWSABLE">
                 </category>
+
                 <data android:scheme="vnd.youtube">
                 </data>
                 <data android:scheme="vnd.youtube.launch">
@@ -124,12 +130,17 @@
         <activity
             android:name=".AboutActivity"
             android:label="@string/title_activity_about"
-            android:parentActivityName=".AddActivity">
+            android:parentActivityName=".LauncherActivity">
         </activity>
         <activity
             android:name=".HelpActivity"
             android:label="@string/title_activity_help"
-            android:parentActivityName=".AddActivity">
+            android:parentActivityName=".LauncherActivity">
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".LauncherActivity">
         </activity>
     </application>
 

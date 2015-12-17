@@ -99,24 +99,56 @@
 
     </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/account_chooser"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/account_chooser_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:text="@string/choose_account"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            />
 
         <ListView
             android:id="@+id/account_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-        <TextView
-            android:id="@+id/account_chooser_empty"
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/no_account"/>
+            android:layout_below="@id/account_chooser_header"
+            android:layout_above="@+id/checkbox_always_use_selected_account"
+            android:choiceMode="singleChoice"
+            android:listSelector="#666666"/>
 
-    </LinearLayout>
+        <CheckBox
+            android:id="@+id/checkbox_always_use_selected_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/button_add_with_selected_account"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            />
+        <TextView
+            android:id="@+id/account_always_use_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/always_use_this_account"
+            android:layout_alignBaseline="@+id/checkbox_always_use_selected_account"
+            android:layout_toRightOf="@id/checkbox_always_use_selected_account"
+            android:layout_toEndOf="@id/checkbox_always_use_selected_account"
+            />
+        <Button
+            android:id="@+id/button_add_with_selected_account"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="@string/button_add_with_selected_account"
+            android:onClick="onMultiAccountDone"
+            android:enabled="false"/>
+    </RelativeLayout>
 
 </com.lambdasoup.watchlater.WatchlaterDialogContent>

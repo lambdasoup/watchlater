@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <!--
   ~ Copyright (c) 2015.
   ~
@@ -23,13 +21,16 @@
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<TextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:text="@string/choose_account"
-    android:textAllCaps="true"
-    android:textColor="@android:color/white"
-    android:textStyle="bold"
-    tools:showIn="@layout/activity_add"/>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="pref_key_account_settings"
+        android:title="@string/pref_youtube_accounts">
+        <Preference
+            android:key="pref_key_default_account_name"
+            android:title="@string/pref_default_account_name_title"
+            android:summary="@string/pref_default_account_name_summary"
+            android:enabled="false"/>
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

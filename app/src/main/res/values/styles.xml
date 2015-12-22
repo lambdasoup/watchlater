@@ -33,4 +33,8 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
+    <style name="HelpText" parent="android:TextAppearance.Holo.Small.Inverse">
+        <item name="android:textColor">@android:color/holo_blue_light</item>
+    </style>
+
 </resources>

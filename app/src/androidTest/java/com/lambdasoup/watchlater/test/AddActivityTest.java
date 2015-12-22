@@ -159,7 +159,7 @@ public class AddActivityTest {
     public void noAccount() throws Exception {
         activityTestRule.launchActivity(null);
 
-        onView(withText(R.string.no_account)).check(matches(isDisplayed()));
+        onView(withText(R.string.error_no_account)).check(matches(isDisplayed()));
     }
 
     @Test

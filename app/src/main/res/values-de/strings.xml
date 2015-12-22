@@ -31,6 +31,7 @@
     <string name="menu_about">Über</string>
 
     <string name="button_retry">Wiederholen</string>
+    <string name="activetext_help_no_channel">Wie kann ich das beheben?</string>
 
     <string name="success_added_video">Video erfolgreich zur "Später ansehen"-Liste von <xliff:g id="channel_title" example="Jane Smith">%1$s</xliff:g> hinzugefügt</string>
 
@@ -49,6 +50,8 @@
     <string name="menu_help">Hilfe</string>
     <string name="title_activity_help">Hilfe</string>
     <string name="error_permission_required_accounts">Die Später ansehen-App benötigt deine Erlaubnis, um auf die auf deinem Gerät konfigurierten Konten zuzugreifen, damit sie auf deinen Youtube-Account zugreifen kann, ohne dein Passwort zu kennen.</string>
+    <string name="error_account_has_no_channel">Kann nicht auf deine Später Ansehen-Liste zugreifen, weil dein YouTube-Konto keinen Kanal hat.</string>
+
 
     <string name="explanation">Später Ansehen ist eine alternative App, um YouTube-Links zu öffnen und dabei automatisch der "Später ansehen"-Liste hinzuzufügen. Wenn die YouTube-App deine Standard-App zum Öffnen von YouTube-Links ist, kann das nicht funktionieren. Wahrscheinlich möchtest du jedesmal wählen, ob du YouTube oder Später Ansehen verwenden möchtest. Probier es aus, indem du unten auf "Beispiel" drückst!</string>
     <string name="button_example">Beispiel</string>

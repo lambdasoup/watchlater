@@ -56,13 +56,13 @@ public class MainActivityMenuFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menu_about:
-				startActivity(new Intent(getContext(), AboutActivity.class));
+				startActivity(new Intent(getActivity(), AboutActivity.class));
 				return true;
 			case R.id.menu_help:
-				startActivity(new Intent(getContext(), HelpActivity.class));
+				startActivity(new Intent(getActivity(), HelpActivity.class));
 				return true;
 			case R.id.menu_settings:
-				startActivity(new Intent(getContext(), SettingsActivity.class));
+				startActivity(new Intent(getActivity(), SettingsActivity.class));
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

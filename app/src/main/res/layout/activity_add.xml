@@ -88,6 +88,16 @@
             android:layout_centerHorizontal="true"
             tools:text="Could not query moon crater list"/>
 
+        <TextView
+            android:id="@+id/activetext_help_no_channel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/error_msg"
+            style="@style/HelpText"
+            android:onClick="onHelp"
+            android:clickable="true"
+            android:text="@string/activetext_help_no_channel"/>
+
         <Button
             android:id="@+id/button_retry"
             android:layout_width="wrap_content"

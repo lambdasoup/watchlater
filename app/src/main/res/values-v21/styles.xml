@@ -33,4 +33,8 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
+    <style name="HelpText" parent="android:TextAppearance.Material.Small.Inverse">
+        <item name="android:textColor">?android:attr/colorAccent</item>
+    </style>
+
 </resources>

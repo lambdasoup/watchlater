@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.Menu;
@@ -48,7 +49,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -60,7 +60,10 @@ import com.lambdasoup.watchlater.YoutubeApi.ErrorTranslatingCallback;
 import com.lambdasoup.watchlater.YoutubeApi.ErrorType;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 import retrofit.RestAdapter;
@@ -414,8 +417,9 @@ public class AddActivity extends Activity {
 		TextView errorMsg = (TextView) findViewById(R.id.error_msg);
 		errorMsg.setText(msg);
 
-		Button retryButton = (Button) findViewById(R.id.button_retry);
-		retryButton.setVisibility(errorResult.allowRetry ? View.VISIBLE : View.GONE);
+		for (ErrorResult.MoreErrorView errorButton : ErrorResult.MoreErrorView.values()) {
+			findViewById(errorButton.buttonId).setVisibility(errorResult.additionalViews.contains(errorButton) ? View.VISIBLE : View.GONE);
+		}
 
 		mainContent.showError();
 	}
@@ -453,6 +457,10 @@ public class AddActivity extends Activity {
 		addToWatchLaterAndShow();
 	}
 
+	public void onHelp(View v) {
+		startActivity(new Intent(this, HelpActivity.class));
+	}
+
 	public void openWithYoutube() {
 		try {
 			Intent intent = new Intent()
@@ -470,6 +478,10 @@ public class AddActivity extends Activity {
 		api.listMyChannels(new ErrorHandlingCallback<YoutubeApi.Channels>() {
 			@Override
 			public void success(YoutubeApi.Channels channels, Response response) {
+				if (channels.items.isEmpty()) {
+					onResult(WatchlaterResult.error(ErrorType.ACCOUNT_HAS_NO_CHANNEL));
+					return;
+				}
 				playlistId = channels.items.get(0).contentDetails.relatedPlaylists.watchLater;
 				channelTitle = channels.items.get(0).snippet.title;
 				if (channelTitle == null || channelTitle.isEmpty()) {
@@ -492,25 +504,28 @@ public class AddActivity extends Activity {
 
 
 	enum ErrorResult {
-		ALREADY_IN_PLAYLIST(R.string.error_already_in_playlist, false),
-		NEED_ACCESS(R.string.error_need_account, true),
-		NOT_A_VIDEO(R.string.error_not_a_video, false),
-		OTHER(R.string.error_other, true),
-		PERMISSION_REQUIRED_ACCOUNTS(R.string.error_permission_required_accounts, true),
-		PLAYLIST_FULL(R.string.error_playlist_full, true),
-		VIDEO_NOT_FOUND(R.string.error_video_not_found, false),
-		NO_ACCOUNT(R.string.error_no_account, true);
+		ALREADY_IN_PLAYLIST(R.string.error_already_in_playlist),
+		NEED_ACCESS(R.string.error_need_account, MoreErrorView.RETRY),
+		NOT_A_VIDEO(R.string.error_not_a_video),
+		OTHER(R.string.error_other, MoreErrorView.RETRY),
+		PERMISSION_REQUIRED_ACCOUNTS(R.string.error_permission_required_accounts, MoreErrorView.RETRY),
+		PLAYLIST_FULL(R.string.error_playlist_full, MoreErrorView.RETRY),
+		VIDEO_NOT_FOUND(R.string.error_video_not_found),
+		NO_ACCOUNT(R.string.error_no_account, MoreErrorView.RETRY),
+		ACCOUNT_HAS_NO_CHANNEL(R.string.error_account_has_no_channel, MoreErrorView.RETRY, MoreErrorView.HELP_NO_CHANNEL);
 
-		final int     msgId;
-		final boolean allowRetry;
+		final int                msgId;
+		final Set<MoreErrorView> additionalViews;
 
-		ErrorResult(int msgId, boolean allowRetry) {
-			this.allowRetry = allowRetry;
+		ErrorResult(int msgId, @IdRes MoreErrorView... additionalViews) {
+			this.additionalViews = additionalViews.length == 0 ? EnumSet.noneOf(MoreErrorView.class) : EnumSet.copyOf(Arrays.asList(additionalViews));
 			this.msgId = msgId;
 		}
 
 		static ErrorResult fromErrorType(ErrorType errorType) {
 			switch (errorType) {
+				case ACCOUNT_HAS_NO_CHANNEL:
+					return ACCOUNT_HAS_NO_CHANNEL;
 				case ALREADY_IN_PLAYLIST:
 					return ALREADY_IN_PLAYLIST;
 				case NEED_ACCESS:
@@ -533,7 +548,18 @@ public class AddActivity extends Activity {
 			}
 		}
 
+		enum MoreErrorView {
+			RETRY(R.id.button_retry),
+			HELP_NO_CHANNEL(R.id.activetext_help_no_channel);
 
+			final
+			@IdRes
+			int buttonId;
+
+			MoreErrorView(@IdRes int buttonId) {
+				this.buttonId = buttonId;
+			}
+		}
 	}
 
 	static class WatchlaterResult implements Parcelable {

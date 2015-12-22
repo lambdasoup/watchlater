@@ -32,6 +32,7 @@
     <string name="menu_about">About</string>
 
     <string name="button_retry">Try again</string>
+    <string name="activetext_help_no_channel">How can I change this?</string>
 
     <string name="success_added_video">Successfully added video to Watch Later playlist of <xliff:g example="Jane Smith" id="channel_title">%1$s</xliff:g></string>
 
@@ -41,6 +42,7 @@
     <string name="error_not_a_video">This does not seem to be a video. Watchlater cannot add it to your Watch Later playlist. Please try opening it again using another app.</string>
     <string name="error_already_in_playlist">This video was already in the Watch Later playlist of <xliff:g example="Jane Smith" id="channel_title">%1$s</xliff:g>.</string>
     <string name="error_video_not_found">Could not add video to your Watch Later playlist: The video does not exist anymore.</string>
+    <string name="error_account_has_no_channel">Cannot get access to your Watch Later playlist, because  the YouTube account has no channel.</string>
 
     <string name="choose_account">Choose account</string>
     <string name="error_no_account">No Google accounts found on this device.</string>

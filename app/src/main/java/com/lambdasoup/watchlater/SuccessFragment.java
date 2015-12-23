@@ -22,22 +22,18 @@
 
 package com.lambdasoup.watchlater;
 
-import android.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Locale;
 
+public class SuccessFragment extends ChannelTitleAwareFragment {
 
-public class SuccessFragment extends Fragment {
-	private static final String ARG_CHANNEL_TITLE  = "com.lambdasoup.watchlater.ARG_CHANNEL_TITLE";
 	private static final String ARG_SUCCESS_RESULT = "com.lambdasoup.watchlater.ARG_SUCCESS_RESULT";
 
-	private String                    channelTitle;
+
 	private AddActivity.SuccessResult successResult;
 
 
@@ -45,12 +41,11 @@ public class SuccessFragment extends Fragment {
 		if (result == null) {
 			throw new IllegalArgumentException("Supplied result must be non-null");
 		}
-		if (! result.isSuccess()) {
+		if (!result.isSuccess()) {
 			throw new IllegalArgumentException("Supplied result " + result + " is not a success");
 		}
 		SuccessFragment fragment = new SuccessFragment();
-		Bundle args = new Bundle();
-		args.putString(ARG_CHANNEL_TITLE, channelTitle);
+		Bundle args = fragment.init(channelTitle);
 		args.putParcelable(ARG_SUCCESS_RESULT, result);
 		fragment.setArguments(args);
 		return fragment;
@@ -64,8 +59,8 @@ public class SuccessFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (getArguments() != null) {
-			channelTitle = getArguments().getString(ARG_CHANNEL_TITLE);
-			((AddActivity.WatchlaterResult) getArguments().getParcelable(ARG_SUCCESS_RESULT)).apply(success -> successResult = success, err -> {});
+			((AddActivity.WatchlaterResult) getArguments().getParcelable(ARG_SUCCESS_RESULT)).apply(success -> successResult = success, err -> {
+			});
 		}
 	}
 
@@ -87,11 +82,4 @@ public class SuccessFragment extends Fragment {
 		return successView;
 	}
 
-	// TODO: DRY
-	private CharSequence withChannelTitle(@StringRes int msgId) {
-		return String.format(
-				Locale.getDefault(),
-				getResources().getString(msgId),
-				channelTitle);
-	}
 }

@@ -33,19 +33,10 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ErrorFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ErrorFragment extends Fragment {
-	private static final String ARG_CHANNEL_TITLE = "com.lambdasoup.watchlater.ARG_CHANNEL_TITLE";
+
+public class ErrorFragment extends ChannelTitleAwareFragment {
 	private static final String ARG_ERROR_RESULT  = "com.lambdasoup.watchlater.ARG_ERROR_RESULT";
 
-	private String                  channelTitle;
 	private AddActivity.ErrorResult errorResult;
 
 	private OnFragmentInteractionListener mListener;
@@ -59,8 +50,7 @@ public class ErrorFragment extends Fragment {
 			throw new IllegalArgumentException("Supplied result " + result + " is not an error");
 		}
 		ErrorFragment fragment = new ErrorFragment();
-		Bundle args = new Bundle();
-		args.putString(ARG_CHANNEL_TITLE, channelTitle);
+		Bundle args = fragment.init(channelTitle);
 		args.putParcelable(ARG_ERROR_RESULT, result);
 		fragment.setArguments(args);
 		return fragment;
@@ -74,7 +64,6 @@ public class ErrorFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (getArguments() != null) {
-			channelTitle = getArguments().getString(ARG_CHANNEL_TITLE);
 			((AddActivity.WatchlaterResult) getArguments().getParcelable(ARG_ERROR_RESULT)).apply(success -> {
 			}, err -> errorResult = err);
 		}
@@ -130,11 +119,5 @@ public class ErrorFragment extends Fragment {
 		void onRetry();
 	}
 
-	// TODO: DRY
-	private CharSequence withChannelTitle(@StringRes int msgId) {
-		return String.format(
-				Locale.getDefault(),
-				getResources().getString(msgId),
-				channelTitle);
-	}
+
 }

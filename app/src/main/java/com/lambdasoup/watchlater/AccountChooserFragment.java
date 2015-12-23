@@ -25,7 +25,6 @@ package com.lambdasoup.watchlater;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

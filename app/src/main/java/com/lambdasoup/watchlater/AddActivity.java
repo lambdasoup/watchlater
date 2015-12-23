@@ -45,14 +45,8 @@ import android.support.annotation.StringRes;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -322,8 +316,6 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 	}
 
 
-
-
 	@Override
 	public void onAccountChosen(Account account) {
 		this.account = account;
@@ -378,7 +370,6 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		api = adapter.create(YoutubeApi.class);
 	}
 
-	// TODO: DRY
 	private CharSequence withChannelTitle(@StringRes int msgId) {
 		return String.format(
 				Locale.getDefault(),

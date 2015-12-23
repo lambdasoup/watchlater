@@ -28,6 +28,7 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -77,7 +78,7 @@ import static android.net.Uri.parse;
 import static com.lambdasoup.watchlater.SettingsActivity.PREF_KEY_DEFAULT_ACCOUNT_NAME;
 
 
-public class AddActivity extends Activity {
+public class AddActivity extends Activity implements ErrorFragment.OnFragmentInteractionListener, AccountChooserFragment.OnFragmentInteractionListener {
 
 	private static final String   SCOPE_YOUTUBE                    = "oauth2:https://www.googleapis.com/auth/youtube";
 	private static final String   PERMISSION_GET_ACCOUNTS          = "android.permission.GET_ACCOUNTS";
@@ -92,15 +93,15 @@ public class AddActivity extends Activity {
 	private static       String   YOUTUBE_ENDPOINT                 = "https://www.googleapis.com/youtube/v3";
 	private static       String   ACCOUNT_TYPE_GOOGLE              = "com.google";
 	private static       Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR  = null;
-	private AccountManager          manager;
-	private YoutubeApi              api;
-	private WatchlaterDialogContent mainContent;
-	private Account                 account;
-	private String                  token;
-	private String                  playlistId;
-	private String                  channelTitle;
-	private WatchlaterResult        result;
-	private boolean                 tokenRetried;
+	private AccountManager      manager;
+	private YoutubeApi          api;
+	private FragmentCoordinator fragmentCoordinator;
+	private Account             account;
+	private String              token;
+	private String              playlistId;
+	private String              channelTitle;
+	private WatchlaterResult    result;
+	private boolean             tokenRetried;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +111,7 @@ public class AddActivity extends Activity {
 
 		setContentView(R.layout.activity_add);
 
-		mainContent = (WatchlaterDialogContent) findViewById(R.id.progress_animator);
+		fragmentCoordinator = new FragmentCoordinator();
 
 		manager = AccountManager.get(this);
 		setApiAdapter();
@@ -209,7 +210,7 @@ public class AddActivity extends Activity {
 	@TargetApi(23)
 	private void tryAcquireAccountsPermission() {
 		requestPermissions(new String[]{PERMISSION_GET_ACCOUNTS}, PERMISSIONS_REQUEST_GET_ACCOUNTS);
-		mainContent.showProgress();
+		fragmentCoordinator.showProgress();
 	}
 
 	@TargetApi(23)
@@ -265,7 +266,7 @@ public class AddActivity extends Activity {
 	}
 
 	private void setAuthTokenAndRetry() {
-		mainContent.showProgress();
+		fragmentCoordinator.showProgress();
 		manager.getAuthToken(account, SCOPE_YOUTUBE, null, this, future -> {
 			try {
 				token = future.getResult().getString(AccountManager.KEY_AUTHTOKEN);
@@ -317,48 +318,25 @@ public class AddActivity extends Activity {
 			prefs.edit().remove(PREF_KEY_DEFAULT_ACCOUNT_NAME).apply();
 		}
 
-
-		final ListView listView = (ListView) findViewById(R.id.account_list);
-
-		final ArrayAdapter<Account> adapter = new ArrayAdapter<Account>(this, R.layout.item_account, accounts) {
-			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
-				TextView accountName;
-				if (convertView != null) {
-					accountName = (TextView) convertView;
-				} else {
-					accountName = (TextView) getLayoutInflater().inflate(R.layout.item_account, parent, false);
-				}
-				accountName.setText(getItem(position).name);
-				return accountName;
-			}
-		};
-		listView.setAdapter(adapter);
-		listView.setOnItemClickListener(
-				(parent, view, position, id) -> findViewById(R.id.button_add_with_selected_account).setEnabled(true)
-		);
-
-		mainContent.showAccountChooser();
-	}
-
-	public void onMultiAccountDone(View view) {
-		ListView accountsList = (ListView) findViewById(R.id.account_list);
-		Account account = (Account) accountsList.getAdapter().getItem(accountsList.getCheckedItemPosition());
-
-		if (((CheckBox) findViewById(R.id.checkbox_always_use_selected_account)).isChecked()) {
-			PreferenceManager.getDefaultSharedPreferences(this).edit().putString(PREF_KEY_DEFAULT_ACCOUNT_NAME, account.name).apply();
-		}
-		onAccountChosen(account);
+		fragmentCoordinator.showAccountChooser(accounts);
 	}
 
 
-	private void onAccountChosen(Account account) {
+
+
+	@Override
+	public void onAccountChosen(Account account) {
 		this.account = account;
 		addToWatchLaterAndShow();
 	}
 
+	@Override
+	public void onSetDefaultAccount(Account account) {
+		PreferenceManager.getDefaultSharedPreferences(this).edit().putString(PREF_KEY_DEFAULT_ACCOUNT_NAME, account.name).apply();
+	}
+
 	private void insertPlaylistItemAndRetry() {
-		mainContent.showProgress();
+		fragmentCoordinator.showProgress();
 		try {
 			YoutubeApi.PlaylistItem.Snippet.ResourceId resourceId = new YoutubeApi.PlaylistItem.Snippet.ResourceId(getVideoId());
 			YoutubeApi.PlaylistItem.Snippet snippet = new YoutubeApi.PlaylistItem.Snippet(playlistId, resourceId, null, null);
@@ -400,6 +378,7 @@ public class AddActivity extends Activity {
 		api = adapter.create(YoutubeApi.class);
 	}
 
+	// TODO: DRY
 	private CharSequence withChannelTitle(@StringRes int msgId) {
 		return String.format(
 				Locale.getDefault(),
@@ -408,40 +387,20 @@ public class AddActivity extends Activity {
 	}
 
 	private void showError(ErrorResult errorResult) {
-		CharSequence msg = withChannelTitle(errorResult.msgId);
 		if (isFinishing()) {
-			showToast(msg);
+			showToast(withChannelTitle(errorResult.msgId));
 			return;
 		}
 
-		TextView errorMsg = (TextView) findViewById(R.id.error_msg);
-		errorMsg.setText(msg);
-
-		for (ErrorResult.MoreErrorView errorButton : ErrorResult.MoreErrorView.values()) {
-			findViewById(errorButton.buttonId).setVisibility(errorResult.additionalViews.contains(errorButton) ? View.VISIBLE : View.GONE);
-		}
-
-		mainContent.showError();
+		fragmentCoordinator.showError();
 	}
 
 	private void showSuccess(SuccessResult successResult) {
-		CharSequence msg = withChannelTitle(R.string.success_added_video);
 		if (isFinishing()) {
-			showToast(msg);
+			showToast(withChannelTitle(R.string.success_added_video));
 			return;
 		}
-
-		TextView successMsg = (TextView) findViewById(R.id.success_msg);
-		successMsg.setText(msg);
-
-		TextView title = (TextView) findViewById(R.id.success_title);
-		title.setText(successResult.title);
-
-		TextView description = (TextView) findViewById(R.id.success_description);
-		description.setText(successResult.description);
-
-
-		mainContent.showSuccess();
+		fragmentCoordinator.showSuccess();
 	}
 
 	private void showToast(@StringRes int msgId) {
@@ -452,12 +411,12 @@ public class AddActivity extends Activity {
 		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 	}
 
-	public void onRetry(View v) {
+	public void onRetry() {
 		result = null;
 		addToWatchLaterAndShow();
 	}
 
-	public void onHelp(View v) {
+	public void onShowHelp() {
 		startActivity(new Intent(this, HelpActivity.class));
 	}
 
@@ -474,7 +433,7 @@ public class AddActivity extends Activity {
 	}
 
 	private void setPlaylistIdAndRetry() {
-		mainContent.showProgress();
+		fragmentCoordinator.showProgress();
 		api.listMyChannels(new ErrorHandlingCallback<YoutubeApi.Channels>() {
 			@Override
 			public void success(YoutubeApi.Channels channels, Response response) {
@@ -697,6 +656,37 @@ public class AddActivity extends Activity {
 				default:
 					onResult(WatchlaterResult.error(errorType));
 			}
+		}
+	}
+
+	private class FragmentCoordinator {
+
+		public void showProgress() {
+			showFragment(ProgressFragment.newInstance());
+		}
+
+		public void showAccountChooser(Account[] accounts) {
+			showFragment(AccountChooserFragment.newInstance(accounts));
+		}
+
+		public void showError() {
+			showFragment(ErrorFragment.newInstance(channelTitle, result));
+		}
+
+		public void showSuccess() {
+			showFragment(SuccessFragment.newInstance(channelTitle, result));
+		}
+
+		private void showFragment(Fragment fragment) {
+			Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
+			if (currentFragment != null && currentFragment.getClass().equals(fragment.getClass())) {
+				return;
+			}
+			getFragmentManager()
+					.beginTransaction()
+					.replace(R.id.fragment_container, fragment)
+					.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+					.commit();
 		}
 	}
 }

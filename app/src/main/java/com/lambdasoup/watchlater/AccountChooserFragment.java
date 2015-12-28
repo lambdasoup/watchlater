@@ -26,6 +26,7 @@ import android.accounts.Account;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ import android.widget.TextView;
  */
 public class AccountChooserFragment extends Fragment {
 	private static final String ARG_ACCOUNTS = "com.lambdasoup.watchlater.ARG_ACCOUNTS";
+	private static final String   KEY_CHECKED_ITEM_POSITION                       = "com.lambdasoup.watchlater.checked_item_position";
 
 	private Account[] accounts;
 
@@ -71,6 +73,12 @@ public class AccountChooserFragment extends Fragment {
 	}
 
 	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt(KEY_CHECKED_ITEM_POSITION, ((ListView) getView().findViewById(R.id.account_list)).getCheckedItemPosition());
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
 		View accountChooserView = inflater.inflate(R.layout.fragment_account_chooser, container, false);
@@ -94,6 +102,16 @@ public class AccountChooserFragment extends Fragment {
 		listView.setOnItemClickListener(
 				(parent, view, position, id) -> accountChooserView.findViewById(R.id.button_add_with_selected_account).setEnabled(true)
 		);
+
+		if (savedInstanceState != null) {
+			int pos = savedInstanceState.getInt(KEY_CHECKED_ITEM_POSITION);
+			if (pos != ListView.INVALID_POSITION) {
+				listView.setItemChecked(pos, true);
+				listView.setSelection(pos);
+
+				accountChooserView.findViewById(R.id.button_add_with_selected_account).setEnabled(true);
+			}
+		}
 
 		accountChooserView.findViewById(R.id.button_add_with_selected_account).setOnClickListener(v -> onMultiAccountDone());
 		return accountChooserView;

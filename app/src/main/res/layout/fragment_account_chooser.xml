@@ -43,8 +43,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/checkbox_always_use_selected_account"
         android:layout_below="@id/account_chooser_header"
-        android:choiceMode="singleChoice"
-        android:listSelector="#666666"/>
+        android:choiceMode="singleChoice"/>
 
     <CheckBox
         android:id="@+id/checkbox_always_use_selected_account"

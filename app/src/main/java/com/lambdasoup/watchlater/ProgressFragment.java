@@ -44,8 +44,7 @@ public class ProgressFragment extends Fragment {
 	 */
 	// TODO: Rename and change types and number of parameters
 	public static ProgressFragment newInstance() {
-		ProgressFragment fragment = new ProgressFragment();
-		return fragment;
+		return new ProgressFragment();
 	}
 
 	public ProgressFragment() {

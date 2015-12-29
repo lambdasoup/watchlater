@@ -83,9 +83,11 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 	private static final String   KEY_CHANNEL_TITLE                = "com.lambdasoup.watchlater_channelTitle";
 	private static final String   KEY_RESULT                       = "com.lambdasoup.watchlater_result";
 	// fields are not final to be somewhat accessible for testing to inject other values
-	@SuppressWarnings("FieldCanBeLocal")
+	@SuppressWarnings({"FieldCanBeLocal", "CanBeFinal"})
 	private static       String   YOUTUBE_ENDPOINT                 = "https://www.googleapis.com/youtube/v3";
+	@SuppressWarnings("CanBeFinal")
 	private static       String   ACCOUNT_TYPE_GOOGLE              = "com.google";
+	@SuppressWarnings("CanBeFinal")
 	private static       Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR  = null;
 	private AccountManager      manager;
 	private YoutubeApi          api;
@@ -386,7 +388,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		fragmentCoordinator.showError();
 	}
 
-	private void showSuccess(SuccessResult successResult) {
+	private void showSuccess(@SuppressWarnings("UnusedParameters") SuccessResult successResult) {
 		if (isFinishing()) {
 			showToast(withChannelTitle(R.string.success_added_video));
 			return;
@@ -394,6 +396,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		fragmentCoordinator.showSuccess();
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private void showToast(@StringRes int msgId) {
 		showToast(getResources().getText(msgId));
 	}
@@ -411,7 +414,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		startActivity(new Intent(this, HelpActivity.class));
 	}
 
-	public void openWithYoutube() {
+	private void openWithYoutube() {
 		try {
 			Intent intent = new Intent()
 					.setData(getIntent().getData())
@@ -533,7 +536,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 			this.error = error;
 		}
 
-		protected WatchlaterResult(Parcel in) {
+		WatchlaterResult(Parcel in) {
 			this.success = in.readParcelable(SuccessResult.class.getClassLoader());
 			int tmpError = in.readInt();
 			this.error = tmpError == -1 ? null : ErrorResult.values()[tmpError];
@@ -604,7 +607,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		}
 
 
-		protected SuccessResult(Parcel in) {
+		SuccessResult(Parcel in) {
 			this.title = in.readString();
 			this.description = in.readString();
 		}
@@ -632,6 +635,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 	private class WatchlaterException extends Exception {
 		public final ErrorType type;
 
+		@SuppressWarnings("SameParameterValue")
 		public WatchlaterException(ErrorType type) {
 			this.type = type;
 		}

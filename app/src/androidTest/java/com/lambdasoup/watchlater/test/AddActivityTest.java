@@ -83,12 +83,14 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @RunWith(AndroidJUnit4.class)
 public class AddActivityTest {
 
-    public static final String CHANNEL_TITLE = "Testi Testsdottir";
-    private static final String TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
-    private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
-    private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
-    private static MockWebServer mockWebServer;
+    private static final String  CHANNEL_TITLE     = "Testi Testsdottir";
+    private static final String  TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
+    private static final Account ACCOUNT_1         = new Account("test account 1", TEST_ACCOUNT_TYPE);
+    private static final Account ACCOUNT_2         = new Account("test account 2", TEST_ACCOUNT_TYPE);
+    private static MockWebServer     mockWebServer;
     private static RestfulDispatcher restfulDispatcher;
+
+    @SuppressWarnings("CanBeFinal")
     @Rule
     public ActivityTestRule<AddActivity> activityTestRule = new ActivityTestRule<AddActivity>(AddActivity.class, false, false) {
         @Override

@@ -22,6 +22,7 @@
 
 package com.lambdasoup.watchlater;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +38,7 @@ import android.widget.TextView;
 import static android.net.Uri.parse;
 
 
+@SuppressLint("Registered") // registered in androidTest manifest
 public class DebugLauncherActivity extends Activity {
 
 	private static final String[] VIDEO_EXAMPLE_URIS = {

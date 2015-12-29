@@ -59,8 +59,11 @@ public class SuccessFragment extends ChannelTitleAwareFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (getArguments() != null) {
-			((AddActivity.WatchlaterResult) getArguments().getParcelable(ARG_SUCCESS_RESULT)).apply(success -> successResult = success, err -> {
-			});
+			AddActivity.WatchlaterResult result = getArguments().getParcelable(ARG_SUCCESS_RESULT);
+			if (result != null) {
+				result.apply(success -> successResult = success, err -> {
+				});
+			}
 		}
 	}
 

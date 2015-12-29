@@ -29,9 +29,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-/**
- * Created by jl on 17.12.15.
- */
+
 public class MainActivityMenuFragment extends Fragment {
 
 	public static final String TAG = MainActivityMenuFragment.class.getSimpleName();

@@ -33,9 +33,7 @@ import android.preference.PreferenceGroup;
 import android.util.Log;
 import android.view.MenuItem;
 
-/**
- * Created by jl on 14.12.15.
- */
+
 public class SettingsActivity extends PreferenceActivity {
 	public static final String PREF_KEY_DEFAULT_ACCOUNT_NAME = "pref_key_default_account_name";
 

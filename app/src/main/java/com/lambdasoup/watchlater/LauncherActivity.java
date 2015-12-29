@@ -18,9 +18,7 @@ import java.util.Set;
 
 import static android.net.Uri.parse;
 
-/**
- * Created by jl on 09.12.15.
- */
+
 public class LauncherActivity extends Activity {
     private final String TAG = getClass().getSimpleName();
     private static final Uri EXAMPLE_URI = parse("https://www.youtube.com/watch?v=tntOCGkgt98");
@@ -107,11 +105,11 @@ public class LauncherActivity extends Activity {
         findViewById(R.id.settings_all_apps_button).setVisibility(showAllAppSettings ? View.VISIBLE : View.GONE);
     }
 
-    public void onExampleLink(View view) {
+    public void onExampleLink(@SuppressWarnings("UnusedParameters") View view) {
         startActivity(getExampleIntent());
     }
 
-    public void onSettingsYoutube(View view) {
+    public void onSettingsYoutube(@SuppressWarnings("UnusedParameters") View view) {
         // check if youtube is installed
         if (null != getPackageManager().resolveActivity(new Intent().setData(EXAMPLE_URI).setPackage("com.google.android.youtube"), PackageManager.MATCH_DEFAULT_ONLY)) {
             try {
@@ -124,7 +122,7 @@ public class LauncherActivity extends Activity {
         }
     }
 
-    public void onSettingsWatchlater(View view) {
+    public void onSettingsWatchlater(@SuppressWarnings("UnusedParameters") View view) {
         try {
             startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:com.lambdasoup.watchlater")));
         } catch (ActivityNotFoundException e) {
@@ -133,7 +131,7 @@ public class LauncherActivity extends Activity {
         }
     }
 
-    public void onSettingsAllApps(View view) {
+    public void onSettingsAllApps(@SuppressWarnings("UnusedParameters") View view) {
         try {
             startActivity(new Intent(Settings.ACTION_APPLICATION_SETTINGS));
         } catch (ActivityNotFoundException e) {

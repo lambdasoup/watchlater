@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (c) 2015.
   ~
@@ -21,25 +21,14 @@
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<manifest
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.lambdasoup.watchlater"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sharedUserId="com.lambdasoup.watchlater">
+<lint>
+    <issue id="MissingPermission">
+        <!-- main manifest does not provide permissions needed only for test. Those are in the test manifest. -->
+        <ignore path="src/androidTest/java/com/lambdasoup/watchlater/test"/>
+    </issue>
 
-    <application android:fullBackupContent="@xml/backup_content"
-                 tools:ignore="GoogleAppIndexingWarning">
-
-        <!--activity
-            android:name=".DebugLauncherActivity"
-            android:label="Watch Later - debug">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity-->
-
-    </application>
-
-</manifest>
+    <issue id="InvalidPackage">
+        <!-- references java.nio.file, on some codepath never executed on android -->
+        <ignore path="**/okio-1.6.0.jar"/>
+    </issue>
+</lint>

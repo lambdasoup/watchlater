@@ -23,24 +23,25 @@
 package com.lambdasoup.watchlater;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Locale;
-
 
 public class ErrorFragment extends ChannelTitleAwareFragment {
-	private static final String ARG_ERROR_RESULT  = "com.lambdasoup.watchlater.ARG_ERROR_RESULT";
+	private static final String ARG_ERROR_RESULT = "com.lambdasoup.watchlater.ARG_ERROR_RESULT";
 
 	private AddActivity.ErrorResult errorResult;
 
 	private OnFragmentInteractionListener mListener;
 
+
+	public ErrorFragment() {
+		// Required empty public constructor
+	}
 
 	public static ErrorFragment newInstance(String channelTitle, AddActivity.WatchlaterResult result) {
 		if (result == null) {
@@ -56,16 +57,14 @@ public class ErrorFragment extends ChannelTitleAwareFragment {
 		return fragment;
 	}
 
-	public ErrorFragment() {
-		// Required empty public constructor
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (getArguments() != null) {
-			((AddActivity.WatchlaterResult) getArguments().getParcelable(ARG_ERROR_RESULT)).apply(success -> {
-			}, err -> errorResult = err);
+			AddActivity.WatchlaterResult result = getArguments().getParcelable(ARG_ERROR_RESULT);
+			if (result != null) {
+				result.apply(success -> {}, err -> errorResult = err);
+			}
 		}
 	}
 
@@ -94,6 +93,8 @@ public class ErrorFragment extends ChannelTitleAwareFragment {
 	}
 
 
+	// need to keep this for compatibility with API level < 23
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onAttach(Activity context) {
 		super.onAttach(context);
@@ -104,6 +105,7 @@ public class ErrorFragment extends ChannelTitleAwareFragment {
 					+ " must implement OnFragmentInteractionListener");
 		}
 	}
+
 
 
 	@Override

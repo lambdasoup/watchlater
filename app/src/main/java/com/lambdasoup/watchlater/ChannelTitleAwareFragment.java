@@ -28,9 +28,6 @@ import android.support.annotation.StringRes;
 
 import java.util.Locale;
 
-/**
- * Created by jl on 23.12.15.
- */
 public class ChannelTitleAwareFragment extends Fragment {
 	private static final String ARG_CHANNEL_TITLE  = "com.lambdasoup.watchlater.ARG_CHANNEL_TITLE";
 
@@ -42,11 +39,12 @@ public class ChannelTitleAwareFragment extends Fragment {
 		return fragment;
 	}
 
+	@SuppressWarnings("WeakerAccess")
 	public ChannelTitleAwareFragment() {
 		// public default constructor is necessary
 	}
 
-	public Bundle init(String channelTitle) {
+	Bundle init(String channelTitle) {
 		Bundle args = new Bundle();
 		args.putString(ARG_CHANNEL_TITLE, channelTitle);
 		setArguments(args);
@@ -62,7 +60,7 @@ public class ChannelTitleAwareFragment extends Fragment {
 	}
 
 
-	protected CharSequence withChannelTitle(@StringRes int msgId) {
+	CharSequence withChannelTitle(@StringRes int msgId) {
 		return String.format(
 				Locale.getDefault(),
 				getResources().getString(msgId),

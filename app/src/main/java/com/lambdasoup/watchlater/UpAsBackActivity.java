@@ -28,9 +28,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-/**
- * Created by jl on 16.12.15.
- */
+
 public abstract class UpAsBackActivity extends Activity {
 
 	@Override

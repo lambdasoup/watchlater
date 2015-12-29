@@ -27,6 +27,7 @@ import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.accounts.NetworkErrorException;
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import android.os.IBinder;
 /**
  * Mock Service for Testing
  */
+@SuppressLint("Registered") // registered in androidTest manifest
 public class MockAuthenticatorService extends Service {
 
     @Override

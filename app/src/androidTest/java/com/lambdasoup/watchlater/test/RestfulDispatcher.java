@@ -30,10 +30,11 @@ import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("WeakerAccess")
 public class RestfulDispatcher extends Dispatcher {
-    public static final String STATUS_NOT_FOUND = "HTTP/1.1 404 Not Found";
-    private static final String TAG = "RestfulDispatcher";
-    protected final ConcurrentHashMap<String, MockResponse> responses = new ConcurrentHashMap<>();
+    private static final String                                  STATUS_NOT_FOUND = "HTTP/1.1 404 Not Found";
+    private static final String                                  TAG              = "RestfulDispatcher";
+    private final        ConcurrentHashMap<String, MockResponse> responses        = new ConcurrentHashMap<>();
 
     /**
      * Registers a canned response for a particular full path. Request method and all other info
@@ -63,7 +64,7 @@ public class RestfulDispatcher extends Dispatcher {
         return response;
     }
 
-    protected MockResponse getFailureResponse() {
+    private MockResponse getFailureResponse() {
         return new MockResponse().setStatus(STATUS_NOT_FOUND);
     }
 

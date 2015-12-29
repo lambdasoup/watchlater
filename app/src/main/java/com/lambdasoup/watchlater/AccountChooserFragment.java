@@ -25,8 +25,8 @@ package com.lambdasoup.watchlater;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,8 +44,8 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class AccountChooserFragment extends Fragment {
-	private static final String ARG_ACCOUNTS = "com.lambdasoup.watchlater.ARG_ACCOUNTS";
-	private static final String   KEY_CHECKED_ITEM_POSITION                       = "com.lambdasoup.watchlater.checked_item_position";
+	private static final String ARG_ACCOUNTS              = "com.lambdasoup.watchlater.ARG_ACCOUNTS";
+	private static final String KEY_CHECKED_ITEM_POSITION = "com.lambdasoup.watchlater.checked_item_position";
 
 	private Account[] accounts;
 
@@ -75,7 +75,10 @@ public class AccountChooserFragment extends Fragment {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putInt(KEY_CHECKED_ITEM_POSITION, ((ListView) getView().findViewById(R.id.account_list)).getCheckedItemPosition());
+		View view = getView();
+		if (view != null) {
+			outState.putInt(KEY_CHECKED_ITEM_POSITION, ((ListView) view.findViewById(R.id.account_list)).getCheckedItemPosition());
+		}
 	}
 
 	@Override
@@ -117,11 +120,15 @@ public class AccountChooserFragment extends Fragment {
 		return accountChooserView;
 	}
 
-	public void onMultiAccountDone() {
-		ListView accountsList = (ListView) getView().findViewById(R.id.account_list);
+	private void onMultiAccountDone() {
+		View view = getView();
+		if (view == null) {
+			return;
+		}
+		ListView accountsList = (ListView) view.findViewById(R.id.account_list);
 		Account account = (Account) accountsList.getAdapter().getItem(accountsList.getCheckedItemPosition());
 
-		if (((CheckBox) getView().findViewById(R.id.checkbox_always_use_selected_account)).isChecked()) {
+		if (((CheckBox) view.findViewById(R.id.checkbox_always_use_selected_account)).isChecked()) {
 			if (mListener != null) {
 				mListener.onSetDefaultAccount(account);
 			}
@@ -132,6 +139,8 @@ public class AccountChooserFragment extends Fragment {
 		}
 	}
 
+	// need to keep this for compatibility with API level < 23
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onAttach(Activity context) {
 		super.onAttach(context);
@@ -142,6 +151,7 @@ public class AccountChooserFragment extends Fragment {
 					+ " must implement OnFragmentInteractionListener");
 		}
 	}
+
 
 	@Override
 	public void onDetach() {

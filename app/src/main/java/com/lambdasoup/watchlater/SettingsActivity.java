@@ -22,7 +22,9 @@
 
 package com.lambdasoup.watchlater;
 
+import android.app.ActionBar;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -44,6 +46,17 @@ public class SettingsActivity extends PreferenceActivity {
 		getFragmentManager().beginTransaction()
 				.replace(android.R.id.content, new SettingsFragment())
 				.commit();
+
+		ActionBar actionBar = getActionBar();
+		if (actionBar != null) {
+			actionBar.setDisplayHomeAsUpEnabled(true);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
+			} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+				actionBar.setDisplayShowHomeEnabled(false);
+				actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp_padded);
+			}
+		}
 	}
 
 	@Override
@@ -72,6 +85,8 @@ public class SettingsActivity extends PreferenceActivity {
 						return true;
 					}
 			);
+
+
 		}
 
 		@Override

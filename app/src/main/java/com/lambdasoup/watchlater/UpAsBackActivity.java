@@ -22,13 +22,33 @@
 
 package com.lambdasoup.watchlater;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.os.Build;
+import android.os.Bundle;
 import android.view.MenuItem;
 
 /**
  * Created by jl on 16.12.15.
  */
 public abstract class UpAsBackActivity extends Activity {
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		ActionBar actionBar = getActionBar();
+		if (actionBar != null) {
+			actionBar.setDisplayHomeAsUpEnabled(true);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
+			} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+				actionBar.setDisplayShowHomeEnabled(false);
+				actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp_padded);
+			}
+		}
+	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

@@ -34,58 +34,58 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements IdlingResource {
-	public static final String IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
-	private static final String TAG = "RetrofitIdlingResource";
-	private final       AtomicInteger currentTaskCount = new AtomicInteger(0);
-	private volatile ResourceCallback idleTransitionCallback;
+    private static final String        IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
+    private static final String        TAG              = "RetrofitIdlingResource";
+    private final        AtomicInteger currentTaskCount = new AtomicInteger(0);
+    private volatile ResourceCallback idleTransitionCallback;
 
 
-	public RetrofitHttpExecutorIdlingResource() {
-		// imitate the retrofit 1.9.1 default http executor properties
-		super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-				new ThreadFactory() {
-					@Override
-					public Thread newThread(@NonNull final Runnable r) {
-						return new Thread(() -> {
-							android.os.Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
-							r.run();
-						}, IDLE_THREAD_NAME);
-					}
-				}
-		);
-	}
+    public RetrofitHttpExecutorIdlingResource() {
+        // imitate the retrofit 1.9.1 default http executor properties
+        super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+                new ThreadFactory() {
+                    @Override
+                    public Thread newThread(@NonNull final Runnable r) {
+                        return new Thread(() -> {
+                            android.os.Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+                            r.run();
+                        }, IDLE_THREAD_NAME);
+                    }
+                }
+        );
+    }
 
-	@Override
-	public String getName() {
-		return RetrofitHttpExecutorIdlingResource.class.getName();
-	}
+    @Override
+    public String getName() {
+        return RetrofitHttpExecutorIdlingResource.class.getName();
+    }
 
-	@Override
-	public boolean isIdleNow() {
-		boolean idle = currentTaskCount.intValue() == 0;
-		if (idle && idleTransitionCallback != null) {
-			idleTransitionCallback.onTransitionToIdle();
-		}
-		return idle;
-	}
+    @Override
+    public boolean isIdleNow() {
+        boolean idle = currentTaskCount.intValue() == 0;
+        if (idle && idleTransitionCallback != null) {
+            idleTransitionCallback.onTransitionToIdle();
+        }
+        return idle;
+    }
 
-	@Override
-	public void registerIdleTransitionCallback(ResourceCallback resourceCallback) {
-		this.idleTransitionCallback = resourceCallback;
-	}
+    @Override
+    public void registerIdleTransitionCallback(ResourceCallback resourceCallback) {
+        this.idleTransitionCallback = resourceCallback;
+    }
 
-	@Override
-	protected void afterExecute(Runnable r, Throwable t) {
-		super.afterExecute(r, t);
-		if (currentTaskCount.decrementAndGet() == 0 && idleTransitionCallback != null) {
-			idleTransitionCallback.onTransitionToIdle();
-		}
-	}
+    @Override
+    protected void afterExecute(Runnable r, Throwable t) {
+        super.afterExecute(r, t);
+        if (currentTaskCount.decrementAndGet() == 0 && idleTransitionCallback != null) {
+            idleTransitionCallback.onTransitionToIdle();
+        }
+    }
 
 
-	@Override
-	public void execute(Runnable command) {
-		currentTaskCount.incrementAndGet();
-		super.execute(command);
-	}
+    @Override
+    public void execute(Runnable command) {
+        currentTaskCount.incrementAndGet();
+        super.execute(command);
+    }
 }

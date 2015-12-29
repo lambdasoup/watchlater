@@ -48,9 +48,10 @@ public interface YoutubeApi {
 	void insertPlaylistItem(@Body PlaylistItem playlistItem, Callback<PlaylistItem> cb);
 
 	enum ErrorType {
-		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO, INVALID_TOKEN, VIDEO_NOT_FOUND, ALREADY_IN_PLAYLIST, PERMISSION_REQUIRED_ACCOUNTS
+		NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO, INVALID_TOKEN, VIDEO_NOT_FOUND, ALREADY_IN_PLAYLIST, NO_ACCOUNT, ACCOUNT_HAS_NO_CHANNEL, PERMISSION_REQUIRED_ACCOUNTS
 	}
 
+	@SuppressWarnings("unused")
 	class Channels {
 		public final List<Channel> items;
 
@@ -100,12 +101,14 @@ public interface YoutubeApi {
 			this.snippet = snippet;
 		}
 
+		@SuppressWarnings("unused")
 		static class Snippet {
 			public final String playlistId;
 			public final ResourceId resourceId;
 			public final String title;
 			public final String description;
 
+			@SuppressWarnings("SameParameterValue")
 			public Snippet(String playlistId, ResourceId resourceId, String title, String description) {
 				this.playlistId = playlistId;
 				this.resourceId = resourceId;
@@ -113,6 +116,7 @@ public interface YoutubeApi {
 				this.description = description;
 			}
 
+			@SuppressWarnings("unused")
 			static class ResourceId {
 				@SuppressWarnings("unused")
 				public final String kind = "youtube#video";
@@ -132,6 +136,7 @@ public interface YoutubeApi {
 			this.error = error;
 		}
 
+		@SuppressWarnings("unused")
 		class RootError {
 			public final int code;
 			public final String message;
@@ -143,6 +148,7 @@ public interface YoutubeApi {
 				this.errors = errors;
 			}
 
+			@SuppressWarnings("unused")
 			class ErrorDetail {
 				public final String domain;
 				public final String reason;

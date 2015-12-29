@@ -81,141 +81,143 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
  */
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class AddActivityTest  {
+public class AddActivityTest {
 
-	public static final  String  CHANNEL_TITLE     = "Testi Testsdottir";
-	private static final String  TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
-	private static final Account ACCOUNT_1         = new Account("test account 1", TEST_ACCOUNT_TYPE);
-	private static final Account ACCOUNT_2         = new Account("test account 2", TEST_ACCOUNT_TYPE);
-	private static MockWebServer     mockWebServer;
-	private static RestfulDispatcher restfulDispatcher;
-	@Rule
-	public ActivityTestRule<AddActivity> activityTestRule = new ActivityTestRule<AddActivity>(AddActivity.class, false, false) {
-		@Override
-		protected Intent getActivityIntent() {
-			return new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/v/8f7h837f4"));
-		}
-	};
-	private RetrofitHttpExecutorIdlingResource idlingExecutor;
+    private static final String  CHANNEL_TITLE     = "Testi Testsdottir";
+    private static final String  TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
+    private static final Account ACCOUNT_1         = new Account("test account 1", TEST_ACCOUNT_TYPE);
+    private static final Account ACCOUNT_2         = new Account("test account 2", TEST_ACCOUNT_TYPE);
+    private static MockWebServer     mockWebServer;
+    private static RestfulDispatcher restfulDispatcher;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		restfulDispatcher = new RestfulDispatcher();
-		mockWebServer = new MockWebServer();
-		mockWebServer.setDispatcher(restfulDispatcher);
-		mockWebServer.start(8080);
-	}
+    @SuppressWarnings("CanBeFinal")
+    @Rule
+    public ActivityTestRule<AddActivity> activityTestRule = new ActivityTestRule<AddActivity>(AddActivity.class, false, false) {
+        @Override
+        protected Intent getActivityIntent() {
+            return new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/v/8f7h837f4"));
+        }
+    };
+    private RetrofitHttpExecutorIdlingResource idlingExecutor;
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		mockWebServer.shutdown();
-	}
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        restfulDispatcher = new RestfulDispatcher();
+        mockWebServer = new MockWebServer();
+        mockWebServer.setDispatcher(restfulDispatcher);
+        mockWebServer.start(8080);
+    }
 
-	@Before
-	public void setUp() throws Exception {
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+        mockWebServer.shutdown();
+    }
 
-		// inject retrofit http executor for espresso idling resource
-		Field httpExecutor = AddActivity.class.getDeclaredField("OPTIONAL_RETROFIT_HTTP_EXECUTOR");
-		httpExecutor.setAccessible(true);
-		idlingExecutor = new RetrofitHttpExecutorIdlingResource();
-		httpExecutor.set(AddActivity.class, idlingExecutor);
-		registerIdlingResources(idlingExecutor);
+    @Before
+    public void setUp() throws Exception {
 
-		// inject test account type
-		Field accountType = AddActivity.class.getDeclaredField("ACCOUNT_TYPE_GOOGLE");
-		accountType.setAccessible(true);
-		accountType.set(AddActivity.class, TEST_ACCOUNT_TYPE);
+        // inject retrofit http executor for espresso idling resource
+        Field httpExecutor = AddActivity.class.getDeclaredField("OPTIONAL_RETROFIT_HTTP_EXECUTOR");
+        httpExecutor.setAccessible(true);
+        idlingExecutor = new RetrofitHttpExecutorIdlingResource();
+        httpExecutor.set(AddActivity.class, idlingExecutor);
+        registerIdlingResources(idlingExecutor);
 
-		// clear accounts
-		AccountManager accountManager = AccountManager.get(InstrumentationRegistry.getInstrumentation().getContext());
-		//noinspection ResourceType,deprecation
-		accountManager.removeAccount(ACCOUNT_1, null, null).getResult();
-		//noinspection ResourceType,deprecation
-		accountManager.removeAccount(ACCOUNT_2, null, null).getResult();
+        // inject test account type
+        Field accountType = AddActivity.class.getDeclaredField("ACCOUNT_TYPE_GOOGLE");
+        accountType.setAccessible(true);
+        accountType.set(AddActivity.class, TEST_ACCOUNT_TYPE);
 
-		// inject mock backend
-		Field endpoint = AddActivity.class.getDeclaredField("YOUTUBE_ENDPOINT");
-		endpoint.setAccessible(true);
-		endpoint.set(AddActivity.class, mockWebServer.url("/").toString());
-	}
+        // clear accounts
+        AccountManager accountManager = AccountManager.get(InstrumentationRegistry.getInstrumentation().getContext());
+        //noinspection ResourceType,deprecation
+        accountManager.removeAccount(ACCOUNT_1, null, null).getResult();
+        //noinspection ResourceType,deprecation
+        accountManager.removeAccount(ACCOUNT_2, null, null).getResult();
 
-	@After
-	public void tearDown() throws Exception {
-		unregisterIdlingResources(idlingExecutor);
-		restfulDispatcher.clear();
-	}
+        // inject mock backend
+        Field endpoint = AddActivity.class.getDeclaredField("YOUTUBE_ENDPOINT");
+        endpoint.setAccessible(true);
+        endpoint.set(AddActivity.class, mockWebServer.url("/").toString());
+    }
 
-	private void addAccount(Account account) {
-		AccountManager accountManager = AccountManager.get(InstrumentationRegistry.getInstrumentation().getContext());
-		//noinspection ResourceType
-		accountManager.addAccountExplicitly(account, null, null);
-	}
+    @After
+    public void tearDown() throws Exception {
+        unregisterIdlingResources(idlingExecutor);
+        restfulDispatcher.clear();
+    }
 
-	private String fillChannelTitle(int msgId) {
-		return String.format(Locale.US, activityTestRule.getActivity().getResources().getString(msgId), CHANNEL_TITLE);
-	}
+    private void addAccount(Account account) {
+        AccountManager accountManager = AccountManager.get(InstrumentationRegistry.getInstrumentation().getContext());
+        //noinspection ResourceType
+        accountManager.addAccountExplicitly(account, null, null);
+    }
 
-	@Test
-	public void noAccount() throws Exception {
-		activityTestRule.launchActivity(null);
+    private String fillChannelTitle(int msgId) {
+        return String.format(Locale.US, activityTestRule.getActivity().getResources().getString(msgId), CHANNEL_TITLE);
+    }
 
-		onView(withText(R.string.no_account)).check(matches(isDisplayed()));
-	}
+    @Test
+    public void noAccount() throws Exception {
+        activityTestRule.launchActivity(null);
 
-	@Test
-	public void multipleAccounts() throws Exception {
-		addAccount(ACCOUNT_1);
-		addAccount(ACCOUNT_2);
+        onView(withText(R.string.error_no_account)).check(matches(isDisplayed()));
+    }
 
-		activityTestRule.launchActivity(null);
+    @Test
+    public void multipleAccounts() throws Exception {
+        addAccount(ACCOUNT_1);
+        addAccount(ACCOUNT_2);
 
-		ViewInteraction accountChooserHeader = onView(withText(R.string.choose_account));
-		accountChooserHeader.check(matches(isDisplayed()));
-		accountChooserHeader.perform(ViewActions.click());
-		accountChooserHeader.check(matches(isDisplayed()));
+        activityTestRule.launchActivity(null);
 
-	}
+        ViewInteraction accountChooserHeader = onView(withText(R.string.choose_account));
+        accountChooserHeader.check(matches(isDisplayed()));
+        accountChooserHeader.perform(ViewActions.click());
+        accountChooserHeader.check(matches(isDisplayed()));
 
-	@Test
-	public void addSuccess() throws Exception {
-		String testDescription = "Description for the Test video";
-		String testTitle = "Test Title";
+    }
 
-		// set channel list response
-		registerChannelListResponse();
+    @Test
+    public void addSuccess() throws Exception {
+        String testDescription = "Description for the Test video";
+        String testTitle = "Test Title";
 
-		// set add video to list response
-		{
-			JSONObject json = new JSONObject();
+        // set channel list response
+        registerChannelListResponse();
 
-			JSONObject snippet = new JSONObject();
-			snippet.put("title", testTitle);
-			snippet.put("description", testDescription);
-			json.put("snippet", snippet);
+        // set add video to list response
+        {
+            JSONObject json = new JSONObject();
 
-			MockResponse response = new MockResponse();
-			response.setBody(json.toString(8));
-			restfulDispatcher.registerResponse("/playlistItems?part=snippet", response);
-		}
+            JSONObject snippet = new JSONObject();
+            snippet.put("title", testTitle);
+            snippet.put("description", testDescription);
+            json.put("snippet", snippet);
 
-		// set account
-		addAccount(ACCOUNT_1);
+            MockResponse response = new MockResponse();
+            response.setBody(json.toString(8));
+            restfulDispatcher.registerResponse("/playlistItems?part=snippet", response);
+        }
 
-		// launch activity
-		activityTestRule.launchActivity(null);
+        // set account
+        addAccount(ACCOUNT_1);
 
-		onView(withText(fillChannelTitle(R.string.success_added_video))).check(matches(isDisplayed()));
-		onView(withText(testTitle)).check(matches(isDisplayed()));
-		onView(withText(testDescription)).check(matches(isDisplayed()));
-	}
+        // launch activity
+        activityTestRule.launchActivity(null);
 
-	@Test
-	public void addAlreadyInPlaylist() throws Exception {
-		registerChannelListResponse();
+        onView(withText(fillChannelTitle(R.string.success_added_video))).check(matches(isDisplayed()));
+        onView(withText(testTitle)).check(matches(isDisplayed()));
+        onView(withText(testDescription)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void addAlreadyInPlaylist() throws Exception {
+        registerChannelListResponse();
 
 
-		// set add video to list response
-		{
+        // set add video to list response
+        {
             JSONObject error0 = new JSONObject();
             error0.put("domain", "youtube.playlistItem");
             error0.put("reason", "videoAlreadyInPlaylist");
@@ -232,70 +234,70 @@ public class AddActivityTest  {
             MockResponse response = new MockResponse();
             response.setBody(json.toString(8));
             response.setStatus("HTTP/1.1 409 Conflict");
-			restfulDispatcher.registerResponse("/playlistItems?part=snippet", response);
-		}
+            restfulDispatcher.registerResponse("/playlistItems?part=snippet", response);
+        }
 
-		// set account
-		addAccount(ACCOUNT_1);
+        // set account
+        addAccount(ACCOUNT_1);
 
-		// launch activity
-		activityTestRule.launchActivity(null);
+        // launch activity
+        activityTestRule.launchActivity(null);
 
-		onView(withText(fillChannelTitle(R.string.error_already_in_playlist))).check(matches(isDisplayed()));
-	}
+        onView(withText(fillChannelTitle(R.string.error_already_in_playlist))).check(matches(isDisplayed()));
+    }
 
-	private void registerChannelListResponse() throws JSONException {
-		// set channel list response
-		{
-			JSONObject json = new JSONObject();
-			JSONArray items = new JSONArray();
-			json.put("items", items);
-			JSONObject channel = new JSONObject();
-			items.put(channel);
-			JSONObject contentDetails = new JSONObject();
-			channel.put("contentDetails", contentDetails);
-			JSONObject relatedPlaylists = new JSONObject();
-			contentDetails.put("relatedPlaylists", relatedPlaylists);
-			String watchLaterId = "45h7394875w3495";
-			relatedPlaylists.put("watchLater", watchLaterId);
-			JSONObject snippet = new JSONObject();
-			channel.put("snippet", snippet);
-			snippet.put("title", CHANNEL_TITLE);
+    private void registerChannelListResponse() throws JSONException {
+        // set channel list response
+        {
+            JSONObject json = new JSONObject();
+            JSONArray items = new JSONArray();
+            json.put("items", items);
+            JSONObject channel = new JSONObject();
+            items.put(channel);
+            JSONObject contentDetails = new JSONObject();
+            channel.put("contentDetails", contentDetails);
+            JSONObject relatedPlaylists = new JSONObject();
+            contentDetails.put("relatedPlaylists", relatedPlaylists);
+            String watchLaterId = "45h7394875w3495";
+            relatedPlaylists.put("watchLater", watchLaterId);
+            JSONObject snippet = new JSONObject();
+            channel.put("snippet", snippet);
+            snippet.put("title", CHANNEL_TITLE);
 
             MockResponse response = new MockResponse();
             response.setBody(json.toString(8));
-			restfulDispatcher.registerResponse("/channels?part=contentDetails,snippet&maxResults=50&mine=true", response);
-		}
-	}
+            restfulDispatcher.registerResponse("/channels?part=contentDetails,snippet&maxResults=50&mine=true", response);
+        }
+    }
 
-	@Test
-	public void authFail() throws Exception {
-		// set channel list response
-		{
-			JSONObject error0 = new JSONObject();
-			error0.put("domain", "youtube.playlistItem");
-			error0.put("reason", "dailyLimitExceededUnreg");
-			JSONArray errors = new JSONArray();
-			errors.put(error0);
-			JSONObject error = new JSONObject();
-			error.put("errors", errors);
-			error.put("code", 403);
-			JSONObject json = new JSONObject();
-			json.put("error", error);
+    @Test
+    public void authFail() throws Exception {
+        // set channel list response
+        {
+            JSONObject error0 = new JSONObject();
+            error0.put("domain", "youtube.playlistItem");
+            error0.put("reason", "dailyLimitExceededUnreg");
+            JSONArray errors = new JSONArray();
+            errors.put(error0);
+            JSONObject error = new JSONObject();
+            error.put("errors", errors);
+            error.put("code", 403);
+            JSONObject json = new JSONObject();
+            json.put("error", error);
 
-			MockResponse response = new MockResponse();
-			response.setBody(json.toString(8));
-			response.setStatus("HTTP/1.1 403 Forbidden");
-			restfulDispatcher.registerResponse("/channels?part=contentDetails,snippet&maxResults=50&mine=true", response);
-		}
-		// set account
-		addAccount(ACCOUNT_1);
+            MockResponse response = new MockResponse();
+            response.setBody(json.toString(8));
+            response.setStatus("HTTP/1.1 403 Forbidden");
+            restfulDispatcher.registerResponse("/channels?part=contentDetails,snippet&maxResults=50&mine=true", response);
+        }
+        // set account
+        addAccount(ACCOUNT_1);
 
-		// launch activity
-		activityTestRule.launchActivity(null);
+        // launch activity
+        activityTestRule.launchActivity(null);
 
-		onView(withText(fillChannelTitle(R.string.error_need_account))).check(matches(isDisplayed()));
+        onView(withText(fillChannelTitle(R.string.error_need_account))).check(matches(isDisplayed()));
 
-	}
+    }
 
 }

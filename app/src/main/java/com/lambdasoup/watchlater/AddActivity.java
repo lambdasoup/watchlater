@@ -28,27 +28,25 @@ import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -57,7 +55,10 @@ import com.lambdasoup.watchlater.YoutubeApi.ErrorTranslatingCallback;
 import com.lambdasoup.watchlater.YoutubeApi.ErrorType;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 import retrofit.RestAdapter;
@@ -68,32 +69,35 @@ import retrofit.converter.GsonConverter;
 
 import static android.net.Uri.decode;
 import static android.net.Uri.parse;
+import static com.lambdasoup.watchlater.SettingsActivity.PREF_KEY_DEFAULT_ACCOUNT_NAME;
 
 
-public class AddActivity extends Activity {
+public class AddActivity extends Activity implements ErrorFragment.OnFragmentInteractionListener, AccountChooserFragment.OnFragmentInteractionListener {
 
-	private static final String SCOPE_YOUTUBE                    = "oauth2:https://www.googleapis.com/auth/youtube";
-	private static final String PERMISSION_GET_ACCOUNTS          = "android.permission.GET_ACCOUNTS";
-	private static final int    PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
-	private static final String KEY_ACCOUNT       = "com.lambdasoup.watchlater_account";
-	private static final String KEY_TOKEN         = "com.lambdasoup.watchlater_token";
-	private static final String KEY_PLAYLIST_ID   = "com.lambdasoup.watchlater_playlistId";
-	private static final String KEY_CHANNEL_TITLE = "com.lambdasoup.watchlater_channelTitle";
-	private static final String KEY_RESULT        = "com.lambdasoup.watchlater_result";
+	private static final String   SCOPE_YOUTUBE                    = "oauth2:https://www.googleapis.com/auth/youtube";
+	private static final String   PERMISSION_GET_ACCOUNTS          = "android.permission.GET_ACCOUNTS";
+	private static final int      PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
+	private static final String   KEY_ACCOUNT                      = "com.lambdasoup.watchlater_account";
+	private static final String   KEY_TOKEN                        = "com.lambdasoup.watchlater_token";
+	private static final String   KEY_PLAYLIST_ID                  = "com.lambdasoup.watchlater_playlistId";
+	private static final String   KEY_CHANNEL_TITLE                = "com.lambdasoup.watchlater_channelTitle";
+	private static final String   KEY_RESULT                       = "com.lambdasoup.watchlater_result";
 	// fields are not final to be somewhat accessible for testing to inject other values
-	@SuppressWarnings("FieldCanBeLocal")
-	private static String   YOUTUBE_ENDPOINT                = "https://www.googleapis.com/youtube/v3";
-	private static String   ACCOUNT_TYPE_GOOGLE             = "com.google";
-	private static Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR = null;
-	private AccountManager          manager;
-	private YoutubeApi              api;
-	private WatchlaterDialogContent mainContent;
-	private Account          account;
-	private String           token;
-	private String           playlistId;
-	private String           channelTitle;
-	private WatchlaterResult result;
-	private boolean          tokenRetried;
+	@SuppressWarnings({"FieldCanBeLocal", "CanBeFinal"})
+	private static       String   YOUTUBE_ENDPOINT                 = "https://www.googleapis.com/youtube/v3";
+	@SuppressWarnings("CanBeFinal")
+	private static       String   ACCOUNT_TYPE_GOOGLE              = "com.google";
+	@SuppressWarnings("CanBeFinal")
+	private static       Executor OPTIONAL_RETROFIT_HTTP_EXECUTOR  = null;
+	private AccountManager      manager;
+	private YoutubeApi          api;
+	private FragmentCoordinator fragmentCoordinator;
+	private Account             account;
+	private String              token;
+	private String              playlistId;
+	private String              channelTitle;
+	private WatchlaterResult    result;
+	private boolean             tokenRetried;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +107,7 @@ public class AddActivity extends Activity {
 
 		setContentView(R.layout.activity_add);
 
-		mainContent = (WatchlaterDialogContent) findViewById(R.id.progress_animator);
+		fragmentCoordinator = new FragmentCoordinator();
 
 		manager = AccountManager.get(this);
 		setApiAdapter();
@@ -114,6 +118,10 @@ public class AddActivity extends Activity {
 			account = savedInstanceState.getParcelable(KEY_ACCOUNT);
 			channelTitle = savedInstanceState.getString(KEY_CHANNEL_TITLE);
 			result = savedInstanceState.getParcelable(KEY_RESULT);
+		}
+
+		if (getFragmentManager().findFragmentByTag(MainActivityMenuFragment.TAG) == null) {
+			getFragmentManager().beginTransaction().add(MainActivityMenuFragment.newInstance(), MainActivityMenuFragment.TAG).commit();
 		}
 		addToWatchLaterAndShow();
 	}
@@ -150,12 +158,6 @@ public class AddActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.menu_about:
-				showAbout();
-				return true;
-			case R.id.menu_help:
-				showHelp();
-				return true;
 			case R.id.menu_open_with_youtube:
 				openWithYoutube();
 				return true;
@@ -164,13 +166,6 @@ public class AddActivity extends Activity {
 		}
 	}
 
-	private void showAbout() {
-		startActivity(new Intent(this, AboutActivity.class));
-	}
-
-	private void showHelp() {
-		startActivity(new Intent(this, HelpActivity.class));
-	}
 
 	private void addToWatchLaterAndShow() {
 		if (result != null) {
@@ -211,7 +206,7 @@ public class AddActivity extends Activity {
 	@TargetApi(23)
 	private void tryAcquireAccountsPermission() {
 		requestPermissions(new String[]{PERMISSION_GET_ACCOUNTS}, PERMISSIONS_REQUEST_GET_ACCOUNTS);
-		mainContent.showProgress();
+		fragmentCoordinator.showProgress();
 	}
 
 	@TargetApi(23)
@@ -267,7 +262,7 @@ public class AddActivity extends Activity {
 	}
 
 	private void setAuthTokenAndRetry() {
-		mainContent.showProgress();
+		fragmentCoordinator.showProgress();
 		manager.getAuthToken(account, SCOPE_YOUTUBE, null, this, future -> {
 			try {
 				token = future.getResult().getString(AccountManager.KEY_AUTHTOKEN);
@@ -291,52 +286,51 @@ public class AddActivity extends Activity {
 		}
 		Account[] accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE);
 
-		if (accounts.length != 1) {
+		if (accounts.length == 0) {
+			onResult(WatchlaterResult.error(ErrorType.NO_ACCOUNT));
+			return;
+		} else if (accounts.length != 1) {
 			onMultipleAccounts();
 			return;
 		}
 
-		this.account = accounts[0];
-		addToWatchLaterAndShow();
+		onAccountChosen(accounts[0]);
 	}
-
 
 
 	private void onMultipleAccounts() {
-		final ListView listView = (ListView) findViewById(R.id.account_list);
-		View header = getLayoutInflater().inflate(R.layout.list_header_account_chooser, listView, false);
-		listView.addHeaderView(header, null, false); // header should not be selectable
-		listView.setEmptyView(findViewById(R.id.account_chooser_empty));
-
-		final ArrayAdapter<Account> adapter = new ArrayAdapter<Account>(this, R.layout.item_account, manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE)) {
-			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
-				TextView accountName;
-				if (convertView != null) {
-					accountName = (TextView) convertView;
-				} else {
-					accountName = (TextView) getLayoutInflater().inflate(R.layout.item_account, parent, false);
-				}
-				accountName.setText(getItem(position).name);
-				return accountName;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String defaultAccountName = prefs.getString(PREF_KEY_DEFAULT_ACCOUNT_NAME, null);
+		Account[] accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE);
+		for (Account account : accounts) {
+			if (account.name.equals(defaultAccountName)) {
+				onAccountChosen(account);
+				return;
 			}
-		};
-		listView.setAdapter(adapter);
-		listView.setOnItemClickListener((parent, view, position, id) ->
-						onAccountChosen(adapter.getItem(position - listView.getHeaderViewsCount()))
-		);
+		}
 
-		mainContent.showAccountChooser();
+		// no account set as default or default account not available any more
+		if (defaultAccountName != null) { // out of date default account
+			prefs.edit().remove(PREF_KEY_DEFAULT_ACCOUNT_NAME).apply();
+		}
+
+		fragmentCoordinator.showAccountChooser(accounts);
 	}
 
-	private void onAccountChosen(Account account) {
+
+	@Override
+	public void onAccountChosen(Account account) {
 		this.account = account;
 		addToWatchLaterAndShow();
 	}
 
+	@Override
+	public void onSetDefaultAccount(Account account) {
+		PreferenceManager.getDefaultSharedPreferences(this).edit().putString(PREF_KEY_DEFAULT_ACCOUNT_NAME, account.name).apply();
+	}
 
 	private void insertPlaylistItemAndRetry() {
-		mainContent.showProgress();
+		fragmentCoordinator.showProgress();
 		try {
 			YoutubeApi.PlaylistItem.Snippet.ResourceId resourceId = new YoutubeApi.PlaylistItem.Snippet.ResourceId(getVideoId());
 			YoutubeApi.PlaylistItem.Snippet snippet = new YoutubeApi.PlaylistItem.Snippet(playlistId, resourceId, null, null);
@@ -386,41 +380,23 @@ public class AddActivity extends Activity {
 	}
 
 	private void showError(ErrorResult errorResult) {
-		CharSequence msg = withChannelTitle(errorResult.msgId);
 		if (isFinishing()) {
-			showToast(msg);
+			showToast(withChannelTitle(errorResult.msgId));
 			return;
 		}
 
-		TextView errorMsg = (TextView) findViewById(R.id.error_msg);
-		errorMsg.setText(msg);
-
-		Button retryButton = (Button) findViewById(R.id.button_retry);
-		retryButton.setVisibility(errorResult.allowRetry ? View.VISIBLE : View.GONE);
-
-		mainContent.showError();
+		fragmentCoordinator.showError();
 	}
 
-	private void showSuccess(SuccessResult successResult) {
-		CharSequence msg = withChannelTitle(R.string.success_added_video);
+	private void showSuccess(@SuppressWarnings("UnusedParameters") SuccessResult successResult) {
 		if (isFinishing()) {
-			showToast(msg);
+			showToast(withChannelTitle(R.string.success_added_video));
 			return;
 		}
-
-		TextView successMsg = (TextView) findViewById(R.id.success_msg);
-		successMsg.setText(msg);
-
-		TextView title = (TextView) findViewById(R.id.success_title);
-		title.setText(successResult.title);
-
-		TextView description = (TextView) findViewById(R.id.success_description);
-		description.setText(successResult.description);
-
-
-		mainContent.showSuccess();
+		fragmentCoordinator.showSuccess();
 	}
 
+	@SuppressWarnings("SameParameterValue")
 	private void showToast(@StringRes int msgId) {
 		showToast(getResources().getText(msgId));
 	}
@@ -429,12 +405,16 @@ public class AddActivity extends Activity {
 		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 	}
 
-	public void onRetry(View v) {
+	public void onRetry() {
 		result = null;
 		addToWatchLaterAndShow();
 	}
 
-	public void openWithYoutube() {
+	public void onShowHelp() {
+		startActivity(new Intent(this, HelpActivity.class));
+	}
+
+	private void openWithYoutube() {
 		try {
 			Intent intent = new Intent()
 					.setData(getIntent().getData())
@@ -447,10 +427,14 @@ public class AddActivity extends Activity {
 	}
 
 	private void setPlaylistIdAndRetry() {
-		mainContent.showProgress();
+		fragmentCoordinator.showProgress();
 		api.listMyChannels(new ErrorHandlingCallback<YoutubeApi.Channels>() {
 			@Override
 			public void success(YoutubeApi.Channels channels, Response response) {
+				if (channels.items.isEmpty()) {
+					onResult(WatchlaterResult.error(ErrorType.ACCOUNT_HAS_NO_CHANNEL));
+					return;
+				}
 				playlistId = channels.items.get(0).contentDetails.relatedPlaylists.watchLater;
 				channelTitle = channels.items.get(0).snippet.title;
 				if (channelTitle == null || channelTitle.isEmpty()) {
@@ -473,28 +457,34 @@ public class AddActivity extends Activity {
 
 
 	enum ErrorResult {
-		ALREADY_IN_PLAYLIST(R.string.error_already_in_playlist, false),
-		NEED_ACCESS(R.string.error_need_account, true),
-		NOT_A_VIDEO(R.string.error_not_a_video, false),
-		OTHER(R.string.error_other, true),
-		PERMISSION_REQUIRED_ACCOUNTS(R.string.error_permission_required_accounts, true),
-		PLAYLIST_FULL(R.string.error_playlist_full, true),
-		VIDEO_NOT_FOUND(R.string.error_video_not_found, false);
+		ALREADY_IN_PLAYLIST(R.string.error_already_in_playlist),
+		NEED_ACCESS(R.string.error_need_account, MoreErrorView.RETRY),
+		NOT_A_VIDEO(R.string.error_not_a_video),
+		OTHER(R.string.error_other, MoreErrorView.RETRY),
+		PERMISSION_REQUIRED_ACCOUNTS(R.string.error_permission_required_accounts, MoreErrorView.RETRY),
+		PLAYLIST_FULL(R.string.error_playlist_full, MoreErrorView.RETRY),
+		VIDEO_NOT_FOUND(R.string.error_video_not_found),
+		NO_ACCOUNT(R.string.error_no_account, MoreErrorView.RETRY),
+		ACCOUNT_HAS_NO_CHANNEL(R.string.error_account_has_no_channel, MoreErrorView.RETRY, MoreErrorView.HELP_NO_CHANNEL);
 
-		final int     msgId;
-		final boolean allowRetry;
+		final int                msgId;
+		final Set<MoreErrorView> additionalViews;
 
-		ErrorResult(int msgId, boolean allowRetry) {
-			this.allowRetry = allowRetry;
+		ErrorResult(int msgId, @IdRes MoreErrorView... additionalViews) {
+			this.additionalViews = additionalViews.length == 0 ? EnumSet.noneOf(MoreErrorView.class) : EnumSet.copyOf(Arrays.asList(additionalViews));
 			this.msgId = msgId;
 		}
 
 		static ErrorResult fromErrorType(ErrorType errorType) {
 			switch (errorType) {
+				case ACCOUNT_HAS_NO_CHANNEL:
+					return ACCOUNT_HAS_NO_CHANNEL;
 				case ALREADY_IN_PLAYLIST:
 					return ALREADY_IN_PLAYLIST;
 				case NEED_ACCESS:
 					return NEED_ACCESS;
+				case NO_ACCOUNT:
+					return NO_ACCOUNT;
 				case NOT_A_VIDEO:
 					return NOT_A_VIDEO;
 				case OTHER:
@@ -511,7 +501,18 @@ public class AddActivity extends Activity {
 			}
 		}
 
+		enum MoreErrorView {
+			RETRY(R.id.button_retry),
+			HELP_NO_CHANNEL(R.id.activetext_help_no_channel);
 
+			final
+			@IdRes
+			int buttonId;
+
+			MoreErrorView(@IdRes int buttonId) {
+				this.buttonId = buttonId;
+			}
+		}
 	}
 
 	static class WatchlaterResult implements Parcelable {
@@ -535,7 +536,7 @@ public class AddActivity extends Activity {
 			this.error = error;
 		}
 
-		protected WatchlaterResult(Parcel in) {
+		WatchlaterResult(Parcel in) {
 			this.success = in.readParcelable(SuccessResult.class.getClassLoader());
 			int tmpError = in.readInt();
 			this.error = tmpError == -1 ? null : ErrorResult.values()[tmpError];
@@ -606,7 +607,7 @@ public class AddActivity extends Activity {
 		}
 
 
-		protected SuccessResult(Parcel in) {
+		SuccessResult(Parcel in) {
 			this.title = in.readString();
 			this.description = in.readString();
 		}
@@ -634,6 +635,7 @@ public class AddActivity extends Activity {
 	private class WatchlaterException extends Exception {
 		public final ErrorType type;
 
+		@SuppressWarnings("SameParameterValue")
 		public WatchlaterException(ErrorType type) {
 			this.type = type;
 		}
@@ -649,6 +651,37 @@ public class AddActivity extends Activity {
 				default:
 					onResult(WatchlaterResult.error(errorType));
 			}
+		}
+	}
+
+	private class FragmentCoordinator {
+
+		public void showProgress() {
+			showFragment(ProgressFragment.newInstance());
+		}
+
+		public void showAccountChooser(Account[] accounts) {
+			showFragment(AccountChooserFragment.newInstance(accounts));
+		}
+
+		public void showError() {
+			showFragment(ErrorFragment.newInstance(channelTitle, result));
+		}
+
+		public void showSuccess() {
+			showFragment(SuccessFragment.newInstance(channelTitle, result));
+		}
+
+		private void showFragment(Fragment fragment) {
+			Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
+			if (currentFragment != null && currentFragment.getClass().equals(fragment.getClass())) {
+				return;
+			}
+			getFragmentManager()
+					.beginTransaction()
+					.replace(R.id.fragment_container, fragment)
+					.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+					.commit();
 		}
 	}
 }

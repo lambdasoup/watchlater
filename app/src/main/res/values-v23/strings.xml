@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015.
+  ~
+  ~  Maximilian Hille <mh@lambdasoup.com>
+  ~ Juliane Lehmann <jl@lambdasoup.com>
+  ~
+  ~ This file is part of Watch Later.
+  ~
+  ~ Watch Later is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ Watch Later is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="defaults_advice_adjust_both">You should adjust the \"Open by default\" settings for both YouTube and Watch Later. Clear the defaults so that they are not set as default. Both should be set to ask every time to open supported links.</string>
+    <string name="defaults_advice_youtube_choice_missing">Your defaults settings for Watch Later are fine. You should adjust the \"Open by default\" settings for YouTube. It should be set to ask every time to open supported links.</string>
+    <string name="defaults_advice_watchlater_choice_missing">Your defaults settings for YouTube are fine. You should adjust the \"Open by default\" settings for Watch Later. It should be set to ask every time to open supported links.</string>
+    <string name="defaults_advice_both_choice_missing">You should adjust the \"Open by default\" settings for both YouTube and Watch Later. Clear the defaults so that they are not set as default. Both should be set to ask every time to open supported links.</string>
+    <string name="defaults_advice_youtube_default">You should adjust the \"Open by default\" settings for the YouTube app. Clear the defaults so that it is not set as default. It should be set to ask every time to open supported links.</string>
+    <string name="defaults_advice_watchlater_default">You should adjust the \"Open by default\" settings for the Watch Later app. Clear the defaults so that it is not set as default. It should be set to ask every time to open supported links.</string>
+    <string name="defaults_advice_other_app_default">You should adjust the \"Open by default\" settings for the %1$s app. Clear the defaults so that it is not set as default. It should be set to ask every time to open supported links.</string>
+</resources>

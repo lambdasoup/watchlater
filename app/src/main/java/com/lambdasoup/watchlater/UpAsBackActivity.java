@@ -22,19 +22,39 @@
 
 package com.lambdasoup.watchlater;
 
+import android.app.ActionBar;
+import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
-import android.webkit.WebView;
+import android.view.MenuItem;
 
 
-public class HelpActivity extends UpAsBackActivity {
+public abstract class UpAsBackActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		WebView webView = new WebView(this);
-		webView.loadUrl("file:///android_asset/html/" + getString(R.string.asset_prefix) + "/youtube_channel_help.html");
-		setContentView(webView);
+		ActionBar actionBar = getActionBar();
+		if (actionBar != null) {
+			actionBar.setDisplayHomeAsUpEnabled(true);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
+			} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+				actionBar.setDisplayShowHomeEnabled(false);
+				actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp_padded);
+			}
+		}
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				finish();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
 }

@@ -21,10 +21,9 @@
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<!--suppress AndroidDomInspection --><!-- R.string.label_mockaccount only present in scope androidTest -->
-<account-authenticator
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accountType="com.lambdasoup.watchlater.test"
-    android:icon="@android:drawable/ic_dialog_alert"
-    android:label="@string/label_mockaccount"
-    android:smallIcon="@android:drawable/ic_dialog_alert"/>
+<ProgressBar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/progress"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    />

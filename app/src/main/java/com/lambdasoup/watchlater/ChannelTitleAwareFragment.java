@@ -29,7 +29,12 @@ import android.support.annotation.StringRes;
 
 import java.util.Locale;
 
-// TODO: comment & explain! Or solve with composition instead of inheritance
+/**
+ * Superclass for ErrorFragment and SuccessFragment; carrying the common functionality of storing a
+ * channelTitle and filling it into messages.
+ *
+ * Serves as an example for dealing with the arguments in an inheritance chain of fragments.
+ */
 public class ChannelTitleAwareFragment extends Fragment {
 	private static final String ARG_CHANNEL_TITLE  = "com.lambdasoup.watchlater.ARG_CHANNEL_TITLE";
 

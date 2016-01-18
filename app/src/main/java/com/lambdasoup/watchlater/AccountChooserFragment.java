@@ -25,7 +25,6 @@ package com.lambdasoup.watchlater;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,124 +43,120 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class AccountChooserFragment extends Fragment {
-	private static final String ARG_ACCOUNTS              = "com.lambdasoup.watchlater.ARG_ACCOUNTS";
-	private static final String KEY_CHECKED_ITEM_POSITION = "com.lambdasoup.watchlater.checked_item_position";
+    private static final String ARG_ACCOUNTS = "com.lambdasoup.watchlater.ARG_ACCOUNTS";
+    private static final String KEY_CHECKED_ITEM_POSITION = "com.lambdasoup.watchlater.checked_item_position";
 
-	private Account[] accounts;
+    private Account[] accounts;
 
-	private OnFragmentInteractionListener mListener;
-
-
-	public static AccountChooserFragment newInstance(Account[] accounts) {
-		AccountChooserFragment fragment = new AccountChooserFragment();
-		Bundle args = new Bundle();
-		args.putParcelableArray(ARG_ACCOUNTS, accounts);
-		fragment.setArguments(args);
-		return fragment;
-	}
-
-	public AccountChooserFragment() {
-		// Required empty public constructor
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		if (getArguments() != null) {
-			accounts = (Account[]) getArguments().getParcelableArray(ARG_ACCOUNTS);
-		}
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		View view = getView();
-		if (view != null) {
-			outState.putInt(KEY_CHECKED_ITEM_POSITION, ((ListView) view.findViewById(R.id.account_list)).getCheckedItemPosition());
-		}
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
-		View accountChooserView = inflater.inflate(R.layout.fragment_account_chooser, container, false);
-
-		final ListView listView = (ListView) accountChooserView.findViewById(R.id.account_list);
-
-		final ArrayAdapter<Account> adapter = new ArrayAdapter<Account>(getActivity(), R.layout.item_account, accounts) {
-			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
-				TextView accountName;
-				if (convertView != null) {
-					accountName = (TextView) convertView;
-				} else {
-					accountName = (TextView) inflater.inflate(R.layout.item_account, parent, false);
-				}
-				accountName.setText(getItem(position).name);
-				return accountName;
-			}
-		};
-		listView.setAdapter(adapter);
-		listView.setOnItemClickListener(
-				(parent, view, position, id) -> accountChooserView.findViewById(R.id.button_add_with_selected_account).setEnabled(true)
-		);
-
-		if (savedInstanceState != null) {
-			int pos = savedInstanceState.getInt(KEY_CHECKED_ITEM_POSITION);
-			if (pos != ListView.INVALID_POSITION) {
-				listView.setItemChecked(pos, true);
-				listView.setSelection(pos);
-
-				accountChooserView.findViewById(R.id.button_add_with_selected_account).setEnabled(true);
-			}
-		}
-
-		accountChooserView.findViewById(R.id.button_add_with_selected_account).setOnClickListener(v -> onMultiAccountDone());
-		return accountChooserView;
-	}
-
-	private void onMultiAccountDone() {
-		View view = getView();
-		if (view == null) {
-			return;
-		}
-		ListView accountsList = (ListView) view.findViewById(R.id.account_list);
-		Account account = (Account) accountsList.getAdapter().getItem(accountsList.getCheckedItemPosition());
-
-		if (((CheckBox) view.findViewById(R.id.checkbox_always_use_selected_account)).isChecked()) {
-			if (mListener != null) {
-				mListener.onSetDefaultAccount(account);
-			}
-
-		}
-		if (mListener != null) {
-			mListener.onAccountChosen(account);
-		}
-	}
-
-	// need to keep this for compatibility with API level < 23
-	@SuppressWarnings("deprecation")
-	@Override
-	public void onAttach(Activity context) {
-		super.onAttach(context);
-		if (context instanceof OnFragmentInteractionListener) {
-			mListener = (OnFragmentInteractionListener) context;
-		} else {
-			throw new RuntimeException(context.toString()
-					+ " must implement OnFragmentInteractionListener");
-		}
-	}
+    private OnFragmentInteractionListener listener;
 
 
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		mListener = null;
-	}
+    public static AccountChooserFragment newInstance(Account[] accounts) {
+        AccountChooserFragment fragment = new AccountChooserFragment();
+        Bundle args = new Bundle();
+        args.putParcelableArray(ARG_ACCOUNTS, accounts);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
-	public interface OnFragmentInteractionListener {
-		void onAccountChosen(Account account);
+    public AccountChooserFragment() {
+        // Required empty public constructor
+    }
 
-		void onSetDefaultAccount(Account account);
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            accounts = (Account[]) getArguments().getParcelableArray(ARG_ACCOUNTS);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        View view = getView();
+        if (view != null) {
+            outState.putInt(KEY_CHECKED_ITEM_POSITION, ((ListView) view.findViewById(R.id.account_list)).getCheckedItemPosition());
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View accountChooserView = inflater.inflate(R.layout.fragment_account_chooser, container, false);
+
+        final ListView listView = (ListView) accountChooserView.findViewById(R.id.account_list);
+
+        final ArrayAdapter<Account> adapter = new ArrayAdapter<Account>(getActivity(), R.layout.item_account, accounts) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView accountName;
+                if (convertView != null) {
+                    accountName = (TextView) convertView;
+                } else {
+                    accountName = (TextView) inflater.inflate(R.layout.item_account, parent, false);
+                }
+                accountName.setText(getItem(position).name);
+                return accountName;
+            }
+        };
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(
+                (parent, view, position, id) -> accountChooserView.findViewById(R.id.button_add_with_selected_account).setEnabled(true)
+        );
+
+        if (savedInstanceState != null) {
+            int pos = savedInstanceState.getInt(KEY_CHECKED_ITEM_POSITION);
+            if (pos != ListView.INVALID_POSITION) {
+                listView.setItemChecked(pos, true);
+                listView.setSelection(pos);
+
+                accountChooserView.findViewById(R.id.button_add_with_selected_account).setEnabled(true);
+            }
+        }
+
+        accountChooserView.findViewById(R.id.button_add_with_selected_account).setOnClickListener(v -> onMultiAccountDone());
+        return accountChooserView;
+    }
+
+    private void onMultiAccountDone() {
+        View view = getView();
+        if (view == null) {
+            return;
+        }
+        ListView accountsList = (ListView) view.findViewById(R.id.account_list);
+        Account account = (Account) accountsList.getAdapter().getItem(accountsList.getCheckedItemPosition());
+
+        if (((CheckBox) view.findViewById(R.id.checkbox_always_use_selected_account)).isChecked()) {
+            listener.onSetDefaultAccount(account);
+
+        }
+        listener.onAccountChosen(account);
+    }
+
+    // need to keep this for compatibility with API level < 23
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onAttach(Activity context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            listener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
+    public interface OnFragmentInteractionListener {
+        void onAccountChosen(Account account);
+
+        void onSetDefaultAccount(Account account);
+    }
 }

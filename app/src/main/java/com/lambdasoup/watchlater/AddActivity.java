@@ -36,10 +36,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.Menu;
@@ -55,10 +52,7 @@ import com.lambdasoup.watchlater.YoutubeApi.ErrorTranslatingCallback;
 import com.lambdasoup.watchlater.YoutubeApi.ErrorType;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.Executor;
 
 import retrofit.RestAdapter;
@@ -440,182 +434,6 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 	}
 
 
-	enum ErrorResult {
-		ALREADY_IN_PLAYLIST(R.string.error_already_in_playlist),
-		NEED_ACCESS(R.string.error_need_account, MoreErrorView.RETRY),
-		NOT_A_VIDEO(R.string.error_not_a_video),
-		OTHER(R.string.error_other, MoreErrorView.RETRY),
-		PERMISSION_REQUIRED_ACCOUNTS(R.string.error_permission_required_accounts, MoreErrorView.RETRY),
-		PLAYLIST_FULL(R.string.error_playlist_full, MoreErrorView.RETRY),
-		VIDEO_NOT_FOUND(R.string.error_video_not_found),
-		NO_ACCOUNT(R.string.error_no_account, MoreErrorView.RETRY),
-		ACCOUNT_HAS_NO_CHANNEL(R.string.error_account_has_no_channel, MoreErrorView.RETRY, MoreErrorView.HELP_NO_CHANNEL);
-
-		final int                msgId;
-		final Set<MoreErrorView> additionalViews;
-
-		ErrorResult(int msgId, @IdRes MoreErrorView... additionalViews) {
-			this.additionalViews = additionalViews.length == 0 ? EnumSet.noneOf(MoreErrorView.class) : EnumSet.copyOf(Arrays.asList(additionalViews));
-			this.msgId = msgId;
-		}
-
-		static ErrorResult fromErrorType(ErrorType errorType) {
-			switch (errorType) {
-				case ACCOUNT_HAS_NO_CHANNEL:
-					return ACCOUNT_HAS_NO_CHANNEL;
-				case ALREADY_IN_PLAYLIST:
-					return ALREADY_IN_PLAYLIST;
-				case NEED_ACCESS:
-					return NEED_ACCESS;
-				case NO_ACCOUNT:
-					return NO_ACCOUNT;
-				case NOT_A_VIDEO:
-					return NOT_A_VIDEO;
-				case OTHER:
-				case NETWORK:
-					return OTHER;
-				case PERMISSION_REQUIRED_ACCOUNTS:
-					return PERMISSION_REQUIRED_ACCOUNTS;
-				case PLAYLIST_FULL:
-					return PLAYLIST_FULL;
-				case VIDEO_NOT_FOUND:
-					return VIDEO_NOT_FOUND;
-				default:
-					throw new IllegalArgumentException("Unexpected error type: " + errorType);
-			}
-		}
-
-		enum MoreErrorView {
-			RETRY(R.id.button_retry),
-			HELP_NO_CHANNEL(R.id.activetext_help_no_channel);
-
-			final
-			@IdRes
-			int buttonId;
-
-			MoreErrorView(@IdRes int buttonId) {
-				this.buttonId = buttonId;
-			}
-		}
-	}
-
-	static class WatchlaterResult implements Parcelable {
-		public static final Creator<WatchlaterResult> CREATOR = new Creator<WatchlaterResult>() {
-			public WatchlaterResult createFromParcel(Parcel source) {
-				return new WatchlaterResult(source);
-			}
-
-			public WatchlaterResult[] newArray(int size) {
-				return new WatchlaterResult[size];
-			}
-		};
-		private final SuccessResult success;
-		private final ErrorResult   error;
-
-		private WatchlaterResult(SuccessResult success, ErrorResult error) {
-			if ((success == null) == (error == null)) {
-				throw new IllegalArgumentException("Exactly one of success, error must be null");
-			}
-			this.success = success;
-			this.error = error;
-		}
-
-		WatchlaterResult(Parcel in) {
-			this.success = in.readParcelable(SuccessResult.class.getClassLoader());
-			int tmpError = in.readInt();
-			this.error = tmpError == -1 ? null : ErrorResult.values()[tmpError];
-		}
-
-		static WatchlaterResult success(String title, String description) {
-			return new WatchlaterResult(new SuccessResult(title, description), null);
-		}
-
-		static WatchlaterResult error(ErrorType errorType) {
-			return new WatchlaterResult(null, ErrorResult.fromErrorType(errorType));
-		}
-
-		boolean isSuccess() {
-			return success != null;
-		}
-
-		void apply(VoidFunction<SuccessResult> onSuccess, VoidFunction<ErrorResult> onError) {
-			if (isSuccess()) {
-				onSuccess.apply(success);
-			} else {
-				onError.apply(error);
-			}
-		}
-
-		@Override
-		public String toString() {
-			if (isSuccess()) {
-				return "WatchlaterResult " + success;
-			} else {
-				return "WatchlaterResult " + error;
-			}
-		}
-
-		@Override
-		public int describeContents() {
-			return 0;
-		}
-
-		@Override
-		public void writeToParcel(Parcel dest, int flags) {
-			dest.writeParcelable(this.success, 0);
-			dest.writeInt(this.error == null ? -1 : this.error.ordinal());
-		}
-
-		interface VoidFunction<T> {
-			void apply(T t);
-		}
-	}
-
-	static class SuccessResult implements Parcelable {
-		public static final Creator<SuccessResult> CREATOR = new Creator<SuccessResult>() {
-			public SuccessResult createFromParcel(Parcel source) {
-				return new SuccessResult(source);
-			}
-
-			public SuccessResult[] newArray(int size) {
-				return new SuccessResult[size];
-			}
-		};
-		final String title;
-		final String description;
-
-
-		SuccessResult(String title, String description) {
-			this.title = title;
-			this.description = description;
-		}
-
-
-		SuccessResult(Parcel in) {
-			this.title = in.readString();
-			this.description = in.readString();
-		}
-
-		@Override
-		public String toString() {
-			return "SuccessResult{" +
-					"title='" + title + '\'' +
-					", description='" + description + '\'' +
-					'}';
-		}
-
-		@Override
-		public int describeContents() {
-			return 0;
-		}
-
-		@Override
-		public void writeToParcel(Parcel dest, int flags) {
-			dest.writeString(this.title);
-			dest.writeString(this.description);
-		}
-	}
-
 	private class WatchlaterException extends Exception {
 		public final ErrorType type;
 
@@ -653,7 +471,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 				showToast(withChannelTitle(errorResult.msgId));
 				return;
 			}
-			showFragment(ErrorFragment.newInstance(channelTitle, result));
+			showFragment(ErrorFragment.newInstance(channelTitle, errorResult));
 		}
 
 		public void showSuccess(@SuppressWarnings("UnusedParameters") SuccessResult successResult) {
@@ -661,7 +479,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 				showToast(withChannelTitle(R.string.success_added_video));
 				return;
 			}
-			showFragment(SuccessFragment.newInstance(channelTitle, result));
+			showFragment(SuccessFragment.newInstance(channelTitle, successResult));
 		}
 
 		private void showFragment(Fragment fragment) {

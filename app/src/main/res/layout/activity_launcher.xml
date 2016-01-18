@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2015.
+  ~ Copyright (c) 2015 - 2016
   ~
   ~  Maximilian Hille <mh@lambdasoup.com>
   ~ Juliane Lehmann <jl@lambdasoup.com>
@@ -46,7 +46,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/vertical_text_sep"
         android:text="@string/button_example"
-        android:onClick="onExampleLink"/>
+        android:onClick="onClickExampleLink"/>
 
     <TextView
         android:id="@+id/defaults_advice"
@@ -64,7 +64,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/vertical_text_sep"
         android:text="@string/button_settings_youtube"
-        android:onClick="onSettingsYoutube"/>
+        android:onClick="onClickSettingsYoutube"/>
 
     <Button
         android:id="@+id/settings_watchlater_button"
@@ -73,7 +73,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/vertical_text_sep"
         android:text="@string/button_settings_watchlater"
-        android:onClick="onSettingsWatchlater"/>
+        android:onClick="onClickSettingsWatchlater"/>
 
     <Button
         android:id="@+id/settings_all_apps_button"
@@ -82,6 +82,6 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/vertical_text_sep"
         android:text="@string/button_settings_all_apps"
-        android:onClick="onSettingsAllApps"/>
+        android:onClick="onClickSettingsAllApps"/>
 
 </LinearLayout>

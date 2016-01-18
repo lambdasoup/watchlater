@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015.
+ * Copyright (c) 2015 - 2016
  *
  *  Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -24,10 +24,17 @@ package com.lambdasoup.watchlater;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 
 import java.util.Locale;
 
+/**
+ * Superclass for ErrorFragment and SuccessFragment; carrying the common functionality of storing a
+ * channelTitle and filling it into messages.
+ *
+ * Serves as an example for dealing with the arguments in an inheritance chain of fragments.
+ */
 public class ChannelTitleAwareFragment extends Fragment {
 	private static final String ARG_CHANNEL_TITLE  = "com.lambdasoup.watchlater.ARG_CHANNEL_TITLE";
 
@@ -44,7 +51,7 @@ public class ChannelTitleAwareFragment extends Fragment {
 		// public default constructor is necessary
 	}
 
-	Bundle init(String channelTitle) {
+	Bundle init(@NonNull String channelTitle) {
 		Bundle args = new Bundle();
 		args.putString(ARG_CHANNEL_TITLE, channelTitle);
 		setArguments(args);

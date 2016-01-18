@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015.
+ * Copyright (c) 2015 - 2016
  *
  *  Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -23,6 +23,7 @@
 package com.lambdasoup.watchlater;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,16 +35,10 @@ public class SuccessFragment extends ChannelTitleAwareFragment {
 	private static final String ARG_SUCCESS_RESULT = "com.lambdasoup.watchlater.ARG_SUCCESS_RESULT";
 
 
-	private AddActivity.SuccessResult successResult;
+	private SuccessResult successResult;
 
 
-	public static SuccessFragment newInstance(String channelTitle, AddActivity.WatchlaterResult result) {
-		if (result == null) {
-			throw new IllegalArgumentException("Supplied result must be non-null");
-		}
-		if (!result.isSuccess()) {
-			throw new IllegalArgumentException("Supplied result " + result + " is not a success");
-		}
+	public static SuccessFragment newInstance(@NonNull String channelTitle, @NonNull SuccessResult result) {
 		SuccessFragment fragment = new SuccessFragment();
 		Bundle args = fragment.init(channelTitle);
 		args.putParcelable(ARG_SUCCESS_RESULT, result);
@@ -59,11 +54,7 @@ public class SuccessFragment extends ChannelTitleAwareFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (getArguments() != null) {
-			AddActivity.WatchlaterResult result = getArguments().getParcelable(ARG_SUCCESS_RESULT);
-			if (result != null) {
-				result.apply(success -> successResult = success, err -> {
-				});
-			}
+			successResult = getArguments().getParcelable(ARG_SUCCESS_RESULT);
 		}
 	}
 

@@ -43,19 +43,16 @@ import static android.net.Uri.parse;
 
 
 public class LauncherActivity extends Activity {
-    private final String TAG = getClass().getSimpleName();
-
+    private static final Intent INTENT_ALL_APP_SETTINGS = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
+    private static final Intent INTENT_WATCHLATER_SETTINGS = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:com.lambdasoup.watchlater"));
+    private static final Intent INTENT_YOUTUBE_SETTINGS = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:com.google.android.youtube"));
     private static final Uri EXAMPLE_URI = parse("https://www.youtube.com/watch?v=tntOCGkgt98");
-    private static Intent EXAMPLE_INTENT = new Intent(Intent.ACTION_VIEW, EXAMPLE_URI);
-
-    public static final Intent INTENT_ALL_APP_SETTINGS = new Intent(Settings.ACTION_APPLICATION_SETTINGS);
-    public static final Intent INTENT_WATCHLATER_SETTINGS = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:com.lambdasoup.watchlater"));
-    public static final Intent INTENT_YOUTUBE_APP = new Intent().setData(EXAMPLE_URI).setPackage("com.google.android.youtube");
-    public static final Intent INTENT_YOUTUBE_SETTINGS = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:com.google.android.youtube"));
-
+    private static final Intent INTENT_YOUTUBE_APP = new Intent().setData(EXAMPLE_URI).setPackage("com.google.android.youtube");
     private static final String ACTIVITY_RESOLVER = "com.android.internal.app.ResolverActivity";
     private static final String ACTIVITY_YOUTUBE = "com.google.android.youtube.UrlActivity";
     private static final String ACTIVITY_WATCHLATER = "com.lambdasoup.watchlater.AddActivity";
+    private static final Intent EXAMPLE_INTENT = new Intent(Intent.ACTION_VIEW, EXAMPLE_URI);
+    private final String TAG = getClass().getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

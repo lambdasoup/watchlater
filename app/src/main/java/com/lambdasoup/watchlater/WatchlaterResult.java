@@ -61,7 +61,7 @@ class WatchlaterResult implements Parcelable {
         return new WatchlaterResult(null, ErrorResult.fromErrorType(errorType));
     }
 
-    boolean isSuccess() {
+    private boolean isSuccess() {
         return success != null;
     }
 

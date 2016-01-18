@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015 - 2016
   ~
   ~  Maximilian Hille <mh@lambdasoup.com>
@@ -22,17 +21,17 @@
   -->
 
 <manifest
-    package="com.lambdasoup.watchlater"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.lambdasoup.watchlater">
 
     <!-- protection level normal, granted automatically on install -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- protection level dangerous, can be revoked on api level 23 and later -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <!-- exists only pre-23 -->
-    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
         android:allowBackup="true"
@@ -44,9 +43,9 @@
             android:name=".LauncherActivity"
             android:label="Watch Later">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
@@ -56,90 +55,57 @@
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.Add">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW">
-                </action>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED">
-                </action>
+                <action android:name="android.intent.action.VIEW"></action>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"></action>
 
-                <category android:name="android.intent.category.DEFAULT">
-                </category>
-                <category android:name="android.intent.category.BROWSABLE">
-                </category>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE"></category>
 
-                <data android:scheme="http">
-                </data>
-                <data android:scheme="https">
-                </data>
-                <data android:host="youtube.com">
-                </data>
-                <data android:host="www.youtube.com">
-                </data>
-                <data android:host="m.youtube.com">
-                </data>
-                <data android:pathPrefix="/watch">
-                </data>
-                <data android:pathPrefix="/attribution_link">
-                </data>
-                <data android:pathPrefix="/v/">
-                </data>
-                <data android:pathPrefix="/e/">
-                </data>
-                <data android:pathPrefix="/embed/">
-                </data>
-                <data android:pathPrefix="/playlist">
-                </data>
+                <data android:scheme="http"></data>
+                <data android:scheme="https"></data>
+                <data android:host="youtube.com"></data>
+                <data android:host="www.youtube.com"></data>
+                <data android:host="m.youtube.com"></data>
+                <data android:pathPrefix="/watch"></data>
+                <data android:pathPrefix="/attribution_link"></data>
+                <data android:pathPrefix="/v/"></data>
+                <data android:pathPrefix="/e/"></data>
+                <data android:pathPrefix="/embed/"></data>
+                <data android:pathPrefix="/playlist"></data>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW">
-                </action>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED">
-                </action>
+                <action android:name="android.intent.action.VIEW"></action>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"></action>
 
-                <category android:name="android.intent.category.DEFAULT">
-                </category>
-                <category android:name="android.intent.category.BROWSABLE">
-                </category>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE"></category>
 
-                <data android:scheme="http">
-                </data>
-                <data android:scheme="https">
-                </data>
-                <data android:host="youtu.be">
-                </data>
-                <data android:pathPrefix="/">
-                </data>
+                <data android:scheme="http"></data>
+                <data android:scheme="https"></data>
+                <data android:host="youtu.be"></data>
+                <data android:pathPrefix="/"></data>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW">
-                </action>
-                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH">
-                </action>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED">
-                </action>
+                <action android:name="android.intent.action.VIEW"></action>
+                <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH"></action>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"></action>
 
-                <category android:name="android.intent.category.DEFAULT">
-                </category>
-                <category android:name="android.intent.category.BROWSABLE">
-                </category>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <category android:name="android.intent.category.BROWSABLE"></category>
 
-                <data android:scheme="vnd.youtube">
-                </data>
-                <data android:scheme="vnd.youtube.launch">
-                </data>
+                <data android:scheme="vnd.youtube"></data>
+                <data android:scheme="vnd.youtube.launch"></data>
             </intent-filter>
         </activity>
         <activity
             android:name=".AboutActivity"
-            android:label="@string/title_activity_about">
-        </activity>
+            android:label="@string/title_activity_about"></activity>
         <activity
             android:name=".HelpActivity"
-            android:label="@string/title_activity_help">
-        </activity>
+            android:label="@string/title_activity_help"></activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings">
-        </activity>
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

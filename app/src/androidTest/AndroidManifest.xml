@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015 - 2016
   ~
   ~  Maximilian Hille <mh@lambdasoup.com>
@@ -22,9 +21,9 @@
   -->
 
 <manifest
-    package="com.lambdasoup.watchlater.test"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    package="com.lambdasoup.watchlater.test"
     android:sharedUserId="com.lambdasoup.watchlater"
     android:versionCode="1"
     android:versionName="1.0">
@@ -34,22 +33,22 @@
         android:name="android.support.test.runner.AndroidJUnitRunner"
         android:label="Watch Later tests"
         android:targetPackage="com.lambdasoup.watchlater"
-        tools:replace="android:label"/>
+        tools:replace="android:label" />
 
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
 
     <application>
 
         <!--suppress AndroidDomInspection -->
         <service android:name=".MockAuthenticatorService">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator"/>
+                <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
             <!--suppress AndroidDomInspection -->
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator"/>
+                android:resource="@xml/authenticator" />
         </service>
 
     </application>

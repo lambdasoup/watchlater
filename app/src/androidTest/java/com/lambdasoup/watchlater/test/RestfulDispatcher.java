@@ -34,9 +34,9 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("WeakerAccess")
 public class RestfulDispatcher extends Dispatcher {
-    private static final String                                  STATUS_NOT_FOUND = "HTTP/1.1 404 Not Found";
-    private static final String                                  TAG              = "RestfulDispatcher";
-    private final        ConcurrentHashMap<String, MockResponse> responses        = new ConcurrentHashMap<>();
+    private static final String STATUS_NOT_FOUND = "HTTP/1.1 404 Not Found";
+    private static final String TAG = "RestfulDispatcher";
+    private final ConcurrentHashMap<String, MockResponse> responses = new ConcurrentHashMap<>();
     private int delayDuration = 0;
     private TimeUnit delayTimeUnit = TimeUnit.SECONDS;
 

@@ -32,45 +32,45 @@ import java.util.Locale;
 /**
  * Superclass for ErrorFragment and SuccessFragment; carrying the common functionality of storing a
  * channelTitle and filling it into messages.
- *
+ * <p>
  * Serves as an example for dealing with the arguments in an inheritance chain of fragments.
  */
 public class ChannelTitleAwareFragment extends Fragment {
-	private static final String ARG_CHANNEL_TITLE  = "com.lambdasoup.watchlater.ARG_CHANNEL_TITLE";
+    private static final String ARG_CHANNEL_TITLE = "com.lambdasoup.watchlater.ARG_CHANNEL_TITLE";
 
-	private String                    channelTitle;
+    private String channelTitle;
 
-	public static ChannelTitleAwareFragment newInstance(String channelTitle) {
-		ChannelTitleAwareFragment fragment = new ChannelTitleAwareFragment();
-		fragment.init(channelTitle);
-		return fragment;
-	}
+    @SuppressWarnings("WeakerAccess")
+    public ChannelTitleAwareFragment() {
+        // public default constructor is necessary
+    }
 
-	@SuppressWarnings("WeakerAccess")
-	public ChannelTitleAwareFragment() {
-		// public default constructor is necessary
-	}
+    public static ChannelTitleAwareFragment newInstance(String channelTitle) {
+        ChannelTitleAwareFragment fragment = new ChannelTitleAwareFragment();
+        fragment.init(channelTitle);
+        return fragment;
+    }
 
-	Bundle init(@NonNull String channelTitle) {
-		Bundle args = new Bundle();
-		args.putString(ARG_CHANNEL_TITLE, channelTitle);
-		setArguments(args);
-		return args;
-	}
+    Bundle init(@NonNull String channelTitle) {
+        Bundle args = new Bundle();
+        args.putString(ARG_CHANNEL_TITLE, channelTitle);
+        setArguments(args);
+        return args;
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		if (getArguments() != null) {
-			channelTitle = getArguments().getString(ARG_CHANNEL_TITLE);
-		}
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            channelTitle = getArguments().getString(ARG_CHANNEL_TITLE);
+        }
+    }
 
 
-	CharSequence withChannelTitle(@StringRes int msgId) {
-		return String.format(
-				Locale.getDefault(),
-				getResources().getString(msgId),
-				channelTitle);
-	}
+    CharSequence withChannelTitle(@StringRes int msgId) {
+        return String.format(
+                Locale.getDefault(),
+                getResources().getString(msgId),
+                channelTitle);
+    }
 }

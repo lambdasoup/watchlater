@@ -51,16 +51,16 @@ public class AccountChooserFragment extends Fragment {
     private OnFragmentInteractionListener listener;
 
 
+    public AccountChooserFragment() {
+        // Required empty public constructor
+    }
+
     public static AccountChooserFragment newInstance(Account[] accounts) {
         AccountChooserFragment fragment = new AccountChooserFragment();
         Bundle args = new Bundle();
         args.putParcelableArray(ARG_ACCOUNTS, accounts);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public AccountChooserFragment() {
-        // Required empty public constructor
     }
 
     @Override

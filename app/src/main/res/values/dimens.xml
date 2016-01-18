@@ -26,6 +26,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="dialog_width">320dp</dimen>
-  <dimen name="vertical_text_sep">6sp</dimen>
+    <dimen name="vertical_text_sep">6sp</dimen>
 
 </resources>

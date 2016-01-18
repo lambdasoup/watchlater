@@ -47,7 +47,6 @@ import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -72,14 +71,11 @@ import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.registerIdlingResources;
 import static android.support.test.espresso.Espresso.unregisterIdlingResources;
-import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
@@ -89,11 +85,11 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @RunWith(AndroidJUnit4.class)
 public class AddActivityTest {
 
-    private static final String  CHANNEL_TITLE     = "Testi Testsdottir";
-    private static final String  TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
-    private static final Account ACCOUNT_1         = new Account("test account 1", TEST_ACCOUNT_TYPE);
-    private static final Account ACCOUNT_2         = new Account("test account 2", TEST_ACCOUNT_TYPE);
-    private static MockWebServer     mockWebServer;
+    private static final String CHANNEL_TITLE = "Testi Testsdottir";
+    private static final String TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
+    private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
+    private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
+    private static MockWebServer mockWebServer;
     private static RestfulDispatcher restfulDispatcher;
 
     @SuppressWarnings("CanBeFinal")

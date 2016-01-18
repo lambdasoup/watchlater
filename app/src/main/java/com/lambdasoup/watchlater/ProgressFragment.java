@@ -36,27 +36,26 @@ import android.view.ViewGroup;
 public class ProgressFragment extends Fragment {
 
 
-	/**
-	 * Use this factory method to create a new instance of
-	 * this fragment using the provided parameters.
-	 *
-	 * @return A new instance of fragment ProgressFragment.
-	 */
-	// TODO: Rename and change types and number of parameters
-	public static ProgressFragment newInstance() {
-		return new ProgressFragment();
-	}
+    public ProgressFragment() {
+        // Required empty public constructor
+    }
 
-	public ProgressFragment() {
-		// Required empty public constructor
-	}
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment ProgressFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static ProgressFragment newInstance() {
+        return new ProgressFragment();
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_progress, container, false);
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_progress, container, false);
-
-	}
+    }
 
 }

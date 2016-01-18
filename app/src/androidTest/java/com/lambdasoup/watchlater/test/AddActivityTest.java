@@ -43,9 +43,11 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.action.ViewActions;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -68,12 +70,16 @@ import org.junit.runner.RunWith;
 
 import java.lang.reflect.Field;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
+import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.registerIdlingResources;
 import static android.support.test.espresso.Espresso.unregisterIdlingResources;
+import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
@@ -209,6 +215,43 @@ public class AddActivityTest {
         onView(withText(fillChannelTitle(R.string.success_added_video))).check(matches(isDisplayed()));
         onView(withText(testTitle)).check(matches(isDisplayed()));
         onView(withText(testDescription)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void longCallbackLifecycleInteraction() throws Exception {
+        String testDescription = "Description for the Test video";
+        String testTitle = "Test Title";
+        int delaySeconds = 1;
+
+        // set channel list response
+        registerChannelListResponse();
+
+        // set add video to list response
+        {
+            JSONObject json = new JSONObject();
+
+            JSONObject snippet = new JSONObject();
+            snippet.put("title", testTitle);
+            snippet.put("description", testDescription);
+            json.put("snippet", snippet);
+
+            MockResponse response = new MockResponse();
+            response.setBody(json.toString(8));
+            restfulDispatcher.registerResponse("/playlistItems?part=snippet", response);
+            restfulDispatcher.setDelay(delaySeconds, TimeUnit.SECONDS);
+        }
+
+        // set account
+        addAccount(ACCOUNT_1);
+
+        // launch activity
+        AddActivity activity = activityTestRule.launchActivity(null);
+        activity.finish();
+
+        // point here is to wait until the http request has finished
+        // it would be nice if would could block until espresso says we've gone quiet
+        // but onView requires the activity to exists
+        SystemClock.sleep(TimeUnit.SECONDS.toMillis(delaySeconds));
     }
 
     @Test

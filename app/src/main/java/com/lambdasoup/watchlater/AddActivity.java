@@ -170,7 +170,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 	private void addToWatchLaterAndShow() {
 		if (result != null) {
 			// we're done, there will be no retry of this method
-			result.apply(this::showSuccess, this::showError);
+			result.apply(fragmentCoordinator::showSuccess, fragmentCoordinator::showError);
 			return;
 		}
 		// still work to do and things to try
@@ -379,22 +379,6 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 				channelTitle);
 	}
 
-	private void showError(ErrorResult errorResult) {
-		if (isFinishing()) {
-			showToast(withChannelTitle(errorResult.msgId));
-			return;
-		}
-
-		fragmentCoordinator.showError();
-	}
-
-	private void showSuccess(@SuppressWarnings("UnusedParameters") SuccessResult successResult) {
-		if (isFinishing()) {
-			showToast(withChannelTitle(R.string.success_added_video));
-			return;
-		}
-		fragmentCoordinator.showSuccess();
-	}
 
 	@SuppressWarnings("SameParameterValue")
 	private void showToast(@StringRes int msgId) {
@@ -664,15 +648,26 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 			showFragment(AccountChooserFragment.newInstance(accounts));
 		}
 
-		public void showError() {
+		public void showError(ErrorResult errorResult) {
+			if (isFinishing() || isDestroyed()) {
+				showToast(withChannelTitle(errorResult.msgId));
+				return;
+			}
 			showFragment(ErrorFragment.newInstance(channelTitle, result));
 		}
 
-		public void showSuccess() {
+		public void showSuccess(@SuppressWarnings("UnusedParameters") SuccessResult successResult) {
+			if (isFinishing() || isDestroyed()) {
+				showToast(withChannelTitle(R.string.success_added_video));
+				return;
+			}
 			showFragment(SuccessFragment.newInstance(channelTitle, result));
 		}
 
 		private void showFragment(Fragment fragment) {
+			if (isFinishing() || isDestroyed()) {
+				return;
+			}
 			Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
 			if (currentFragment != null && currentFragment.getClass().equals(fragment.getClass())) {
 				return;

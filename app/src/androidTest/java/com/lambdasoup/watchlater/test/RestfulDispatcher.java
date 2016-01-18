@@ -22,6 +22,7 @@
 
 package com.lambdasoup.watchlater.test;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.squareup.okhttp.mockwebserver.Dispatcher;
@@ -29,12 +30,15 @@ import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("WeakerAccess")
 public class RestfulDispatcher extends Dispatcher {
     private static final String                                  STATUS_NOT_FOUND = "HTTP/1.1 404 Not Found";
     private static final String                                  TAG              = "RestfulDispatcher";
     private final        ConcurrentHashMap<String, MockResponse> responses        = new ConcurrentHashMap<>();
+    private int delayDuration = 0;
+    private TimeUnit delayTimeUnit = TimeUnit.SECONDS;
 
     /**
      * Registers a canned response for a particular full path. Request method and all other info
@@ -61,6 +65,9 @@ public class RestfulDispatcher extends Dispatcher {
             Log.d(TAG, "No canned response available for path " + request.getPath());
             response = getFailureResponse();
         }
+        if (delayDuration != 0) {
+            SystemClock.sleep(delayTimeUnit.toMillis(delayDuration));
+        }
         return response;
     }
 
@@ -73,5 +80,10 @@ public class RestfulDispatcher extends Dispatcher {
      */
     public void clear() {
         responses.clear();
+    }
+
+    public void setDelay(int duration, TimeUnit timeUnit) {
+        delayDuration = duration;
+        delayTimeUnit = timeUnit;
     }
 }

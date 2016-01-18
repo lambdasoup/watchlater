@@ -25,7 +25,7 @@ apply plugin: 'me.tatarka.retrolambda'
 
 def version_major = 1
 def version_minor = 3
-def version_patch = 0
+def version_patch = 1
 
 android {
     compileSdkVersion 23

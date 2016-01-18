@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015.
+ * Copyright (c) 2015 - 2016
  *
  *  Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -23,6 +23,7 @@
 package com.lambdasoup.watchlater;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,10 +38,7 @@ public class SuccessFragment extends ChannelTitleAwareFragment {
 	private AddActivity.SuccessResult successResult;
 
 
-	public static SuccessFragment newInstance(String channelTitle, AddActivity.WatchlaterResult result) {
-		if (result == null) {
-			throw new IllegalArgumentException("Supplied result must be non-null");
-		}
+	public static SuccessFragment newInstance(@NonNull String channelTitle, @NonNull AddActivity.WatchlaterResult result) {
 		if (!result.isSuccess()) {
 			throw new IllegalArgumentException("Supplied result " + result + " is not a success");
 		}

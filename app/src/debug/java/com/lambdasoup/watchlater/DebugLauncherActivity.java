@@ -38,7 +38,7 @@ import android.widget.TextView;
 import static android.net.Uri.parse;
 
 
-@SuppressLint("Registered") // registered in androidTest manifest
+@SuppressLint("Registered") // registered in debug manifest
 public class DebugLauncherActivity extends Activity {
 
     private static final String[] VIDEO_EXAMPLE_URIS = {
@@ -46,7 +46,8 @@ public class DebugLauncherActivity extends Activity {
             "https://youtu.be/1qG61X3bkKs",
             "http://www.youtube.com/attribution_link?u=/watch%3Fv%3DJ1zNbWJC5aw%26feature%3Dem-subs_digest",
             "http://www.youtube.com/v/OdT9z-JjtJk",
-            "http://www.youtube.com/embed/UkWd0azv3fQ"
+            "http://www.youtube.com/embed/UkWd0azv3fQ",
+            "vnd.youtube:UkWd0azv3fQ"
     };
 
     private static final String[] PLAYLIST_EXAMPLE_URIS = {

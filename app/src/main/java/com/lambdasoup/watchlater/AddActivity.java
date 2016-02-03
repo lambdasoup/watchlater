@@ -227,6 +227,11 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
     }
 
     private String getVideoId(Uri uri) throws WatchlaterException {
+        // e.g. vnd.youtube:jqxENMKaeCU
+        if (uri.isOpaque()) {
+            return uri.getSchemeSpecificPart();
+        }
+
         // e.g. https://www.youtube.com/watch?v=jqxENMKaeCU
         String videoId = uri.getQueryParameter("v");
         if (videoId != null) {

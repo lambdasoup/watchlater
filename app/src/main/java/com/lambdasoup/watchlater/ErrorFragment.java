@@ -70,12 +70,8 @@ public class ErrorFragment extends ChannelTitleAwareFragment {
             errorView.findViewById(errorButton.buttonId).setVisibility(errorResult.additionalViewIds.contains(errorButton) ? View.VISIBLE : View.GONE);
         }
 
-        errorView.findViewById(R.id.activetext_help_no_channel).setOnClickListener(v -> {
-            listener.onShowHelp();
-        });
-        errorView.findViewById(R.id.button_retry).setOnClickListener(v -> {
-            listener.onRetry();
-        });
+        errorView.findViewById(R.id.activetext_help_no_channel).setOnClickListener(v -> listener.onShowHelp());
+        errorView.findViewById(R.id.button_retry).setOnClickListener(v -> listener.onRetry());
         return errorView;
     }
 

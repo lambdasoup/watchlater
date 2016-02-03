@@ -28,13 +28,13 @@ import android.webkit.WebView;
 
 public class HelpActivity extends UpAsBackActivity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		WebView webView = new WebView(this);
-		webView.loadUrl("file:///android_asset/html/" + getString(R.string.asset_prefix) + "/youtube_channel_help.html");
-		setContentView(webView);
-	}
+        WebView webView = new WebView(this);
+        webView.loadUrl("file:///android_asset/html/" + getString(R.string.asset_prefix) + "/youtube_channel_help.html");
+        setContentView(webView);
+    }
 
 }

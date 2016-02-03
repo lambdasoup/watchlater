@@ -28,14 +28,14 @@ import android.webkit.WebView;
 
 public class AboutActivity extends UpAsBackActivity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		WebView webView = new WebView(this);
-		webView.loadUrl("file:///android_asset/html/about.html");
-		setContentView(webView);
-	}
+        WebView webView = new WebView(this);
+        webView.loadUrl("file:///android_asset/html/about.html");
+        setContentView(webView);
+    }
 
 
 }

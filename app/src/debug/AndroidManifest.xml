@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015 - 2016
   ~
   ~  Maximilian Hille <mh@lambdasoup.com>
@@ -21,14 +20,14 @@
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<manifest
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.lambdasoup.watchlater"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:sharedUserId="com.lambdasoup.watchlater">
 
-    <application android:fullBackupContent="@xml/backup_content"
-                 tools:ignore="GoogleAppIndexingWarning">
+    <application
+        android:fullBackupContent="@xml/backup_content"
+        tools:ignore="GoogleAppIndexingWarning">
 
         <!--activity
             android:name=".DebugLauncherActivity"

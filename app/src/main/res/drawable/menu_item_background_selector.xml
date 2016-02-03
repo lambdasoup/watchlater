@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015 - 2016
   ~
   ~  Maximilian Hille <mh@lambdasoup.com>
@@ -22,15 +21,9 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_activated="true"
-          android:drawable="@color/medium_gray">
-    </item>
+    <item android:drawable="@color/medium_gray" android:state_activated="true"></item>
 
-    <item android:state_pressed="true"
-          android:drawable="@color/medium_gray">
-    </item>
+    <item android:drawable="@color/medium_gray" android:state_pressed="true"></item>
 
-    <item android:state_pressed="false"
-          android:drawable="@android:color/transparent">
-    </item>
+    <item android:drawable="@android:color/transparent" android:state_pressed="false"></item>
 </selector>

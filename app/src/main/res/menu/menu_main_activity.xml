@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2015 - 2016
   ~
   ~  Maximilian Hille <mh@lambdasoup.com>
@@ -21,24 +20,20 @@
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/menu_settings"
         android:showAsAction="never"
-        android:title="@string/menu_settings"
-        />
+        android:title="@string/menu_settings" />
 
     <item
         android:id="@+id/menu_help"
         android:showAsAction="never"
-        android:title="@string/menu_help"
-        />
+        android:title="@string/menu_help" />
 
     <item
         android:id="@+id/menu_about"
         android:showAsAction="never"
-        android:title="@string/menu_about"
-        />
+        android:title="@string/menu_about" />
 
 </menu>

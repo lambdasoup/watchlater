@@ -32,48 +32,48 @@ import android.widget.TextView;
 
 public class SuccessFragment extends ChannelTitleAwareFragment {
 
-	private static final String ARG_SUCCESS_RESULT = "com.lambdasoup.watchlater.ARG_SUCCESS_RESULT";
+    private static final String ARG_SUCCESS_RESULT = "com.lambdasoup.watchlater.ARG_SUCCESS_RESULT";
 
 
-	private SuccessResult successResult;
+    private SuccessResult successResult;
 
 
-	public static SuccessFragment newInstance(@NonNull String channelTitle, @NonNull SuccessResult result) {
-		SuccessFragment fragment = new SuccessFragment();
-		Bundle args = fragment.init(channelTitle);
-		args.putParcelable(ARG_SUCCESS_RESULT, result);
-		fragment.setArguments(args);
-		return fragment;
-	}
+    public SuccessFragment() {
+        // Required empty public constructor
+    }
 
-	public SuccessFragment() {
-		// Required empty public constructor
-	}
+    public static SuccessFragment newInstance(@NonNull String channelTitle, @NonNull SuccessResult result) {
+        SuccessFragment fragment = new SuccessFragment();
+        Bundle args = fragment.init(channelTitle);
+        args.putParcelable(ARG_SUCCESS_RESULT, result);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		if (getArguments() != null) {
-			successResult = getArguments().getParcelable(ARG_SUCCESS_RESULT);
-		}
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            successResult = getArguments().getParcelable(ARG_SUCCESS_RESULT);
+        }
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
-		View successView = inflater.inflate(R.layout.fragment_success, container, false);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View successView = inflater.inflate(R.layout.fragment_success, container, false);
 
-		CharSequence msg = withChannelTitle(R.string.success_added_video);
+        CharSequence msg = withChannelTitle(R.string.success_added_video);
 
-		TextView successMsg = (TextView) successView.findViewById(R.id.success_msg);
-		successMsg.setText(msg);
+        TextView successMsg = (TextView) successView.findViewById(R.id.success_msg);
+        successMsg.setText(msg);
 
-		TextView title = (TextView) successView.findViewById(R.id.success_title);
-		title.setText(successResult.title);
+        TextView title = (TextView) successView.findViewById(R.id.success_title);
+        title.setText(successResult.title);
 
-		TextView description = (TextView) successView.findViewById(R.id.success_description);
-		description.setText(successResult.description);
-		return successView;
-	}
+        TextView description = (TextView) successView.findViewById(R.id.success_description);
+        description.setText(successResult.description);
+        return successView;
+    }
 
 }

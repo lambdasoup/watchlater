@@ -41,13 +41,13 @@ package com.lambdasoup.watchlater.test;/*
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.espresso.action.ViewActions;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
@@ -72,14 +72,11 @@ import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.registerIdlingResources;
 import static android.support.test.espresso.Espresso.unregisterIdlingResources;
-import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 /**
@@ -89,21 +86,31 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @RunWith(AndroidJUnit4.class)
 public class AddActivityTest {
 
-    private static final String  CHANNEL_TITLE     = "Testi Testsdottir";
-    private static final String  TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
-    private static final Account ACCOUNT_1         = new Account("test account 1", TEST_ACCOUNT_TYPE);
-    private static final Account ACCOUNT_2         = new Account("test account 2", TEST_ACCOUNT_TYPE);
-    private static MockWebServer     mockWebServer;
+    private static final String CHANNEL_TITLE = "Testi Testsdottir";
+    private static final String TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
+    private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
+    private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
+    private static MockWebServer mockWebServer;
     private static RestfulDispatcher restfulDispatcher;
 
     @SuppressWarnings("CanBeFinal")
     @Rule
-    public ActivityTestRule<AddActivity> activityTestRule = new ActivityTestRule<AddActivity>(AddActivity.class, false, false) {
+    public ActivityTestRule<AddActivity> activityTestRuleHttpsUri = new ActivityTestRule<AddActivity>(AddActivity.class, false, false) {
         @Override
         protected Intent getActivityIntent() {
             return new Intent(Intent.ACTION_VIEW, Uri.parse("https://youtube.com/v/8f7h837f4"));
         }
     };
+
+    @SuppressWarnings("CanBeFinal")
+    @Rule
+    public ActivityTestRule<AddActivity> activityTestRuleVndYoutubeUri = new ActivityTestRule<AddActivity>(AddActivity.class, false, false) {
+        @Override
+        protected Intent getActivityIntent() {
+            return new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:8f7h837f4"));
+        }
+    };
+
     private RetrofitHttpExecutorIdlingResource idlingExecutor;
 
     @BeforeClass
@@ -159,13 +166,13 @@ public class AddActivityTest {
         accountManager.addAccountExplicitly(account, null, null);
     }
 
-    private String fillChannelTitle(int msgId) {
-        return String.format(Locale.US, activityTestRule.getActivity().getResources().getString(msgId), CHANNEL_TITLE);
+    private String fillChannelTitle(int msgId, Activity activity) {
+        return String.format(Locale.US, activity.getResources().getString(msgId), CHANNEL_TITLE);
     }
 
     @Test
     public void noAccount() throws Exception {
-        activityTestRule.launchActivity(null);
+        activityTestRuleHttpsUri.launchActivity(null);
 
         onView(withText(R.string.error_no_account)).check(matches(isDisplayed()));
     }
@@ -175,7 +182,7 @@ public class AddActivityTest {
         addAccount(ACCOUNT_1);
         addAccount(ACCOUNT_2);
 
-        activityTestRule.launchActivity(null);
+        activityTestRuleHttpsUri.launchActivity(null);
 
         ViewInteraction accountChooserHeader = onView(withText(R.string.choose_account));
         accountChooserHeader.check(matches(isDisplayed()));
@@ -185,7 +192,7 @@ public class AddActivityTest {
     }
 
     @Test
-    public void addSuccess() throws Exception {
+    public void addSuccessHttps() throws Exception {
         String testDescription = "Description for the Test video";
         String testTitle = "Test Title";
 
@@ -210,9 +217,42 @@ public class AddActivityTest {
         addAccount(ACCOUNT_1);
 
         // launch activity
-        activityTestRule.launchActivity(null);
+        AddActivity activity = activityTestRuleHttpsUri.launchActivity(null);
 
-        onView(withText(fillChannelTitle(R.string.success_added_video))).check(matches(isDisplayed()));
+        onView(withText(fillChannelTitle(R.string.success_added_video, activity))).check(matches(isDisplayed()));
+        onView(withText(testTitle)).check(matches(isDisplayed()));
+        onView(withText(testDescription)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void addSuccessVndYoutube() throws Exception {
+        String testDescription = "Description for the Test video";
+        String testTitle = "Test Title";
+
+        // set channel list response
+        registerChannelListResponse();
+
+        // set add video to list response
+        {
+            JSONObject json = new JSONObject();
+
+            JSONObject snippet = new JSONObject();
+            snippet.put("title", testTitle);
+            snippet.put("description", testDescription);
+            json.put("snippet", snippet);
+
+            MockResponse response = new MockResponse();
+            response.setBody(json.toString(8));
+            restfulDispatcher.registerResponse("/playlistItems?part=snippet", response);
+        }
+
+        // set account
+        addAccount(ACCOUNT_1);
+
+        // launch activity
+        AddActivity activity = activityTestRuleVndYoutubeUri.launchActivity(null);
+
+        onView(withText(fillChannelTitle(R.string.success_added_video, activity))).check(matches(isDisplayed()));
         onView(withText(testTitle)).check(matches(isDisplayed()));
         onView(withText(testDescription)).check(matches(isDisplayed()));
     }
@@ -245,7 +285,7 @@ public class AddActivityTest {
         addAccount(ACCOUNT_1);
 
         // launch activity
-        AddActivity activity = activityTestRule.launchActivity(null);
+        AddActivity activity = activityTestRuleHttpsUri.launchActivity(null);
         activity.finish();
 
         // point here is to wait until the http request has finished
@@ -284,9 +324,9 @@ public class AddActivityTest {
         addAccount(ACCOUNT_1);
 
         // launch activity
-        activityTestRule.launchActivity(null);
+        AddActivity activity = activityTestRuleHttpsUri.launchActivity(null);
 
-        onView(withText(fillChannelTitle(R.string.error_already_in_playlist))).check(matches(isDisplayed()));
+        onView(withText(fillChannelTitle(R.string.error_already_in_playlist, activity))).check(matches(isDisplayed()));
     }
 
     private void registerChannelListResponse() throws JSONException {
@@ -337,9 +377,9 @@ public class AddActivityTest {
         addAccount(ACCOUNT_1);
 
         // launch activity
-        activityTestRule.launchActivity(null);
+        AddActivity activity = activityTestRuleHttpsUri.launchActivity(null);
 
-        onView(withText(fillChannelTitle(R.string.error_need_account))).check(matches(isDisplayed()));
+        onView(withText(fillChannelTitle(R.string.error_need_account, activity))).check(matches(isDisplayed()));
 
     }
 

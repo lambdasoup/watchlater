@@ -34,9 +34,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements IdlingResource {
-    private static final String        IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
-    private static final String        TAG              = "RetrofitIdlingResource";
-    private final        AtomicInteger currentTaskCount = new AtomicInteger(0);
+    private static final String IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
+    private static final String TAG = "RetrofitIdlingResource";
+    private final AtomicInteger currentTaskCount = new AtomicInteger(0);
     private volatile ResourceCallback idleTransitionCallback;
 
 

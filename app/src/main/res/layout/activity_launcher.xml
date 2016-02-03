@@ -31,13 +31,14 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.lambdasoup.watchlater.LauncherActivity">
+
     <TextView
         android:id="@+id/explanation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:text="@string/explanation"/>
+        android:text="@string/explanation" />
 
     <Button
         android:id="@+id/example_link_button"
@@ -45,17 +46,17 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:text="@string/button_example"
-        android:onClick="onClickExampleLink"/>
+        android:onClick="onClickExampleLink"
+        android:text="@string/button_example" />
 
     <TextView
         android:id="@+id/defaults_advice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/vertical_text_sep"
         android:layout_marginBottom="@dimen/vertical_text_sep"
-        tools:text="The advice text for the defaults will be set programmatically after detection."/>
+        android:layout_marginTop="@dimen/vertical_text_sep"
+        tools:text="The advice text for the defaults will be set programmatically after detection." />
 
     <Button
         android:id="@+id/settings_youtube_button"
@@ -63,8 +64,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:text="@string/button_settings_youtube"
-        android:onClick="onClickSettingsYoutube"/>
+        android:onClick="onClickSettingsYoutube"
+        android:text="@string/button_settings_youtube" />
 
     <Button
         android:id="@+id/settings_watchlater_button"
@@ -72,8 +73,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:text="@string/button_settings_watchlater"
-        android:onClick="onClickSettingsWatchlater"/>
+        android:onClick="onClickSettingsWatchlater"
+        android:text="@string/button_settings_watchlater" />
 
     <Button
         android:id="@+id/settings_all_apps_button"
@@ -81,7 +82,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:text="@string/button_settings_all_apps"
-        android:onClick="onClickSettingsAllApps"/>
+        android:onClick="onClickSettingsAllApps"
+        android:text="@string/button_settings_all_apps" />
 
 </LinearLayout>

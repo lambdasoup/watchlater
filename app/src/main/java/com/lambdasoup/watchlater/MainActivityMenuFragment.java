@@ -32,38 +32,38 @@ import android.view.MenuItem;
 
 public class MainActivityMenuFragment extends Fragment {
 
-	public static final String TAG = MainActivityMenuFragment.class.getSimpleName();
+    public static final String TAG = MainActivityMenuFragment.class.getSimpleName();
 
-	public static MainActivityMenuFragment newInstance() {
-		return new MainActivityMenuFragment();
-	}
+    public static MainActivityMenuFragment newInstance() {
+        return new MainActivityMenuFragment();
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-	}
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.menu_main_activity, menu);
-		super.onCreateOptionsMenu(menu, inflater);
-	}
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main_activity, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.menu_about:
-				startActivity(new Intent(getActivity(), AboutActivity.class));
-				return true;
-			case R.id.menu_help:
-				startActivity(new Intent(getActivity(), HelpActivity.class));
-				return true;
-			case R.id.menu_settings:
-				startActivity(new Intent(getActivity(), SettingsActivity.class));
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_about:
+                startActivity(new Intent(getActivity(), AboutActivity.class));
+                return true;
+            case R.id.menu_help:
+                startActivity(new Intent(getActivity(), HelpActivity.class));
+                return true;
+            case R.id.menu_settings:
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

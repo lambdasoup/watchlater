@@ -472,15 +472,15 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
         }
 
         public void showError(ErrorResult errorResult) {
-            if (isFinishing() || isDestroyed()) {
+            if (isFinishing()) {
                 showToast(withChannelTitle(errorResult.msgId));
                 return;
             }
             showFragment(ErrorFragment.newInstance(channelTitle, errorResult));
         }
 
-        public void showSuccess(@SuppressWarnings("UnusedParameters") SuccessResult successResult) {
-            if (isFinishing() || isDestroyed()) {
+        public void showSuccess(SuccessResult successResult) {
+            if (isFinishing()) {
                 showToast(withChannelTitle(R.string.success_added_video));
                 return;
             }
@@ -488,7 +488,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
         }
 
         private void showFragment(Fragment fragment) {
-            if (isFinishing() || isDestroyed()) {
+            if (isFinishing()) {
                 return;
             }
             Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
@@ -499,7 +499,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment)
                     .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                    .commit();
+                    .commitAllowingStateLoss();
         }
     }
 }

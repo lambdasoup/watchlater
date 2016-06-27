@@ -24,13 +24,19 @@ package com.lambdasoup.watchlater;
 
 import android.util.Log;
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.List;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.http.Body;
-import retrofit.http.GET;
-import retrofit.http.POST;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Converter;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
 
 /**
  * Youtube's Data Api
@@ -41,11 +47,11 @@ import retrofit.http.POST;
 public interface YoutubeApi {
     String TAG = "YoutubeApi";
 
-    @GET("/channels?part=contentDetails,snippet&maxResults=50&mine=true")
-    void listMyChannels(Callback<Channels> cb);
+    @GET("channels?part=contentDetails,snippet&maxResults=50&mine=true")
+    Call<Channels> listMyChannels();
 
-    @POST("/playlistItems?part=snippet")
-    void insertPlaylistItem(@Body PlaylistItem playlistItem, Callback<PlaylistItem> cb);
+    @POST("playlistItems?part=snippet")
+    Call<PlaylistItem> insertPlaylistItem(@Body PlaylistItem playlistItem);
 
     enum ErrorType {
         NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO, INVALID_TOKEN, VIDEO_NOT_FOUND, ALREADY_IN_PLAYLIST, NO_ACCOUNT, ACCOUNT_HAS_NO_CHANNEL, PERMISSION_REQUIRED_ACCOUNTS
@@ -170,14 +176,25 @@ public interface YoutubeApi {
         public static final String PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos";
         public static final String VIDEO_NOT_FOUND = "videoNotFound";
 
-        public static ErrorType translateError(RetrofitError error) {
-            if (error.getResponse() == null) {
-                return ErrorType.NETWORK;
-            }
+		private final Converter<ResponseBody, YouTubeError> youTubeErrorConverter;
 
-            YouTubeError youtubeError = (YouTubeError) error.getBodyAs(YouTubeError.class);
+
+		protected ErrorTranslatingCallback(Retrofit retrofit) {
+			youTubeErrorConverter = retrofit.responseBodyConverter(YouTubeError.class, new Annotation[0]);
+		}
+
+
+        public ErrorType translateError(Response<T> errorResponse) {
+			YouTubeError youtubeError;
+			try {
+				youtubeError = youTubeErrorConverter.convert(errorResponse.errorBody());
+			} catch (IOException e) {
+				Log.d(TAG, "Expected a youtube api error response, got instead: " + errorResponse.message());
+				return ErrorType.OTHER;
+			}
+
             if (youtubeError == null) {
-                Log.d(TAG, "Expected a youtube api error response, got instead: " + error);
+                Log.d(TAG, "Expected a youtube api error response, got instead: " + errorResponse.message());
                 return ErrorType.OTHER;
             }
 
@@ -187,7 +204,7 @@ public interface YoutubeApi {
                 errorDetail = youtubeError.error.errors.get(0).reason;
             }
 
-            switch (error.getResponse().getStatus()) {
+            switch (errorResponse.code()) {
                 case 401:
                     return ErrorType.INVALID_TOKEN;
                 case 403:
@@ -217,11 +234,22 @@ public interface YoutubeApi {
         }
 
         @Override
-        final public void failure(RetrofitError error) {
-            failure(translateError(error));
+        public void onFailure(Call<T> call, Throwable t) {
+            failure(ErrorType.NETWORK);
+        }
+
+        @Override
+        public void onResponse(Call<T> call, Response<T> response) {
+            if (response.isSuccessful()) {
+                success(response.body());
+            } else {
+                failure(translateError(response));
+            }
         }
 
         protected abstract void failure(ErrorType errorType);
+
+        protected abstract void success(T result);
     }
 
 

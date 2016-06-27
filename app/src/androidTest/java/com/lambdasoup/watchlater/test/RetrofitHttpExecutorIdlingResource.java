@@ -31,6 +31,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import okhttp3.internal.Util;
+
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements IdlingResource {
@@ -41,18 +43,8 @@ class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements I
 
 
     public RetrofitHttpExecutorIdlingResource() {
-        // imitate the retrofit 1.9.1 default http executor properties
-        super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-                new ThreadFactory() {
-                    @Override
-                    public Thread newThread(@NonNull final Runnable r) {
-                        return new Thread(() -> {
-                            android.os.Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
-                            r.run();
-                        }, IDLE_THREAD_NAME);
-                    }
-                }
-        );
+        // imitate the okhttp3 default Dispatcher executor properties
+        super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(), Util.threadFactory("Idiling resource OkHttp Dispatcher", false));
     }
 
     @Override

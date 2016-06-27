@@ -1,14 +1,11 @@
 -dontobfuscate
 
 # retrofit
-# https://github.com/square/retrofit/issues/117
--dontwarn rx.**
--dontwarn com.google.appengine.**
--keep class retrofit.** { *; }
--keep class package.with.model.classes.** { *; }
--keepclassmembernames interface * {
-    @retrofit.http.* <methods>;
-}
+# http://square.github.io/retrofit/
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
 
 # okio
 -dontwarn java.nio.file.Files

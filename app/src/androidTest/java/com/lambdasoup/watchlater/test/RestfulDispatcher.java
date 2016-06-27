@@ -25,12 +25,13 @@ package com.lambdasoup.watchlater.test;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.squareup.okhttp.mockwebserver.Dispatcher;
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.RecordedRequest;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.mockwebserver.Dispatcher;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.RecordedRequest;
 
 @SuppressWarnings("WeakerAccess")
 public class RestfulDispatcher extends Dispatcher {

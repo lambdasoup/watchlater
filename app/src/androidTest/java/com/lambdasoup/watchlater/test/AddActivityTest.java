@@ -54,8 +54,6 @@ import android.test.suitebuilder.annotation.LargeTest;
 
 import com.lambdasoup.watchlater.AddActivity;
 import com.lambdasoup.watchlater.R;
-import com.squareup.okhttp.mockwebserver.MockResponse;
-import com.squareup.okhttp.mockwebserver.MockWebServer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,6 +69,9 @@ import org.junit.runner.RunWith;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.registerIdlingResources;
@@ -90,7 +91,7 @@ public class AddActivityTest {
     private static final String TEST_ACCOUNT_TYPE = "com.lambdasoup.watchlater.test";
     private static final Account ACCOUNT_1 = new Account("test account 1", TEST_ACCOUNT_TYPE);
     private static final Account ACCOUNT_2 = new Account("test account 2", TEST_ACCOUNT_TYPE);
-    private static MockWebServer mockWebServer;
+    private static MockWebServer     mockWebServer;
     private static RestfulDispatcher restfulDispatcher;
 
     @SuppressWarnings("CanBeFinal")

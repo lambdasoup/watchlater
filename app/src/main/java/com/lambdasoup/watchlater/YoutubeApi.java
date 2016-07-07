@@ -36,7 +36,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 /**
  * Youtube's Data Api
@@ -52,6 +54,11 @@ public interface YoutubeApi {
 
     @POST("playlistItems?part=snippet")
     Call<PlaylistItem> insertPlaylistItem(@Body PlaylistItem playlistItem);
+
+    // TODO: store browser api key in a secure place
+	@Headers("Referer: lambdasoup.com/watchlater")
+    @GET("videos?part=snippet&key=AIzaSyCl-lsReVAyLtCgQ7Uzl7MXBFuzqR1DuZA")
+    Call<Video> getVideoInfo(@Query("id") String id);
 
     enum ErrorType {
         NEED_ACCESS, NETWORK, OTHER, PLAYLIST_FULL, NOT_A_VIDEO, INVALID_TOKEN, VIDEO_NOT_FOUND, ALREADY_IN_PLAYLIST, NO_ACCOUNT, ACCOUNT_HAS_NO_CHANNEL, PERMISSION_REQUIRED_ACCOUNTS
@@ -135,6 +142,28 @@ public interface YoutubeApi {
         }
     }
 
+    class Video {
+        public final List<VideoResource> items;
+        public Video(List<VideoResource> items) { this.items = items; }
+
+        static class VideoResource {
+            public final Snippet snippet;
+            public VideoResource(Snippet snippet) {
+                this.snippet = snippet;
+            }
+
+            static class Snippet {
+                public final String title;
+                public final String description;
+
+                public Snippet(String title, String description) {
+                    this.title = title;
+                    this.description = description;
+                }
+            }
+        }
+    }
+
     class YouTubeError {
         public final RootError error;
 
@@ -168,6 +197,8 @@ public interface YoutubeApi {
             }
         }
     }
+
+
 
     abstract class ErrorTranslatingCallback<T> implements Callback<T> {
 

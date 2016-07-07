@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddActivity"
+            android:name=".TestActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_add"
             android:launchMode="singleTop"

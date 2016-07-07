@@ -353,6 +353,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 
 	private void setApiAdapter() {
 		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+		// TODO: don't leak the activity here!
 		httpClient.interceptors().add(chain -> {
 			Request request = chain.request().newBuilder().addHeader("Authorization", "Bearer " + token).build();
 			return chain.proceed(request);

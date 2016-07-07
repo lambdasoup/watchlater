@@ -183,11 +183,13 @@ public class TestActivity extends Activity implements LoaderManager.LoaderCallba
 
 	@Override
 	public Loader<TestLoader.Result<YoutubeApi.Video>> onCreateLoader(int id, Bundle args) {
+		Log.d(TAG, "onCreateLoader called");
 		return new TestLoader(this, api, args.getString(ARG_VIDEO_ID));
 	}
 
 	@Override
 	public void onLoadFinished(Loader<TestLoader.Result<YoutubeApi.Video>> loader, TestLoader.Result<YoutubeApi.Video> data) {
+		Log.d(TAG, "onLoadFinished called");
 		data.apply(videoResponse -> {
 					if (videoResponse.isSuccessful()) {
 						if (videoResponse.body().items.size() == 0) {

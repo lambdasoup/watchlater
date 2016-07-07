@@ -29,7 +29,7 @@
         android:fullBackupContent="@xml/backup_content"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <!--activity
+        <activity
             android:name=".DebugLauncherActivity"
             android:label="Watch Later - debug">
             <intent-filter>
@@ -37,7 +37,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity-->
+        </activity>
 
     </application>
 

@@ -376,7 +376,9 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 
 		retrofit = retrofitBuilder.build();
 		api = retrofit.create(YoutubeApi.class);
+
 	}
+
 
 	private CharSequence withChannelTitle(@StringRes int msgId) {
 		return String.format(

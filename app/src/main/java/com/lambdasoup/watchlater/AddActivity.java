@@ -39,6 +39,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -67,31 +68,30 @@ import static com.lambdasoup.watchlater.SettingsActivity.PREF_KEY_DEFAULT_ACCOUN
 
 public class AddActivity extends Activity implements ErrorFragment.OnFragmentInteractionListener, AccountChooserFragment.OnFragmentInteractionListener {
 
-	private static final String          SCOPE_YOUTUBE                    = "oauth2:https://www.googleapis.com/auth/youtube";
 	private static final String          PERMISSION_GET_ACCOUNTS          = "android.permission.GET_ACCOUNTS";
 	private static final int             PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
-	private static final String          KEY_ACCOUNT                      = "com.lambdasoup.watchlater_account";
-	private static final String          KEY_TOKEN                        = "com.lambdasoup.watchlater_token";
-	private static final String          KEY_PLAYLIST_ID                  = "com.lambdasoup.watchlater_playlistId";
-	private static final String          KEY_CHANNEL_TITLE                = "com.lambdasoup.watchlater_channelTitle";
-	private static final String          KEY_RESULT                       = "com.lambdasoup.watchlater_result";
+	private static final String          KEY_ACCOUNT                     = "com.lambdasoup.watchlater_account";
+	private static final String          KEY_TOKEN                       = "com.lambdasoup.watchlater_token";
+	private static final String          KEY_PLAYLIST_ID                 = "com.lambdasoup.watchlater_playlistId";
+	private static final String          KEY_CHANNEL_TITLE               = "com.lambdasoup.watchlater_channelTitle";
+	private static final String          KEY_RESULT                      = "com.lambdasoup.watchlater_result";
+	private static final String TAG                                      = AddActivity.class.getSimpleName();
+	private static final String KEY_AUTHENTICATOR                        = "com.lambdasoup.watchlater_authenticator";
 	// fields are not final to be somewhat accessible for testing to inject other values
 	@SuppressWarnings({"FieldCanBeLocal", "CanBeFinal"})
-	private static       String          YOUTUBE_ENDPOINT                 = "https://www.googleapis.com/youtube/v3/";
+	private static       String          YOUTUBE_ENDPOINT                = "https://www.googleapis.com/youtube/v3/";
 	@SuppressWarnings("CanBeFinal")
-	private static       String          ACCOUNT_TYPE_GOOGLE              = "com.google";
-	@SuppressWarnings("CanBeFinal")
-	private static       ExecutorService OPTIONAL_RETROFIT_HTTP_EXECUTOR  = null;
+	private static       String          ACCOUNT_TYPE_GOOGLE             = "com.google";
+
 	private AccountManager      manager;
 	private Retrofit            retrofit;
 	private YoutubeApi          api;
 	private FragmentCoordinator fragmentCoordinator;
 	private Account             account;
-	private String              token;
 	private String              playlistId;
 	private String              channelTitle;
 	private WatchlaterResult    result;
-	private boolean             tokenRetried;
+	private GoogleAccountAuthenticator authenticator;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,15 +104,18 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		fragmentCoordinator = new FragmentCoordinator();
 
 		manager = AccountManager.get(this);
-		setApiAdapter();
 
 		if (savedInstanceState != null) {
-			token = savedInstanceState.getString(KEY_TOKEN);
+			authenticator = savedInstanceState.getParcelable(KEY_AUTHENTICATOR);
+			//noinspection ConstantConditions
+			authenticator.init(this);
 			playlistId = savedInstanceState.getString(KEY_PLAYLIST_ID);
-			account = savedInstanceState.getParcelable(KEY_ACCOUNT);
+			setAccount(savedInstanceState.getParcelable(KEY_ACCOUNT));
 			channelTitle = savedInstanceState.getString(KEY_CHANNEL_TITLE);
 			result = savedInstanceState.getParcelable(KEY_RESULT);
 		}
+
+		setApiAdapter();
 
 		if (getFragmentManager().findFragmentByTag(MainActivityMenuFragment.TAG) == null) {
 			getFragmentManager().beginTransaction().add(MainActivityMenuFragment.newInstance(), MainActivityMenuFragment.TAG).commit();
@@ -123,7 +126,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 	@Override
 	protected void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putString(KEY_TOKEN, token);
+		outState.putParcelable(KEY_AUTHENTICATOR, authenticator);
 		outState.putString(KEY_PLAYLIST_ID, playlistId);
 		outState.putParcelable(KEY_ACCOUNT, account);
 		outState.putString(KEY_CHANNEL_TITLE, channelTitle);
@@ -174,10 +177,6 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 			return;
 		}
 
-		if (token == null) {
-			setAuthTokenAndRetry();
-			return;
-		}
 
 		if (playlistId == null) {
 			setPlaylistIdAndRetry();
@@ -260,21 +259,27 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		return uri.getLastPathSegment();
 	}
 
-	private void setAuthTokenAndRetry() {
-		fragmentCoordinator.showProgress();
-		manager.getAuthToken(account, SCOPE_YOUTUBE, null, this, future -> {
-			try {
-				token = future.getResult().getString(AccountManager.KEY_AUTHTOKEN);
-				addToWatchLaterAndShow();
-			} catch (OperationCanceledException e) {
-				onResult(WatchlaterResult.error(ErrorType.NEED_ACCESS));
-			} catch (IOException e) {
-				onResult(WatchlaterResult.error(ErrorType.NETWORK));
-			} catch (AuthenticatorException e) {
-				onResult(WatchlaterResult.error(ErrorType.OTHER));
-			}
-		}, null);
+
+	private void setAccount(Account account) {
+		this.account = account;
+		//authenticator.setAccount(account);
 	}
+
+//	private void setAuthTokenAndRetry() {
+//		fragmentCoordinator.showProgress();
+//		manager.getAuthToken(account, SCOPE_YOUTUBE, null, this, future -> {
+//			try {
+//				setToken(future.getResult().getString(AccountManager.KEY_AUTHTOKEN));
+//				addToWatchLaterAndShow();
+//			} catch (OperationCanceledException e) {
+//				onResult(WatchlaterResult.error(ErrorType.NEED_ACCESS));
+//			} catch (IOException e) {
+//				onResult(WatchlaterResult.error(ErrorType.NETWORK));
+//			} catch (AuthenticatorException e) {
+//				onResult(WatchlaterResult.error(ErrorType.OTHER));
+//			}
+//		}, null);
+//	}
 
 	private void setGoogleAccountAndRetry() {
 		if (supportsRuntimePermissions()) {
@@ -319,7 +324,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 
 	@Override
 	public void onAccountChosen(Account account) {
-		this.account = account;
+		setAccount(account);
 		addToWatchLaterAndShow();
 	}
 
@@ -352,30 +357,31 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 	}
 
 	private void setApiAdapter() {
-		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-		// TODO: don't leak the activity here!
-		httpClient.interceptors().add(chain -> {
-			Request request = chain.request().newBuilder().addHeader("Authorization", "Bearer " + token).build();
-			return chain.proceed(request);
-		});
-
-		if (BuildConfig.DEBUG) {
-			HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-			loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-			httpClient.networkInterceptors().add(loggingInterceptor);
-
-			if (OPTIONAL_RETROFIT_HTTP_EXECUTOR != null) {
-				httpClient.dispatcher(new Dispatcher(OPTIONAL_RETROFIT_HTTP_EXECUTOR));
-			}
-		}
-
-		Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
-				.baseUrl(YOUTUBE_ENDPOINT)
-				.addConverterFactory(GsonConverterFactory.create())
-				.client(httpClient.build());
-
-		retrofit = retrofitBuilder.build();
-		api = retrofit.create(YoutubeApi.class);
+//		if (authenticator == null) {
+//			authenticator = new GoogleAccountAuthenticator();
+//			authenticator.init(this);
+//		}
+//		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+//		httpClient.interceptors().add(authenticator);
+//		httpClient.authenticator(authenticator);
+//
+//		if (BuildConfig.DEBUG) {
+//			HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+//			loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+//			httpClient.networkInterceptors().add(loggingInterceptor);
+//
+//			if (OPTIONAL_RETROFIT_HTTP_EXECUTOR != null) {
+//				httpClient.dispatcher(new Dispatcher(OPTIONAL_RETROFIT_HTTP_EXECUTOR));
+//			}
+//		}
+//
+//		Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
+//				.baseUrl(YOUTUBE_ENDPOINT)
+//				.addConverterFactory(GsonConverterFactory.create())
+//				.client(httpClient.build());
+//
+//		retrofit = retrofitBuilder.build();
+//		api = retrofit.create(YoutubeApi.class);
 
 	}
 
@@ -437,16 +443,6 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		});
 	}
 
-	private void onTokenInvalid() {
-		if (tokenRetried) {
-			onResult(WatchlaterResult.error(ErrorType.NEED_ACCESS));
-		}
-		manager.invalidateAuthToken(account.type, token);
-		token = null;
-		tokenRetried = true;
-		addToWatchLaterAndShow();
-	}
-
 
 	private class WatchlaterException extends Exception {
 		public final ErrorType type;
@@ -466,7 +462,8 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		public void failure(ErrorType errorType) {
 			switch (errorType) {
 				case INVALID_TOKEN:
-					onTokenInvalid();
+					// TODO: does this occur? handle it.
+					Log.d(TAG, "Failed with invalid token!");
 					break;
 				default:
 					onResult(WatchlaterResult.error(errorType));

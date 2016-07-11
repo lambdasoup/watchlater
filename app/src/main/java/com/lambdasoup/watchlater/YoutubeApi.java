@@ -55,9 +55,11 @@ public interface YoutubeApi {
     @POST("playlistItems?part=snippet")
     Call<PlaylistItem> insertPlaylistItem(@Body PlaylistItem playlistItem);
 
-    // TODO: store browser api key in a secure place
+    @GET("playlistItems?part=id&maxResults=1&playlistId=WL")
+    Call<PlaylistItemResponse> getPlaylistItemInWl(@Query("videoId") String videoId);
+
 	@Headers("Referer: lambdasoup.com/watchlater")
-    @GET("videos?part=snippet&key=AIzaSyCl-lsReVAyLtCgQ7Uzl7MXBFuzqR1DuZA")
+    @GET("videos?part=snippet")
     Call<Video> getVideoInfo(@Query("id") String id);
 
     enum ErrorType {
@@ -103,6 +105,22 @@ public interface YoutubeApi {
                 public Snippet(String title) {
                     this.title = title;
                 }
+            }
+        }
+    }
+
+    class PlaylistItemResponse {
+        public final PageInfo pageInfo;
+
+        public PlaylistItemResponse(PageInfo pageInfo) {
+            this.pageInfo = pageInfo;
+        }
+
+        static class PageInfo {
+            public final int totalResults;
+
+            public PageInfo(int totalResults) {
+                this.totalResults = totalResults;
             }
         }
     }

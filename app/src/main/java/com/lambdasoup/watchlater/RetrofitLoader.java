@@ -25,6 +25,7 @@ package com.lambdasoup.watchlater;
 import android.content.Context;
 import android.content.Loader;
 import android.os.Build;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
 
@@ -35,11 +36,10 @@ import retrofit2.Response;
 /**
  * Created by jl on 27.06.16.
  */
-public class TestLoader extends Loader<TestLoader.Result<YoutubeApi.Video>> implements Callback<YoutubeApi.Video> {
-	private final YoutubeApi             api;
-	private final String                 videoId;
-	private       TestLoader.Result<YoutubeApi.Video>       data;
-	private       Call<YoutubeApi.Video> call;
+public abstract class RetrofitLoader<T> extends Loader<RetrofitLoader.Result<T>> implements Callback<T> {
+	protected YoutubeApi               api;
+	private   RetrofitLoader.Result<T> data;
+	private   Call<T>                  call;
 
 
 	/**
@@ -52,12 +52,19 @@ public class TestLoader extends Loader<TestLoader.Result<YoutubeApi.Video>> impl
 	 *
 	 * @param context used to retrieve the application context.
 	 */
-	public TestLoader(Context context, YoutubeApi api, String videoId) {
+	protected RetrofitLoader(Context context) {
 		super(context);
-		// TODO: token is unnecessary for video details request
-		this.api = api;
-		this.videoId = videoId;
 	}
+
+	protected void init() {
+		api = buildApi();
+	}
+
+	@NonNull
+	protected abstract YoutubeApi buildApi();
+
+	@NonNull
+	protected abstract Call<T> getCall(@NonNull YoutubeApi api);
 
 	@Override
 	protected void onStartLoading() {
@@ -72,6 +79,7 @@ public class TestLoader extends Loader<TestLoader.Result<YoutubeApi.Video>> impl
 	protected void onStopLoading() {
 		cancelLoad();
 	}
+
 
 	@Override
 	protected boolean onCancelLoad() {
@@ -89,8 +97,11 @@ public class TestLoader extends Loader<TestLoader.Result<YoutubeApi.Video>> impl
 
 	@Override
 	protected void onForceLoad() {
+		if (api == null) {
+			throw new IllegalStateException("Call init first to make the loader usable");
+		}
 		cancelLoad();
-		this.call = api.getVideoInfo(videoId);
+		this.call = getCall(api);
 		this.call.enqueue(this);
 	}
 
@@ -104,7 +115,7 @@ public class TestLoader extends Loader<TestLoader.Result<YoutubeApi.Video>> impl
 	}
 
 	@Override
-	public void deliverResult(TestLoader.Result<YoutubeApi.Video> data) {
+	public void deliverResult(RetrofitLoader.Result<T> data) {
 		if (isReset()) {
 			// loader has been reset; ignore result and invalidate data
 			return;
@@ -118,16 +129,16 @@ public class TestLoader extends Loader<TestLoader.Result<YoutubeApi.Video>> impl
 
 
 	@Override
-	public void onResponse(Call<YoutubeApi.Video> call, Response<YoutubeApi.Video> response) {
+	public void onResponse(Call<T> call, Response<T> response) {
 		onLoadCompleted(Result.response(response));
 	}
 
 	@Override
-	public void onFailure(Call<YoutubeApi.Video> call, Throwable t) {
+	public void onFailure(Call<T> call, Throwable t) {
 		onLoadCompleted(Result.exception((IOException) t));
 	}
 
-	private void onLoadCompleted(Result<YoutubeApi.Video> result) {
+	private void onLoadCompleted(Result<T> result) {
 		if (isAbandoned()) {
 			return;
 		} else {

@@ -13,3 +13,6 @@
 
 # osx junk
 .DS_Store
+
+# secret values
+/app/src/main/res/values/youtubeApiKey.xml

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2015 - 2016
   ~
@@ -20,23 +19,18 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
-<ScrollView
+
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_container"
     android:layout_width="match_parent"
-    android:layout_height="256sp">
-
-    <LinearLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context="com.lambdasoup.watchlater.AddActivity">
+    android:layout_height="256sp"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.lambdasoup.watchlater.AddActivity">
 
 
-    </LinearLayout>
-</ScrollView>
+</FrameLayout>

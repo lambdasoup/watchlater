@@ -22,22 +22,21 @@
 
 package com.lambdasoup.watchlater;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.app.LoaderManager;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import static android.net.Uri.decode;
 import static android.net.Uri.parse;
@@ -45,15 +44,12 @@ import static android.net.Uri.parse;
 /**
  * Created by jl on 30.06.16.
  */
-public class TestActivity extends Activity implements ErrorFragment.OnFragmentInteractionListener {
-	private static       String ACCOUNT_TYPE_GOOGLE = "com.google";
-	private static final int    LOADER_VIDEO_INFO   = 0;
-	private static final int    LOADER_IN_WL        = 1;
-	private static final String ARG_VIDEO_ID        = "com.lambdasoup.watchlater.argument_videoId";
-	private static final String TAG                 = TestActivity.class.getSimpleName();
-	private              String channelTitle        = "HARDCODED CHANNEL TITLE";
-	private FragmentCoordinator fragmentCoordinator;
-	private String              videoId;
+public class TestActivity extends Activity implements ErrorFragment.OnFragmentInteractionListener, WlStatusFragment.OnFragmentInteractionListener, VideoInfoFragment.OnFragmentInteractionListener {
+
+	private static final String TAG                              = TestActivity.class.getSimpleName();
+	private static final int    PERMISSIONS_REQUEST_GET_ACCOUNTS = 0;
+	private              String channelTitle                     = "HARDCODED CHANNEL TITLE ACTIVITY";
+	private String videoId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,57 +59,26 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 
 		setContentView(R.layout.activity_add);
 
-		fragmentCoordinator = new FragmentCoordinator();
-
-
-		if (getFragmentManager().findFragmentByTag(MainActivityMenuFragment.TAG) == null) {
-			getFragmentManager().beginTransaction().add(MainActivityMenuFragment.newInstance(), MainActivityMenuFragment.TAG).commit();
-		}
-		fragmentCoordinator.showProgress();
 
 		try {
 			videoId = getVideoId();
 		} catch (WatchlaterException e) {
 			Log.e(TAG, "could not get video id from intent uri ", e);
-			onResult(WatchlaterResult.error(e.type));
+			onError(ErrorResult.fromErrorType(e.type));
 		}
 
-		Bundle loaderArgs = new Bundle();
-		loaderArgs.putString(ARG_VIDEO_ID, videoId);
-		getLoaderManager().initLoader(LOADER_VIDEO_INFO, loaderArgs, new VideoInfoLoaderCallbacks());
-
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-		detachFromLoaders();
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		attachToLoaders();
-	}
-
-	private void attachToLoaders() {
-		// TODO: for all loaders inheriting from ActivityAwareRetrofitLoader
-		Loader<Object> loader = getLoaderManager().getLoader(LOADER_IN_WL);
-		if (loader != null && loader instanceof ActivityAwareRetrofitLoader) {
-			((ActivityAwareRetrofitLoader) loader).attachActivity(this);
+		FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+		if (getFragmentManager().findFragmentByTag(MainActivityMenuFragment.TAG) == null) {
+			fragmentTransaction.add(MainActivityMenuFragment.newInstance(), MainActivityMenuFragment.TAG);
 		}
-	}
-
-	private void detachFromLoaders() {
-		// TODO: for all loaders inheriting from ActivityAwareRetrofitLoader
-		Loader<Object> loader = getLoaderManager().getLoader(LOADER_IN_WL);
-		if (loader != null && loader instanceof ActivityAwareRetrofitLoader) {
-			((ActivityAwareRetrofitLoader) loader).detachActivity();
+		if (getFragmentManager().findFragmentByTag(VideoInfoFragment.TAG) == null) {
+			fragmentTransaction.add(R.id.fragment_container, VideoInfoFragment.newInstance(videoId), VideoInfoFragment.TAG);
 		}
-	}
+		if (getFragmentManager().findFragmentByTag(WlStatusFragment.TAG) == null) {
+			fragmentTransaction.add(R.id.fragment_container, WlStatusFragment.newInstance(videoId), WlStatusFragment.TAG);
+		}
+		fragmentTransaction.commit();
 
-	private void onResult(WatchlaterResult result) {
-		result.apply(fragmentCoordinator::showSuccess, fragmentCoordinator::showError);
 	}
 
 	private void setDialogBehaviour() {
@@ -128,17 +93,64 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 		getWindow().setAttributes(params);
 	}
 
+	@Override
+	public void onError(ErrorResult errorResult) {
+		Log.d(TAG, "onError " + errorResult);
 
-	private void showToast(CharSequence msg) {
-		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+		getFragmentManager().beginTransaction().add(R.id.fragment_container, ErrorFragment.newInstance(channelTitle, errorResult)).commitAllowingStateLoss();
 	}
 
-	private CharSequence withChannelTitle(@StringRes int msgId) {
-		return String.format(
-				Locale.getDefault(),
-				getResources().getString(msgId),
-				channelTitle);
+	@TargetApi(23)
+	@Override
+	public void ensureAccountsPermission() {
+		Log.d(TAG, "ensureAccountsPermission() called with: " + "");
+		if (hasAccountsPermission()) {
+			onAccountsPermissionGranted();
+		} else {
+			tryAcquireAccountsPermission();
+		}
 	}
+
+	@TargetApi(23)
+	private boolean hasAccountsPermission() {
+		Log.d(TAG, "hasAccountsPermission() called with: " + "");
+		return checkSelfPermission(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED;
+	}
+
+	@TargetApi(23)
+	private void tryAcquireAccountsPermission() {
+		Log.d(TAG, "tryAcquireAccountsPermission() called with: " + "");
+		requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, PERMISSIONS_REQUEST_GET_ACCOUNTS);
+	}
+
+	@TargetApi(23)
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		switch (requestCode) {
+			case PERMISSIONS_REQUEST_GET_ACCOUNTS: {
+				if (grantResults.length > 0
+						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					onAccountsPermissionGranted();
+				} else {
+					onError(ErrorResult.PERMISSION_REQUIRED_ACCOUNTS);
+				}
+				break;
+			}
+			default: {
+				throw new RuntimeException("Unexpected permission request code: " + requestCode);
+			}
+		}
+	}
+
+	private void onAccountsPermissionGranted() {
+		WlStatusFragment wlStatusFragment = (WlStatusFragment) getFragmentManager().findFragmentByTag(WlStatusFragment.TAG);
+		if (wlStatusFragment != null) {
+			wlStatusFragment.onEnsuredAccountsPermission();
+		} else {
+			throw new IllegalStateException("expected wlStatusFragment to be attached on return from permissions request get accounts");
+		}
+	}
+
 
 	private String getVideoId() throws WatchlaterException {
 		return getVideoId(getIntent().getData());
@@ -189,44 +201,6 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 		Log.d(TAG, "onRetry");
 	}
 
-	private class FragmentCoordinator {
-
-		public void showProgress() {
-			showFragment(ProgressFragment.newInstance());
-		}
-
-
-		public void showError(ErrorResult errorResult) {
-			if (isFinishing()) {
-				showToast(withChannelTitle(errorResult.msgId));
-				return;
-			}
-			showFragment(ErrorFragment.newInstance(channelTitle, errorResult));
-		}
-
-		public void showSuccess(SuccessResult successResult) {
-			if (isFinishing()) {
-				showToast(withChannelTitle(R.string.success_added_video));
-				return;
-			}
-			showFragment(SuccessFragment.newInstance(channelTitle, successResult));
-		}
-
-		private void showFragment(Fragment fragment) {
-			if (isFinishing()) {
-				return;
-			}
-			Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragment_container);
-			if (currentFragment != null && currentFragment.getClass().equals(fragment.getClass())) {
-				return;
-			}
-			getFragmentManager()
-					.beginTransaction()
-					.replace(R.id.fragment_container, fragment)
-					.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-					.commitAllowingStateLoss();
-		}
-	}
 
 	private class WatchlaterException extends Exception {
 		public final YoutubeApi.ErrorType type;
@@ -237,94 +211,7 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 		}
 	}
 
-	private class VideoInfoLoaderCallbacks implements LoaderManager.LoaderCallbacks<VideoInfoLoader.Result<YoutubeApi.Video>> {
-		private final String TAG = VideoInfoLoaderCallbacks.class.getSimpleName();
-		@Override
-		public Loader<VideoInfoLoader.Result<YoutubeApi.Video>> onCreateLoader(int id, Bundle args) {
-			Log.d(TAG, "onCreateLoader called");
-			VideoInfoLoader loader = new VideoInfoLoader(TestActivity.this, args.getString(ARG_VIDEO_ID));
-			loader.init();
-			return loader;
-		}
 
-		@Override
-		public void onLoadFinished(Loader<VideoInfoLoader.Result<YoutubeApi.Video>> loader, VideoInfoLoader.Result<YoutubeApi.Video> data) {
-			Log.d(TAG, "onLoadFinished called");
-			data.apply(videoResponse -> {
-						if (videoResponse.isSuccessful()) {
-							if (videoResponse.body().items.size() == 0) {
-								onResult(WatchlaterResult.error(YoutubeApi.ErrorType.VIDEO_NOT_FOUND));
-							} else {
-								YoutubeApi.Video.VideoResource.Snippet snippet = videoResponse.body().items.get(0).snippet;
-								Bundle args = new Bundle();
-								args.putString(ARG_VIDEO_ID, videoId);
-								getLoaderManager().initLoader(LOADER_IN_WL, args, new InWlLoaderCallbacks());
-								onResult(WatchlaterResult.success(snippet.title, snippet.description));
-							}
-						} else {
-							// TODO: proper error mapping
-							try {
-								Log.d(TAG, "response unsuccessful: " + videoResponse.errorBody().string());
-							} catch (IOException e) {
-								Log.d(TAG, "could not parse response error body ", e);
-							}
-							onResult(WatchlaterResult.error(YoutubeApi.ErrorType.OTHER));
-						}
 
-					},
-					e -> onResult(WatchlaterResult.error(YoutubeApi.ErrorType.NETWORK)));
-		}
 
-		@Override
-		public void onLoaderReset(Loader<VideoInfoLoader.Result<YoutubeApi.Video>> loader) {
-			// TODO: ?
-			Log.d(TAG, "onLoaderReset called");
-		}
-	}
-
-	private class InWlLoaderCallbacks implements LoaderManager.LoaderCallbacks<PlaylistItemLoader.Result<YoutubeApi.PlaylistItemResponse>> {
-		private final String TAG = InWlLoaderCallbacks.class.getSimpleName();
-		@Override
-		public Loader<PlaylistItemLoader.Result<YoutubeApi.PlaylistItemResponse>> onCreateLoader(int id, Bundle args) {
-			Log.d(TAG, "onCreateLoader called");
-			// TODO: proper account choice
-			Account account = AccountManager.get(getApplicationContext()).getAccountsByType(ACCOUNT_TYPE_GOOGLE)[0];
-			Log.d(TAG, "using account " + account);
-			PlaylistItemLoader loader = new PlaylistItemLoader(TestActivity.this, args.getString(ARG_VIDEO_ID), account);
-			loader.init();
-			loader.attachActivity(TestActivity.this);
-			return loader;
-		}
-
-		@Override
-		public void onLoadFinished(Loader<PlaylistItemLoader.Result<YoutubeApi.PlaylistItemResponse>> loader, PlaylistItemLoader.Result<YoutubeApi.PlaylistItemResponse> data) {
-			Log.d(TAG, "onLoadFinished called");
-			data.apply(playlistItemResponse -> {
-						if (playlistItemResponse.isSuccessful()) {
-
-							if (playlistItemResponse.body().pageInfo.totalResults == 0) {
-								Log.d(TAG, "video is not in WL");
-							} else {
-								Log.d(TAG, "video is in WL");
-							}
-						} else {
-							// TODO: proper error mapping
-							try {
-								Log.d(TAG, "response unsuccessful: " + playlistItemResponse.errorBody().string());
-							} catch (IOException e) {
-								Log.d(TAG, "could not parse response error body ", e);
-							}
-							onResult(WatchlaterResult.error(YoutubeApi.ErrorType.OTHER));
-						}
-
-					},
-					e -> onResult(WatchlaterResult.error(YoutubeApi.ErrorType.NETWORK)));
-		}
-
-		@Override
-		public void onLoaderReset(Loader<PlaylistItemLoader.Result<YoutubeApi.PlaylistItemResponse>> loader) {
-			// TODO: ?
-			Log.d(TAG, "onLoaderReset called");
-		}
-	}
 }

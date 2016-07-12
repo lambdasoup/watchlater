@@ -61,7 +61,7 @@ public class SuccessFragment extends ChannelTitleAwareFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View successView = inflater.inflate(R.layout.fragment_success, container, false);
+        View successView = inflater.inflate(R.layout.fragment_success_old, container, false);
 
         CharSequence msg = withChannelTitle(R.string.success_added_video);
 

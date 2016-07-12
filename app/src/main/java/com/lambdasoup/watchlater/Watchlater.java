@@ -47,7 +47,6 @@ public class Watchlater extends Application {
 	@SuppressWarnings("CanBeFinal")
 	private static ExecutorService OPTIONAL_RETROFIT_HTTP_EXECUTOR = null;
 
-
 	YoutubeApi apiWithoutAccount;
 
 	@Override

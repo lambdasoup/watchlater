@@ -24,8 +24,6 @@ package com.lambdasoup.watchlater;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
@@ -50,16 +48,9 @@ import android.widget.Toast;
 import com.lambdasoup.watchlater.YoutubeApi.ErrorTranslatingCallback;
 import com.lambdasoup.watchlater.YoutubeApi.ErrorType;
 
-import java.io.IOException;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
 
-import okhttp3.Dispatcher;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.net.Uri.decode;
 import static android.net.Uri.parse;
@@ -99,7 +90,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 
 		setDialogBehaviour();
 
-		setContentView(R.layout.activity_add);
+		setContentView(R.layout.activity_add_old);
 
 		fragmentCoordinator = new FragmentCoordinator();
 

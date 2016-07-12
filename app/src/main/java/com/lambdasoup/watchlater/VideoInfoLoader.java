@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Loader;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -37,7 +38,8 @@ import retrofit2.Response;
  * Created by jl on 27.06.16.
  */
 public class VideoInfoLoader extends RetrofitLoader<YoutubeApi.Video>  {
-	private final String                                   videoId;
+	private static final String TAG = VideoInfoLoader.class.getSimpleName();
+	private final String videoId;
 
 
 	/**
@@ -65,6 +67,7 @@ public class VideoInfoLoader extends RetrofitLoader<YoutubeApi.Video>  {
 	@NonNull
 	@Override
 	protected Call<YoutubeApi.Video> getCall(@NonNull YoutubeApi api) {
+		Log.d(TAG, "getCall: videoId " + videoId);
 		return api.getVideoInfo(videoId);
 	}
 

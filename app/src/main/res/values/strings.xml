@@ -75,5 +75,8 @@
     <string name="pref_default_account_name_summary">Always use %1$s</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="button_open_with_youtube">Open with YouTube</string>
+    <string name="text_in_channel_wl">In your <xliff:g example="Jane Smith" id="channel_title">%1$s</xliff:g> Watch Later list</string>
+    <string name="button_add_to_channel_wl">Add to <xliff:g example="Jane Smith" id="channel_title">%1$s</xliff:g> Watch Later</string>
 
 </resources>

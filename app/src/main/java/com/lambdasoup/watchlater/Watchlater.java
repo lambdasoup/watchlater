@@ -24,6 +24,7 @@ package com.lambdasoup.watchlater;
 
 import android.accounts.Account;
 import android.app.Application;
+import android.app.LoaderManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,9 @@ public class Watchlater extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		// TODO: remove
+		LoaderManager.enableDebugLogging(true);
 
 		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 		httpClient.addInterceptor(chain -> {

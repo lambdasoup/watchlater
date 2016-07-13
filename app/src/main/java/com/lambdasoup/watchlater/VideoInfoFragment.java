@@ -40,18 +40,19 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import static com.lambdasoup.watchlater.TestActivity.LOADER_VIDEO_INFO;
+
 /**
  * Created by jl on 12.07.16.
  */
 public class VideoInfoFragment extends Fragment {
-	public static final  String TAG               = WlStatusFragment.class.getSimpleName();
+	public static final  String TAG               = VideoInfoFragment.class.getSimpleName();
 	private static final String ARG_VIDEO_ID      = "com.lambdasoup.watchlater.ARG_VIDEO_ID";
-	private static final int    LOADER_VIDEO_INFO = 0;
+
 
 	private String videoId;
 
 	private OnFragmentInteractionListener listener;
-	private Button                        buttonViewInYoutube;
 	private TextView                      textTitle;
 	private TextView                      textDescription;
 
@@ -60,6 +61,7 @@ public class VideoInfoFragment extends Fragment {
 	}
 
 	public static VideoInfoFragment newInstance(@NonNull String videoId) {
+		Log.d(TAG, "newInstance() called with: " + "videoId = [" + videoId + "]");
 		VideoInfoFragment fragment = new VideoInfoFragment();
 		Bundle args = new Bundle();
 		args.putString(ARG_VIDEO_ID, videoId);
@@ -86,7 +88,7 @@ public class VideoInfoFragment extends Fragment {
 		View videoInfoView = inflater.inflate(R.layout.fragment_video_info, container, false);
 		textTitle = (TextView) videoInfoView.findViewById(R.id.text_title);
 		textDescription = (TextView) videoInfoView.findViewById(R.id.text_description);
-		buttonViewInYoutube = (Button) videoInfoView.findViewById(R.id.button_view_in_youtube);
+		Button buttonViewInYoutube = (Button) videoInfoView.findViewById(R.id.button_view_in_youtube);
 		buttonViewInYoutube.setOnClickListener(v -> onViewInYoutube());
 		return videoInfoView;
 	}
@@ -102,7 +104,7 @@ public class VideoInfoFragment extends Fragment {
 		Log.d(TAG, "startLoadVideoInfo() called, videoId is " + videoId);
 		Bundle args = new Bundle();
 		args.putString(ARG_VIDEO_ID, videoId);
-		getLoaderManager().initLoader(LOADER_VIDEO_INFO, args, new VideoInfoLoaderCallbacks());
+		getActivity().getLoaderManager().initLoader(LOADER_VIDEO_INFO, args, new VideoInfoLoaderCallbacks());
 	}
 
 	private void onVideoInfo(VideoInfo videoInfo) {
@@ -153,6 +155,7 @@ public class VideoInfoFragment extends Fragment {
 
 		@Override
 		public Loader<VideoInfoLoader.Result<YoutubeApi.Video>> onCreateLoader(int id, Bundle args) {
+			Log.d(TAG, "onCreateLoader() called with: " + "id = [" + id + "], args = [" + args + "]");
 			VideoInfoLoader loader = new VideoInfoLoader(getContext(), args.getString(ARG_VIDEO_ID));
 			loader.init();
 			return loader;

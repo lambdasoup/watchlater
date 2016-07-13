@@ -49,6 +49,11 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 	private static final String TAG                              = TestActivity.class.getSimpleName();
 	private static final int    PERMISSIONS_REQUEST_GET_ACCOUNTS = 0;
 	private              String channelTitle                     = "HARDCODED CHANNEL TITLE ACTIVITY";
+
+	// all fragments use the activity's LoaderManager (otherwise loader gets reset on configuration change)
+	public static final int    LOADER_VIDEO_INFO = 0;
+	public static final int LOADER_WL_STATUS       = 1;
+
 	private String videoId;
 
 	@Override
@@ -90,7 +95,6 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 	@TargetApi(23)
 	@Override
 	public void ensureAccountsPermission() {
-		Log.d(TAG, "ensureAccountsPermission() called with: " + "");
 		if (hasAccountsPermission()) {
 			onAccountsPermissionGranted();
 		} else {
@@ -100,13 +104,11 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 
 	@TargetApi(23)
 	private boolean hasAccountsPermission() {
-		Log.d(TAG, "hasAccountsPermission() called with: " + "");
 		return checkSelfPermission(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED;
 	}
 
 	@TargetApi(23)
 	private void tryAcquireAccountsPermission() {
-		Log.d(TAG, "tryAcquireAccountsPermission() called with: " + "");
 		requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, PERMISSIONS_REQUEST_GET_ACCOUNTS);
 	}
 

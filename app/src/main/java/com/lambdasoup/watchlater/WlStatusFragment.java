@@ -41,6 +41,8 @@ import android.widget.TextView;
 
 import java.io.IOException;
 
+import static com.lambdasoup.watchlater.TestActivity.LOADER_WL_STATUS;
+
 /**
  * Created by jl on 11.07.16.
  */
@@ -51,7 +53,7 @@ public class WlStatusFragment extends Fragment {
 	private static final String KEY_CHANNEL_TITLE   = "com.lambdasoup.watchlater.KEY_CHANNEL_TITLE";
 	private static final String KEY_VIDEO_ID        = "com.lambdasoup.watchlater.KEY_VIDEO_ID";
 	private static final String KEY_ACCOUNT         = "com.lambdasoup.watchlater.KEY_ACCOUNT";
-	private static final int LOADER_WL_STATUS       = 0;
+
 	private static       String ACCOUNT_TYPE_GOOGLE = "com.google";
 
 	private String  channelTitle;
@@ -68,6 +70,7 @@ public class WlStatusFragment extends Fragment {
 	}
 
 	public static WlStatusFragment newInstance(@NonNull String videoId) {
+		Log.d(TAG, "newInstance() called with: " + "videoId = [" + videoId + "]");
 		WlStatusFragment fragment = new WlStatusFragment();
 		Bundle args = new Bundle();
 		args.putString(ARG_VIDEO_ID, videoId);
@@ -87,6 +90,8 @@ public class WlStatusFragment extends Fragment {
 		} else if (getArguments() != null) {
 			videoId = getArguments().getString(ARG_VIDEO_ID);
 		}
+
+
 
 	}
 
@@ -161,7 +166,6 @@ public class WlStatusFragment extends Fragment {
 	}
 
 	private void ensureAccount() {
-		Log.d(TAG, "ensureAccount() called with: " + "");
 		if (account == null) {
 			Account[] accounts = AccountManager.get(getActivity()).getAccountsByType(ACCOUNT_TYPE_GOOGLE);
 
@@ -182,7 +186,7 @@ public class WlStatusFragment extends Fragment {
 		channelTitle = "HARDCODED_CHANNEL_TITLE";
 		Bundle args = new Bundle();
 		args.putString(ARG_VIDEO_ID, videoId);
-		getLoaderManager().initLoader(LOADER_WL_STATUS, args, new InWlLoaderCallbacks());
+		getActivity().getLoaderManager().initLoader(LOADER_WL_STATUS, args, new InWlLoaderCallbacks());
 	}
 
 	private void onStatusRefreshed(boolean inWl) {

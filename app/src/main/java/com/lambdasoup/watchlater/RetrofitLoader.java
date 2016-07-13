@@ -109,9 +109,6 @@ public abstract class RetrofitLoader<T> extends Loader<RetrofitLoader.Result<T>>
 	protected void onReset() {
 		onStopLoading();
 
-		if (this.data != null) {
-			this.data = null;
-		}
 	}
 
 	@Override

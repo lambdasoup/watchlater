@@ -24,12 +24,9 @@
 
     <style name="AppTheme" parent="android:Theme.Material" />
 
-    <style name="AppTheme.Add" parent="android:Theme.Material.Dialog">
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowSoftInputMode">stateAlwaysHidden</item>
-        <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowIsTranslucent">true</item>
+    <style name="AppTheme.Add" parent="android:Theme.Material">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="HelpText" parent="android:TextAppearance.Material.Small.Inverse">

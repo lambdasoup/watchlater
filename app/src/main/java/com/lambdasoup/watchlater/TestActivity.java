@@ -55,8 +55,6 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setDialogBehaviour();
-
 		setContentView(R.layout.activity_add);
 
 
@@ -81,17 +79,6 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 
 	}
 
-	private void setDialogBehaviour() {
-		requestWindowFeature(Window.FEATURE_ACTION_BAR);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND,
-				WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-		WindowManager.LayoutParams params = getWindow().getAttributes();
-		params.height = WindowManager.LayoutParams.WRAP_CONTENT;
-		params.width = getResources().getDimensionPixelSize(R.dimen.dialog_width);
-		params.alpha = 1.0f;
-		params.dimAmount = 0.5f;
-		getWindow().setAttributes(params);
-	}
 
 	@Override
 	public void onError(ErrorResult errorResult) {

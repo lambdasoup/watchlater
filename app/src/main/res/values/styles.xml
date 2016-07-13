@@ -24,12 +24,7 @@
 
     <style name="AppTheme" parent="android:Theme.Holo" />
 
-    <style name="AppTheme.Add" parent="android:Theme.Holo.Dialog">
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowSoftInputMode">stateAlwaysHidden</item>
-        <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowIsTranslucent">true</item>
+    <style name="AppTheme.Add" parent="android:Theme.Holo">
     </style>
 
     <style name="HelpText" parent="android:TextAppearance.Holo.Small.Inverse">

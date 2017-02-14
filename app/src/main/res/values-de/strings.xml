@@ -77,4 +77,5 @@
     <string name="button_add_with_selected_account">Video hinzufügen</string>
     <string name="menu_settings">Einstellungen</string>
     <string name="title_activity_settings">Einstellungen</string>
+    <string name="menu_privacypolicy">Privacy Policy</string>
 </resources>

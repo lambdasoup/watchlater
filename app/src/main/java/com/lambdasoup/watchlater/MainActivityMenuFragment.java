@@ -29,6 +29,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import static android.net.Uri.parse;
+
 
 public class MainActivityMenuFragment extends Fragment {
 
@@ -61,6 +63,9 @@ public class MainActivityMenuFragment extends Fragment {
                 return true;
             case R.id.menu_settings:
                 startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
+            case R.id.menu_privacy:
+                startActivity(new Intent(Intent.ACTION_VIEW, parse("https://lambdasoup.com/privacypolicy-watchlater/")));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

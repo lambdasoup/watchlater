@@ -498,7 +498,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
             getFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, fragment)
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                    .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                     .commitAllowingStateLoss();
         }
     }

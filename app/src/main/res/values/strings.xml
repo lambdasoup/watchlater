@@ -75,5 +75,6 @@
     <string name="pref_default_account_name_summary">Always use %1$s</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="menu_privacypolicy">Privacy Policy</string>
 
 </resources>

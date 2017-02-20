@@ -25,6 +25,10 @@ package com.lambdasoup.watchlater;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.lambdasoup.watchlater.model.ErrorResult;
+import com.lambdasoup.watchlater.youtubeApi.ErrorType;
+import com.lambdasoup.watchlater.youtubeApi.YoutubeApi;
+
 
 class WatchlaterResult implements Parcelable {
     public static final Creator<WatchlaterResult> CREATOR = new Creator<WatchlaterResult>() {
@@ -37,7 +41,7 @@ class WatchlaterResult implements Parcelable {
         }
     };
     private final SuccessResult success;
-    private final ErrorResult error;
+    private final ErrorResult   error;
 
     private WatchlaterResult(SuccessResult success, ErrorResult error) {
         if ((success == null) == (error == null)) {
@@ -57,7 +61,7 @@ class WatchlaterResult implements Parcelable {
         return new WatchlaterResult(new SuccessResult(title, description), null);
     }
 
-    static WatchlaterResult error(YoutubeApi.ErrorType errorType) {
+    static WatchlaterResult error(ErrorType errorType) {
         return new WatchlaterResult(null, ErrorResult.fromErrorType(errorType));
     }
 

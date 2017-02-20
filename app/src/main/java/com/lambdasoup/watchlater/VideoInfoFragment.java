@@ -38,6 +38,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lambdasoup.watchlater.model.ErrorResult;
+import com.lambdasoup.watchlater.model.VideoInfo;
+import com.lambdasoup.watchlater.youtubeApi.ErrorType;
+import com.lambdasoup.watchlater.youtubeApi.Video;
+import com.lambdasoup.watchlater.youtubeApi.YoutubeApi;
+
 import java.io.IOException;
 
 import static com.lambdasoup.watchlater.TestActivity.LOADER_VIDEO_INFO;
@@ -150,11 +156,11 @@ public class VideoInfoFragment extends Fragment {
 		void onError(ErrorResult errorResult);
 	}
 
-	private class VideoInfoLoaderCallbacks implements LoaderManager.LoaderCallbacks<VideoInfoLoader.Result<YoutubeApi.Video>> {
+	private class VideoInfoLoaderCallbacks implements LoaderManager.LoaderCallbacks<VideoInfoLoader.Result<Video>> {
 		private final String TAG = VideoInfoLoaderCallbacks.class.getSimpleName();
 
 		@Override
-		public Loader<VideoInfoLoader.Result<YoutubeApi.Video>> onCreateLoader(int id, Bundle args) {
+		public Loader<VideoInfoLoader.Result<Video>> onCreateLoader(int id, Bundle args) {
 			Log.d(TAG, "onCreateLoader() called with: " + "id = [" + id + "], args = [" + args + "]");
 			VideoInfoLoader loader = new VideoInfoLoader(getContext(), args.getString(ARG_VIDEO_ID));
 			loader.init();
@@ -162,15 +168,15 @@ public class VideoInfoFragment extends Fragment {
 		}
 
 		@Override
-		public void onLoadFinished(Loader<VideoInfoLoader.Result<YoutubeApi.Video>> loader, VideoInfoLoader.Result<YoutubeApi.Video> data) {
+		public void onLoadFinished(Loader<VideoInfoLoader.Result<Video>> loader, VideoInfoLoader.Result<Video> data) {
 			Log.d(TAG, "onLoadFinished called");
 			// TODO: make progress invisible
 			data.apply(videoResponse -> {
 						if (videoResponse.isSuccessful()) {
 							if (videoResponse.body().items.size() == 0) {
-								listener.onError(ErrorResult.fromErrorType(YoutubeApi.ErrorType.VIDEO_NOT_FOUND));
+								listener.onError(ErrorResult.fromErrorType(ErrorType.VIDEO_NOT_FOUND));
 							} else {
-								YoutubeApi.Video.VideoResource.Snippet snippet = videoResponse.body().items.get(0).snippet;
+								Video.VideoResource.Snippet snippet = videoResponse.body().items.get(0).snippet;
 								onVideoInfo(new VideoInfo(snippet.title, snippet.description));
 							}
 						} else {
@@ -180,15 +186,15 @@ public class VideoInfoFragment extends Fragment {
 							} catch (IOException e) {
 								Log.d(TAG, "could not parse response error body ", e);
 							}
-							listener.onError(ErrorResult.fromErrorType(YoutubeApi.ErrorType.OTHER));
+							listener.onError(ErrorResult.fromErrorType(ErrorType.OTHER));
 						}
 
 					},
-					e -> listener.onError(ErrorResult.fromErrorType(YoutubeApi.ErrorType.NETWORK)));
+					e -> listener.onError(ErrorResult.fromErrorType(ErrorType.NETWORK)));
 		}
 
 		@Override
-		public void onLoaderReset(Loader<VideoInfoLoader.Result<YoutubeApi.Video>> loader) {
+		public void onLoaderReset(Loader<VideoInfoLoader.Result<Video>> loader) {
 			// TODO: ?
 			Log.d(TAG, "onLoaderReset called");
 		}

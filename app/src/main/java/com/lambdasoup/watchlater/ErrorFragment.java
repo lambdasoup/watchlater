@@ -30,6 +30,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.lambdasoup.watchlater.model.ErrorResult;
+
 
 public class ErrorFragment extends ChannelTitleAwareFragment {
     private static final String ARG_ERROR_RESULT = "com.lambdasoup.watchlater.ARG_ERROR_RESULT";

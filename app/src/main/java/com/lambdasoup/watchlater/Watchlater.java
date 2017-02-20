@@ -22,12 +22,12 @@
 
 package com.lambdasoup.watchlater;
 
-import android.accounts.Account;
 import android.app.Application;
 import android.app.LoaderManager;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.lambdasoup.watchlater.youtubeApi.RetrofitFactory;
+import com.lambdasoup.watchlater.youtubeApi.YoutubeApi;
+
 import java.util.concurrent.ExecutorService;
 
 import okhttp3.Dispatcher;
@@ -42,20 +42,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by jl on 08.07.16.
  */
 public class Watchlater extends Application {
-	// fields are not final to be somewhat accessible for testing to inject other values
-	@SuppressWarnings({"FieldCanBeLocal", "CanBeFinal"})
-	private static String          YOUTUBE_ENDPOINT                = "https://www.googleapis.com/youtube/v3/";
-	@SuppressWarnings("CanBeFinal")
-	private static ExecutorService OPTIONAL_RETROFIT_HTTP_EXECUTOR = null;
 
-	YoutubeApi apiWithoutAccount;
+
+	public YoutubeApi apiWithoutAccount;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
-		// TODO: remove
-		LoaderManager.enableDebugLogging(true);
 
 		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 		httpClient.addInterceptor(chain -> {
@@ -67,26 +60,9 @@ public class Watchlater extends Application {
 			return chain.proceed(request);
 		});
 
-		apiWithoutAccount = buildYoutubeApi(httpClient);
+		apiWithoutAccount = RetrofitFactory.getInstance().buildYoutubeApi(httpClient).youtubeApi;
 	}
 
 
-	public YoutubeApi buildYoutubeApi(OkHttpClient.Builder httpClientBuilder) {
-		if (BuildConfig.DEBUG) {
-			HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-			loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-			httpClientBuilder.networkInterceptors().add(loggingInterceptor);
 
-			if (OPTIONAL_RETROFIT_HTTP_EXECUTOR != null) {
-				httpClientBuilder.dispatcher(new Dispatcher(OPTIONAL_RETROFIT_HTTP_EXECUTOR));
-			}
-		}
-
-		Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
-				.baseUrl(YOUTUBE_ENDPOINT)
-				.addConverterFactory(GsonConverterFactory.create())
-				.client(httpClientBuilder.build());
-
-		return retrofitBuilder.build().create(YoutubeApi.class);
-	}
 }

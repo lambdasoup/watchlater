@@ -20,16 +20,19 @@
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lambdasoup.watchlater;
+package com.lambdasoup.watchlater.model;
 
 import android.support.annotation.IdRes;
+
+import com.lambdasoup.watchlater.R;
+import com.lambdasoup.watchlater.youtubeApi.ErrorType;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
 
 
-enum ErrorResult {
+public enum ErrorResult {
     ALREADY_IN_PLAYLIST(R.string.error_already_in_playlist),
     NEED_ACCESS(R.string.error_need_account, ErrorExtraViewId.RETRY),
     NOT_A_VIDEO(R.string.error_not_a_video),
@@ -40,15 +43,15 @@ enum ErrorResult {
     NO_ACCOUNT(R.string.error_no_account, ErrorExtraViewId.RETRY),
     ACCOUNT_HAS_NO_CHANNEL(R.string.error_account_has_no_channel, ErrorExtraViewId.RETRY, ErrorExtraViewId.HELP_NO_CHANNEL);
 
-    final int msgId;
-    final Set<ErrorExtraViewId> additionalViewIds;
+    public final int msgId;
+    public final Set<ErrorExtraViewId> additionalViewIds;
 
     ErrorResult(int msgId, @IdRes ErrorExtraViewId... additionalViewIds) {
         this.additionalViewIds = additionalViewIds.length == 0 ? EnumSet.noneOf(ErrorExtraViewId.class) : EnumSet.copyOf(Arrays.asList(additionalViewIds));
         this.msgId = msgId;
     }
 
-    static ErrorResult fromErrorType(YoutubeApi.ErrorType errorType) {
+    public static ErrorResult fromErrorType(ErrorType errorType) {
         switch (errorType) {
             case ACCOUNT_HAS_NO_CHANNEL:
                 return ACCOUNT_HAS_NO_CHANNEL;
@@ -74,11 +77,11 @@ enum ErrorResult {
         }
     }
 
-    enum ErrorExtraViewId {
+    public enum ErrorExtraViewId {
         RETRY(R.id.button_retry),
         HELP_NO_CHANNEL(R.id.activetext_help_no_channel);
 
-        final
+        public final
         @IdRes
         int buttonId;
 

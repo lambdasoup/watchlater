@@ -20,26 +20,22 @@
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package com.lambdasoup.watchlater.wlstatus;
 
+import android.app.Activity;
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import com.lambdasoup.watchlater.model.ErrorResult;
+import com.lambdasoup.watchlater.model.InWlStatus;
 
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-        classpath 'me.tatarka:gradle-retrolambda:3.2.2'
+/**
+ * Created by jl on 13.07.16.
+ */
+public interface WlStatusView {
+	void ensureAccountsPermission();
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
+	void onError(ErrorResult noAccount);
 
-allprojects {
-    repositories {
-        jcenter()
-    }
+	void onWlStatusUpdated(InWlStatus inWlStatus);
+
+	Activity getActivity();
 }

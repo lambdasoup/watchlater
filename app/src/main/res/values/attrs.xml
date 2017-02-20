@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2015 - 2016
   ~
   ~  Maximilian Hille <mh@lambdasoup.com>
@@ -21,13 +22,8 @@
   -->
 
 <resources>
-
-
-
-    <style name="ProgressButton" parent="android:style/Widget.Holo.Button"/>
-
-    <style name="HelpText" parent="android:TextAppearance.Holo.Small.Inverse">
-        <item name="android:textColor">@android:color/holo_blue_light</item>
-    </style>
-
+    <declare-styleable name="ProgressButton">
+        <attr name="text" format="string" />
+        <attr name="progressButtonStyle" format="reference" />
+    </declare-styleable>
 </resources>

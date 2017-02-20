@@ -26,17 +26,15 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.app.LoaderManager;
-import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
 
-import java.io.IOException;
+import com.lambdasoup.watchlater.model.ErrorResult;
+import com.lambdasoup.watchlater.youtubeApi.ErrorType;
+import com.lambdasoup.watchlater.youtubeApi.YoutubeApi;
 
 import static android.net.Uri.decode;
 import static android.net.Uri.parse;
@@ -44,15 +42,13 @@ import static android.net.Uri.parse;
 /**
  * Created by jl on 30.06.16.
  */
-public class TestActivity extends Activity implements ErrorFragment.OnFragmentInteractionListener, WlStatusFragment.OnFragmentInteractionListener, VideoInfoFragment.OnFragmentInteractionListener {
+public class TestActivity extends Activity implements ErrorFragment.OnFragmentInteractionListener,  VideoInfoFragment.OnFragmentInteractionListener {
 
 	private static final String TAG                              = TestActivity.class.getSimpleName();
-	private static final int    PERMISSIONS_REQUEST_GET_ACCOUNTS = 0;
 	private              String channelTitle                     = "HARDCODED CHANNEL TITLE ACTIVITY";
 
 	// all fragments use the activity's LoaderManager (otherwise loader gets reset on configuration change)
 	public static final int    LOADER_VIDEO_INFO = 0;
-	public static final int LOADER_WL_STATUS       = 1;
 
 	private String videoId;
 
@@ -74,9 +70,9 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 		if (getFragmentManager().findFragmentByTag(MainActivityMenuFragment.TAG) == null) {
 			fragmentTransaction.add(MainActivityMenuFragment.newInstance(), MainActivityMenuFragment.TAG);
 		}
-		if (getFragmentManager().findFragmentByTag(VideoInfoFragment.TAG) == null) {
-			fragmentTransaction.add(R.id.fragment_container, VideoInfoFragment.newInstance(videoId), VideoInfoFragment.TAG);
-		}
+//		if (getFragmentManager().findFragmentByTag(VideoInfoFragment.TAG) == null) {
+//			fragmentTransaction.add(R.id.fragment_container, VideoInfoFragment.newInstance(videoId), VideoInfoFragment.TAG);
+//		}
 		if (getFragmentManager().findFragmentByTag(WlStatusFragment.TAG) == null) {
 			fragmentTransaction.add(R.id.fragment_container, WlStatusFragment.newInstance(videoId), WlStatusFragment.TAG);
 		}
@@ -92,53 +88,7 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 		getFragmentManager().beginTransaction().add(R.id.fragment_container, ErrorFragment.newInstance(channelTitle, errorResult)).commitAllowingStateLoss();
 	}
 
-	@TargetApi(23)
-	@Override
-	public void ensureAccountsPermission() {
-		if (hasAccountsPermission()) {
-			onAccountsPermissionGranted();
-		} else {
-			tryAcquireAccountsPermission();
-		}
-	}
 
-	@TargetApi(23)
-	private boolean hasAccountsPermission() {
-		return checkSelfPermission(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_GRANTED;
-	}
-
-	@TargetApi(23)
-	private void tryAcquireAccountsPermission() {
-		requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, PERMISSIONS_REQUEST_GET_ACCOUNTS);
-	}
-
-	@TargetApi(23)
-	@Override
-	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-		switch (requestCode) {
-			case PERMISSIONS_REQUEST_GET_ACCOUNTS: {
-				if (grantResults.length > 0
-						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-					onAccountsPermissionGranted();
-				} else {
-					onError(ErrorResult.PERMISSION_REQUIRED_ACCOUNTS);
-				}
-				break;
-			}
-			default: {
-				throw new RuntimeException("Unexpected permission request code: " + requestCode);
-			}
-		}
-	}
-
-	private void onAccountsPermissionGranted() {
-		WlStatusFragment wlStatusFragment = (WlStatusFragment) getFragmentManager().findFragmentByTag(WlStatusFragment.TAG);
-		if (wlStatusFragment != null) {
-			wlStatusFragment.onEnsuredAccountsPermission();
-		} else {
-			throw new IllegalStateException("expected wlStatusFragment to be attached on return from permissions request get accounts");
-		}
-	}
 
 
 	private String getVideoId() throws WatchlaterException {
@@ -160,7 +110,7 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 		// e.g.https://www.youtube.com/playlist?list=PLxLNk7y0uwqfXzUjcbVT3UuMjRd7pOv_U
 		videoId = uri.getQueryParameter("list");
 		if (videoId != null) {
-			throw new WatchlaterException(YoutubeApi.ErrorType.NOT_A_VIDEO);
+			throw new WatchlaterException(ErrorType.NOT_A_VIDEO);
 		}
 
 		// e.g. http://www.youtube.com/attribution_link?u=/watch%3Fv%3DJ1zNbWJC5aw%26feature%3Dem-subs_digest
@@ -169,7 +119,7 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 			if (encodedUri != null) {
 				return getVideoId(parse(decode(encodedUri)));
 			} else {
-				throw new WatchlaterException(YoutubeApi.ErrorType.NOT_A_VIDEO);
+				throw new WatchlaterException(ErrorType.NOT_A_VIDEO);
 			}
 		}
 
@@ -192,10 +142,10 @@ public class TestActivity extends Activity implements ErrorFragment.OnFragmentIn
 
 
 	private class WatchlaterException extends Exception {
-		public final YoutubeApi.ErrorType type;
+		public final ErrorType type;
 
 		@SuppressWarnings("SameParameterValue")
-		public WatchlaterException(YoutubeApi.ErrorType type) {
+		public WatchlaterException(ErrorType type) {
 			this.type = type;
 		}
 	}

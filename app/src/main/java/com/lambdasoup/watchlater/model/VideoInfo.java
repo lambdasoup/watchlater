@@ -20,7 +20,7 @@
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lambdasoup.watchlater;
+package com.lambdasoup.watchlater.model;
 
 /**
  * Created by jl on 12.07.16.

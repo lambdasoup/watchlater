@@ -23,21 +23,18 @@
 package com.lambdasoup.watchlater;
 
 import android.content.Context;
-import android.content.Loader;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import java.io.IOException;
+import com.lambdasoup.watchlater.youtubeApi.Video;
+import com.lambdasoup.watchlater.youtubeApi.YoutubeApi;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by jl on 27.06.16.
  */
-public class VideoInfoLoader extends RetrofitLoader<YoutubeApi.Video>  {
+public class VideoInfoLoader extends RetrofitLoader<Video>  {
 	private static final String TAG = VideoInfoLoader.class.getSimpleName();
 	private final String videoId;
 
@@ -66,7 +63,7 @@ public class VideoInfoLoader extends RetrofitLoader<YoutubeApi.Video>  {
 
 	@NonNull
 	@Override
-	protected Call<YoutubeApi.Video> getCall(@NonNull YoutubeApi api) {
+	protected Call<Video> getCall(@NonNull YoutubeApi api) {
 		Log.d(TAG, "getCall: videoId " + videoId);
 		return api.getVideoInfo(videoId);
 	}

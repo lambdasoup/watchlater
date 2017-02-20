@@ -20,26 +20,31 @@
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package com.lambdasoup.watchlater.youtubeApi;
 
+import java.util.List;
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+/**
+ * Created by jl on 14.07.16.
+ */
+public class Video {
+	public final List<VideoResource> items;
+	public Video(List<VideoResource> items) { this.items = items; }
 
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-        classpath 'me.tatarka:gradle-retrolambda:3.2.2'
+	public static class VideoResource {
+		public final Snippet snippet;
+		public VideoResource(Snippet snippet) {
+			this.snippet = snippet;
+		}
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
+		public static class Snippet {
+			public final String title;
+			public final String description;
 
-allprojects {
-    repositories {
-        jcenter()
-    }
+			public Snippet(String title, String description) {
+				this.title = title;
+				this.description = description;
+			}
+		}
+	}
 }

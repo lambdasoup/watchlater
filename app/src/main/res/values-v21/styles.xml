@@ -22,17 +22,13 @@
 
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Material" />
 
-    <style name="AppTheme.Add" parent="android:Theme.Material">
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
+
+    <style name="ProgressButton" parent="android:style/Widget.Material.Button"/>
 
     <style name="HelpText" parent="android:TextAppearance.Material.Small.Inverse">
         <item name="android:textColor">?android:attr/colorAccent</item>
     </style>
 
-    <color name="medium_gray">#666666</color>
 
 </resources>

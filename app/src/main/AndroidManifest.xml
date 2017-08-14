@@ -21,17 +21,17 @@
   -->
 
 <manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.lambdasoup.watchlater">
+    package="com.lambdasoup.watchlater"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- protection level normal, granted automatically on install -->
+    <!-- protection level normal -> granted automatically on install -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- protection level dangerous, can be revoked on api level 23 and later -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
-    <!-- exists only pre-23 -->
+    <!-- for pre-23 -->
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+    <!-- for pre-26 -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
     <application
         android:allowBackup="true"

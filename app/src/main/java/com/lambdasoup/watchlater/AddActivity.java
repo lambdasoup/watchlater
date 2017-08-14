@@ -38,6 +38,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -63,9 +64,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static android.net.Uri.decode;
 import static android.net.Uri.parse;
 import static com.lambdasoup.watchlater.SettingsActivity.PREF_KEY_DEFAULT_ACCOUNT_NAME;
+import static java.util.Arrays.asList;
 
 
-public class AddActivity extends Activity implements ErrorFragment.OnFragmentInteractionListener, AccountChooserFragment.OnFragmentInteractionListener {
+public class AddActivity extends Activity implements ErrorFragment.OnFragmentInteractionListener {
 
 	private static final String          SCOPE_YOUTUBE                    = "oauth2:https://www.googleapis.com/auth/youtube";
 	private static final String          PERMISSION_GET_ACCOUNTS          = "android.permission.GET_ACCOUNTS";
@@ -75,6 +77,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 	private static final String          KEY_PLAYLIST_ID                  = "com.lambdasoup.watchlater_playlistId";
 	private static final String          KEY_CHANNEL_TITLE                = "com.lambdasoup.watchlater_channelTitle";
 	private static final String          KEY_RESULT                       = "com.lambdasoup.watchlater_result";
+	private static final int             REQUEST_ACCOUNT                  = 1;
 	// fields are not final to be somewhat accessible for testing to inject other values
 	@SuppressWarnings({"FieldCanBeLocal", "CanBeFinal"})
 	private static       String          YOUTUBE_ENDPOINT                 = "https://www.googleapis.com/youtube/v3/";
@@ -117,7 +120,32 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		if (getFragmentManager().findFragmentByTag(MainActivityMenuFragment.TAG) == null) {
 			getFragmentManager().beginTransaction().add(MainActivityMenuFragment.newInstance(), MainActivityMenuFragment.TAG).commit();
 		}
+
 		addToWatchLaterAndShow();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+			case REQUEST_ACCOUNT:
+				onRequestAccountResult(resultCode, data);
+				return;
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+
+	private void onRequestAccountResult(int resultCode, Intent data) {
+		switch (resultCode) {
+			case Activity.RESULT_OK:
+				String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+				String type = data.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
+				setDefaultAccount(new Account(name, type));
+				addToWatchLaterAndShow();
+				return;
+
+			default:
+				fragmentCoordinator.showError(ErrorResult.NEED_ACCESS);
+		}
 	}
 
 	@Override
@@ -167,10 +195,14 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 			result.apply(fragmentCoordinator::showSuccess, fragmentCoordinator::showError);
 			return;
 		}
-		// still work to do and things to try
+
+		if (needsPermission()) {
+			tryAcquireAccountsPermission();
+			return;
+		}
 
 		if (account == null) {
-			setGoogleAccountAndRetry();
+			setAccountAndRetry();
 			return;
 		}
 
@@ -187,10 +219,33 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		insertPlaylistItemAndRetry();
 	}
 
-	private boolean supportsRuntimePermissions() {
-		return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
+	private boolean needsPermission() {
+		// below 23 permissions are granted at install time
+		if (Build.VERSION.SDK_INT < 23) {
+			return false;
+		}
+
+		// below 26 we need GET_ACCOUNTS
+		if (Build.VERSION.SDK_INT < 26) {
+			boolean supportsRuntimePermissions = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1;
+			return supportsRuntimePermissions && !hasAccountsPermission();
+		}
+
+		// starting with O we don't need any permissions at runtime
+		return false;
 	}
 
+	private void setAccountAndRetry() {
+		account = getDefaultAccount();
+
+		if (account != null) {
+			addToWatchLaterAndShow();
+			return;
+		}
+
+		Intent intent = newChooseAccountIntent();
+		startActivityForResult(intent, REQUEST_ACCOUNT);
+	}
 
 	@TargetApi(23)
 	private boolean hasAccountsPermission() {
@@ -220,6 +275,22 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 				throw new RuntimeException("Unexpected permission request code: " + requestCode);
 			}
 		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private Intent newChooseAccountIntent() {
+		String[] types = {ACCOUNT_TYPE_GOOGLE};
+		String title = getString(R.string.choose_account);
+
+		if (Build.VERSION.SDK_INT < 26) {
+			return AccountManager.newChooseAccountIntent(null, null,
+					types, false, title, null,
+					null, null);
+		}
+
+		return AccountManager.newChooseAccountIntent(null, null,
+				types, title, null, null,
+				null);
 	}
 
 	private String getVideoId() throws WatchlaterException {
@@ -262,6 +333,13 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 
 	private void setAuthTokenAndRetry() {
 		fragmentCoordinator.showProgress();
+
+		if (!isAccountOk()) {
+			setDefaultAccount(null);
+			addToWatchLaterAndShow();
+			return;
+		}
+
 		manager.getAuthToken(account, SCOPE_YOUTUBE, null, this, future -> {
 			try {
 				token = future.getResult().getString(AccountManager.KEY_AUTHTOKEN);
@@ -276,56 +354,34 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 		}, null);
 	}
 
-	private void setGoogleAccountAndRetry() {
-		if (supportsRuntimePermissions()) {
-			if (!hasAccountsPermission()) {
-				tryAcquireAccountsPermission();
-				return;
-			}
-		}
+	private boolean isAccountOk() {
 		Account[] accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE);
-
-		if (accounts.length == 0) {
-			onResult(WatchlaterResult.error(ErrorType.NO_ACCOUNT));
-			return;
-		} else if (accounts.length != 1) {
-			onMultipleAccounts();
-			return;
-		}
-
-		onAccountChosen(accounts[0]);
+		return asList(accounts).contains(account);
 	}
 
-
-	private void onMultipleAccounts() {
+	@Nullable
+	private Account getDefaultAccount() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		String defaultAccountName = prefs.getString(PREF_KEY_DEFAULT_ACCOUNT_NAME, null);
-		Account[] accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE);
-		for (Account account : accounts) {
-			if (account.name.equals(defaultAccountName)) {
-				onAccountChosen(account);
-				return;
-			}
+
+		String name = prefs.getString(PREF_KEY_DEFAULT_ACCOUNT_NAME, null);
+
+		if (name == null) {
+			return null;
 		}
 
-		// no account set as default or default account not available any more
-		if (defaultAccountName != null) { // out of date default account
-			prefs.edit().remove(PREF_KEY_DEFAULT_ACCOUNT_NAME).apply();
+		return new Account(name, ACCOUNT_TYPE_GOOGLE);
+	}
+
+	private void setDefaultAccount(@Nullable Account account) {
+		SharedPreferences.Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+
+		if (account == null) {
+			prefEditor.remove(PREF_KEY_DEFAULT_ACCOUNT_NAME);
+		} else {
+			prefEditor.putString(PREF_KEY_DEFAULT_ACCOUNT_NAME, account.name);
 		}
 
-		fragmentCoordinator.showAccountChooser(accounts);
-	}
-
-
-	@Override
-	public void onAccountChosen(Account account) {
-		this.account = account;
-		addToWatchLaterAndShow();
-	}
-
-	@Override
-	public void onSetDefaultAccount(Account account) {
-		PreferenceManager.getDefaultSharedPreferences(this).edit().putString(PREF_KEY_DEFAULT_ACCOUNT_NAME, account.name).apply();
+		prefEditor.apply();
 	}
 
 	private void insertPlaylistItemAndRetry() {
@@ -446,16 +502,15 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 
 
 	private class WatchlaterException extends Exception {
-		public final ErrorType type;
+		final ErrorType type;
 
-		@SuppressWarnings("SameParameterValue")
-		public WatchlaterException(ErrorType type) {
+		WatchlaterException(ErrorType type) {
 			this.type = type;
 		}
 	}
 
 	private abstract class ErrorHandlingCallback<T> extends ErrorTranslatingCallback<T> {
-		protected ErrorHandlingCallback() {
+		ErrorHandlingCallback() {
 			super(retrofit);
 		}
 
@@ -473,15 +528,12 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 
 	private class FragmentCoordinator {
 
-		public void showProgress() {
+		void showProgress() {
 			showFragment(ProgressFragment.newInstance());
 		}
 
-		public void showAccountChooser(Account[] accounts) {
-			showFragment(AccountChooserFragment.newInstance(accounts));
-		}
 
-		public void showError(ErrorResult errorResult) {
+		void showError(ErrorResult errorResult) {
 			if (isFinishing()) {
 				showToast(withChannelTitle(errorResult.msgId));
 				return;
@@ -489,7 +541,7 @@ public class AddActivity extends Activity implements ErrorFragment.OnFragmentInt
 			showFragment(ErrorFragment.newInstance(channelTitle, errorResult));
 		}
 
-		public void showSuccess(SuccessResult successResult) {
+		void showSuccess(SuccessResult successResult) {
 			if (isFinishing()) {
 				showToast(withChannelTitle(R.string.success_added_video));
 				return;

@@ -52,7 +52,6 @@ public class LauncherActivity extends Activity {
     private static final String ACTIVITY_YOUTUBE = "com.google.android.youtube.UrlActivity";
     private static final String ACTIVITY_WATCHLATER = "com.lambdasoup.watchlater.AddActivity";
     private static final Intent EXAMPLE_INTENT = new Intent(Intent.ACTION_VIEW, EXAMPLE_URI);
-    private final String TAG = getClass().getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +73,7 @@ public class LauncherActivity extends Activity {
         boolean showYoutubeSettings = true;
         boolean showWatchlaterSettings = true;
         boolean showAllAppSettings = false;
-        TextView advice = (TextView) findViewById(R.id.defaults_advice);
+        TextView advice = findViewById(R.id.defaults_advice);
         ResolveInfo resolveInfo = getPackageManager().resolveActivity(EXAMPLE_INTENT, PackageManager.MATCH_DEFAULT_ONLY);
         if (resolveInfo == null) {
             // no matching activity found. User should make sure that youtube is installed, should make sure that both youtube and watchlater are allowed to open youtube links

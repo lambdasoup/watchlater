@@ -45,12 +45,6 @@ public class ChannelTitleAwareFragment extends Fragment {
         // public default constructor is necessary
     }
 
-    public static ChannelTitleAwareFragment newInstance(String channelTitle) {
-        ChannelTitleAwareFragment fragment = new ChannelTitleAwareFragment();
-        fragment.init(channelTitle);
-        return fragment;
-    }
-
     Bundle init(@NonNull String channelTitle) {
         Bundle args = new Bundle();
         args.putString(ARG_CHANNEL_TITLE, channelTitle);

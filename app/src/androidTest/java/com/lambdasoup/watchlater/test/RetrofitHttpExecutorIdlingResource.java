@@ -22,28 +22,22 @@
 
 package com.lambdasoup.watchlater.test;
 
-import android.support.annotation.NonNull;
 import android.support.test.espresso.IdlingResource;
 
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import okhttp3.internal.Util;
 
-import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
-
 class RetrofitHttpExecutorIdlingResource extends ThreadPoolExecutor implements IdlingResource {
-    private static final String IDLE_THREAD_NAME = "RetrofitReplacement-Idle";
-    private static final String TAG = "RetrofitIdlingResource";
     private final AtomicInteger currentTaskCount = new AtomicInteger(0);
     private volatile ResourceCallback idleTransitionCallback;
 
 
-    public RetrofitHttpExecutorIdlingResource() {
-        // imitate the okhttp3 default Dispatcher executor properties
+	RetrofitHttpExecutorIdlingResource() {
+		// imitate the okhttp3 default Dispatcher executor properties
         super(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(), Util.threadFactory("Idiling resource OkHttp Dispatcher", false));
     }
 

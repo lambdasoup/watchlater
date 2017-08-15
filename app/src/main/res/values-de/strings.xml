@@ -1,81 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2015 - 2016
+  ~   Copyright (c) 2015 - 2017
   ~
-  ~  Maximilian Hille <mh@lambdasoup.com>
-  ~ Juliane Lehmann <jl@lambdasoup.com>
+  ~   Maximilian Hille <mh@lambdasoup.com>
+  ~   Juliane Lehmann <jl@lambdasoup.com>
   ~
-  ~ This file is part of Watch Later.
+  ~   This file is part of Watch Later.
   ~
-  ~ Watch Later is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~   Watch Later is free software: you can redistribute it and/or modify
+  ~   it under the terms of the GNU General Public License as published by
+  ~   the Free Software Foundation, either version 3 of the License, or
+  ~   (at your option) any later version.
   ~
-  ~ Watch Later is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
+  ~   Watch Later is distributed in the hope that it will be useful,
+  ~   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~   GNU General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+  ~   You should have received a copy of the GNU General Public License
+  ~   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources>
 
     <string name="app_name">Später ansehen</string>
-
+    <string name="asset_prefix">de</string>
     <string name="title_activity_add">Später ansehen</string>
     <string name="title_activity_about">Über</string>
-
     <string name="menu_about">Über</string>
-
-    <string name="button_retry">Wiederholen</string>
-    <string name="activetext_help_no_channel">Wie kann ich das beheben?</string>
-
-    <string name="success_added_video">Video erfolgreich zur "Später ansehen"-Liste von <xliff:g example="Jane Smith" id="channel_title">%1$s</xliff:g> hinzugefügt</string>
-
-    <string name="error_need_account">Fehler beim Hinzufügen: Benötigt Zugriff auf YouTube-Konto.</string>
-    <string name="error_other">Fehler beim Hinzufügen: Überprüfe Deine Internetverbindung!</string>
-    <string name="error_playlist_full">Die "Später ansehen"-Liste von <xliff:g example="Jane Smith" id="channel_title">%1$s</xliff:g> ist bereits voll.</string>
-
+    <string name="success_added_video">Video zu \'Später Ansehen\'-Liste hinzugefügt</string>
+    <string name="error_already_in_playlist">Video ist bereits in \'Später Ansehen\'-Liste</string>
+    <string name="error_video_not_found">Video nicht gefunden</string>
     <string name="choose_account">Konto auswählen</string>
-    <string name="error_no_account">Keine Google-Konten auf diesem Gerät gefunden.</string>
-    <string name="error_already_in_playlist">Das Video war bereits in der "Später ansehen"-Liste von <xliff:g example="Jane Smith" id="channel_title">%1$s</xliff:g>.</string>
-    <string name="error_not_a_video">Dieser Link scheint kein Video zu sein. Watchlater kann ihn nicht deiner "Später ansehen"-Liste hinzufügen. Bitte versuche, ihn mit einer anderen App zu öffnen.</string>
-    <string name="error_video_not_found">Konnte das Video nicht deiner "Später Ansehen"-Liste hinzufügen: Das Video existiert nicht mehr.</string>
-    <string name="error_youtube_player_missing">Kann die Youtube-App nicht öffnen; ist wahrscheinlich nicht installiert.</string>
-    <string name="menu_open">Öffnen mit Youtube</string>
-    <string name="asset_prefix">de</string>
+    <string name="error_no_account">Kein Konto ausgewählt</string>
+    <string name="error_youtube_player_missing">Kann YouYube-App nicht starten. Ist die App installiert?</string>
     <string name="menu_help">Hilfe</string>
     <string name="title_activity_help">Hilfe</string>
-    <string name="error_permission_required_accounts">Die Später ansehen-App benötigt deine Erlaubnis, um auf die auf deinem Gerät konfigurierten Konten zuzugreifen, damit sie auf deinen Youtube-Account zugreifen kann, ohne dein Passwort zu kennen.</string>
-    <string name="error_account_has_no_channel">Kann nicht auf deine Später Ansehen-Liste zugreifen, weil dein YouTube-Konto keinen Kanal hat.</string>
+    <string name="no_youtube_settings_activity">Kann YouTube-Einstellungen nicht starten. Ist die App installiert?</string>
+    <string name="no_youtube_installed">The YouTube app is not installed.</string>
+    <string name="menu_privacypolicy">Datenschutzerklärung</string>
+    <string name="thumbnail_cd">Video-Vorschau-Bild</string>
+    <string name="video_error_title">Konnte Video-Vorschau nicht laden</string>
+    <string name="error_network">Netwerkfehler - Bitte die Verbindung überprüfen</string>
+    <string name="error_general">Ein Fehler ist aufgetreten (%s)</string>
+    <string name="add_permissions_description">Dieser App benötigt Berechtigungen erteilt werden</string>
+    <string name="add_permissions_grant">Erteilen</string>
+    <string name="error_no_permission">Berechtigungen fehlen</string>
+    <string name="could_not_add">Konnte Video nicht hinzufügen: %s</string>
+    <string name="could_not_load">Konnte Vorschau nicht laden (%s)</string>
+    <string name="account_empty">Kein Konto ausgewählt</string>
+    <string name="account_set">Konto wählen</string>
+    <string name="add_permissions_rationale">Die App wird nicht auf Deine Kontakte zugreifen. Die Berechtigung ist notwending, um mit Deinem YouTube-Konto zu kommunizieren.</string>
+    <string name="launcher_youtube_action_title">Bitte einstellen</string>
+    <string name="launcher_youtube_action_text">Dein Gerät ist konfiguriert, YouTube-Links immer mit der YouTube-App zu öffnen. Öffne die YouTube-Einstellungen und stelle sicher, dass \'Unterstützte Links öffnen\' auf \'Jedes Mal fragen\' steht.</string>
+    <string name="launcher_youtube_action_button">YouTube-Einstellungen Öffnen</string>
+    <string name="launcher_example_button">Beispielvideo testen</string>
+    <string name="launcher_example_text">Hier kannst Du \'Später Ansehen\' mit einem Beispielvideo testen. Keine Sorge, es ist nur ein harmloses Video mit lustigen Katzen.</string>
+    <string name="launcher_example_title">Ausprobieren</string>
+    <string name="action_watchnow">Jetzt ansehen</string>
+    <string name="action_watchlater">Später ansehen</string>
 
-
-    <string name="explanation">Später Ansehen ist eine alternative App, um YouTube-Links zu öffnen und dabei automatisch der "Später ansehen"-Liste hinzuzufügen. Wenn die YouTube-App deine Standard-App zum Öffnen von YouTube-Links ist, kann das nicht funktionieren. Wahrscheinlich möchtest du jedesmal wählen, ob du YouTube oder Später Ansehen verwenden möchtest. Probier es aus, indem du unten auf "Beispiel" drückst!</string>
-    <string name="button_example">Beispiel</string>
-    <string name="button_settings_youtube">YouTube-Einstellungen</string>
-    <string name="no_youtube_settings_activity">Konnte die YouTube-Einstellungen nicht öffnen. Sorry.</string>
-    <string name="button_settings_watchlater">Später Ansehen-Einstellungen</string>
-    <string name="no_watchlater_settings_activity">Konnte die Später Ansehen-Einstellungen nicht öffnen. Sorry.</string>
-    <string name="button_settings_all_apps">Apps-Einstellungen</string>
-    <string name="no_app_settings_activity">Konnte die Apps-Einstellungen nicht öffnen. Sorry.</string>
-    <string name="defaults_advice_adjust_both">Du solltest die "Standardmäßig öffnen"-Einstellungen für YouTube und Später Ansehen ändern. Setze die Aktionen auf Standard zurück, so dass beide Apps nicht als Standard eingestellt sind.</string>
-    <string name="defaults_advice_ok">Deine Einstellungen sind in Ordnung, alles sollte funktionieren!</string>
-    <string name="defaults_advice_youtube_choice_missing">Die "Standardmäßig öffnen"-Einstellungen für Später Ansehen sind in Ordnung. Die YouTube-App scheint zu fehlen. Du solltest sicherstellen, dass sie installiert ist.</string>
-    <string name="defaults_advice_watchlater_choice_missing">Die "Standardmäßig öffnen"-Einstellungen für YouTube sind in Ordnung. Irgendetwas scheint nicht in Ordnung zu sein mit den Einstellungen für Später Ansehen, oder vielleicht denen irgendeiner anderen App für YouTube-Videos.</string>
-    <string name="defaults_advice_both_choice_missing">Irgendetwas scheint nicht in Ordnung zu sein mit den Einstellungen für Später Ansehen und YouTube, oder vielleicht denen irgendeiner anderen App für YouTube-Videos.</string>
-    <string name="defaults_advice_youtube_default">Du solltest die "Standardmäßig öffnen"-Einstellungen für die YouTube-App ändern. Setze die Aktionen auf Standard zurück, so dass sie nicht als Standard eingestellt ist.</string>
-    <string name="defaults_advice_watchlater_default">Du solltest die "Standardmäßig öffnen"-Einstellungen für die Später Ansehen-App ändern. Setze die Aktionen auf Standard zurück, so dass sie nicht als Standard eingestellt ist.</string>
-    <string name="defaults_advice_other_app_default">Du solltest die "Standardmäßig öffnen"-Einstellungen für die %1$s-App ändern. Setze die Aktionen auf Standard zurück, so dass sie nicht als Standard eingestellt ist.</string>
-    <string name="no_youtube_installed">Die YouTube-App ist nicht installiert.</string>
-    <string name="always_use_this_account">Immer dieses Konto verwenden</string>
-    <string name="pref_youtube_accounts">YouTube-Konten</string>
-    <string name="pref_default_account_name_title">Kontoauswahl zurücksetzen</string>
-    <string name="pref_default_account_name_no_default">Kein Account zum immer Verwenden ausgewählt.</string>
-    <string name="pref_default_account_name_summary">Immer %1$s verwenden.</string>
-    <string name="button_add_with_selected_account">Video hinzufügen</string>
-    <string name="menu_settings">Einstellungen</string>
-    <string name="title_activity_settings">Einstellungen</string>
-    <string name="menu_privacypolicy">Privacy Policy</string>
 </resources>

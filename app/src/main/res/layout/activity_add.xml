@@ -1,36 +1,102 @@
 <!--
-  ~ Copyright (c) 2015 - 2016
+  ~   Copyright (c) 2015 - 2017
   ~
-  ~  Maximilian Hille <mh@lambdasoup.com>
-  ~ Juliane Lehmann <jl@lambdasoup.com>
+  ~   Maximilian Hille <mh@lambdasoup.com>
+  ~   Juliane Lehmann <jl@lambdasoup.com>
   ~
-  ~ This file is part of Watch Later.
+  ~   This file is part of Watch Later.
   ~
-  ~ Watch Later is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~   Watch Later is free software: you can redistribute it and/or modify
+  ~   it under the terms of the GNU General Public License as published by
+  ~   the Free Software Foundation, either version 3 of the License, or
+  ~   (at your option) any later version.
   ~
-  ~ Watch Later is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
+  ~   Watch Later is distributed in the hope that it will be useful,
+  ~   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~   GNU General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+  ~   You should have received a copy of the GNU General Public License
+  ~   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_container"
     android:layout_width="match_parent"
-    android:layout_height="256sp"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.lambdasoup.watchlater.AddActivity">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context="com.lambdasoup.watchlater.ui.AddActivity">
 
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-</FrameLayout>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            elevation="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            tools:title="@string/app_name" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:divider="@drawable/divider_vertical"
+        android:orientation="vertical"
+        android:showDividers="middle">
+
+        <com.lambdasoup.watchlater.ui.AccountView
+            android:id="@+id/add_account"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="0dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin" />
+
+        <com.lambdasoup.watchlater.ui.PermissionsView
+            android:id="@+id/add_permissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <com.lambdasoup.watchlater.ui.VideoView
+            android:id="@+id/add_video"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            tools:title="test" />
+
+        <com.lambdasoup.watchlater.ui.ActionView
+            android:id="@+id/add_action"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp" />
+
+        <com.lambdasoup.watchlater.ui.ResultView
+            android:id="@+id/add_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="4dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:visibility="gone"
+            tools:background="@color/error_color"
+            tools:text="Could not add video. Please check your network connection and try again."
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+</LinearLayout>

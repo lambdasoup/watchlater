@@ -1,30 +1,30 @@
 /*
- * Copyright (c) 2015 - 2016
+ *   Copyright (c) 2015 - 2017
  *
- *  Maximilian Hille <mh@lambdasoup.com>
- * Juliane Lehmann <jl@lambdasoup.com>
+ *   Maximilian Hille <mh@lambdasoup.com>
+ *   Juliane Lehmann <jl@lambdasoup.com>
  *
- * This file is part of Watch Later.
+ *   This file is part of Watch Later.
  *
- * Watch Later is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *   Watch Later is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
  *
- * Watch Later is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *   Watch Later is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+ *   You should have received a copy of the GNU General Public License
+ *   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 apply plugin: 'com.android.application'
 
-def version_major = 1
-def version_minor = 3
-def version_patch = 4
+def version_major = 2
+def version_minor = 0
+def version_patch = 0
 
 android {
     compileSdkVersion 26
@@ -37,7 +37,9 @@ android {
 
     defaultConfig {
         applicationId "com.lambdasoup.watchlater"
-        minSdkVersion 16
+        // TODO: set to 19 once the following but is fixed:
+        // https://issuetracker.google.com/issues/64527520
+        minSdkVersion 18
         targetSdkVersion 26
         versionCode version_major * 10000 + version_minor * 100 + version_patch * 1
         versionName "$version_major.$version_minor.$version_patch"
@@ -50,27 +52,38 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    packagingOptions {
-        exclude 'LICENSE.txt'
-    }
 }
 
 dependencies {
     def supportLibVersion = '26.0.1'
+    def gaacVersion = '1.0.0-alpha9'
 
-    androidTestCompile "com.android.support:support-annotations:$supportLibVersion"
-    androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support.test:runner:1.0.0'
-    androidTestCompile 'com.android.support.test:rules:1.0.0'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:3.0.0'
-    androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.3.1'
+    androidTestImplementation "com.android.support:support-annotations:$supportLibVersion"
+    androidTestImplementation 'junit:junit:4.12'
+    androidTestImplementation 'org.mockito:mockito-android:2.7.19'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test:rules:1.0.1'
+    androidTestImplementation "com.android.support.test.espresso:espresso-intents:3.0.1"
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.1'
 
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile 'com.squareup.retrofit2:retrofit:2.2.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
-    compile 'com.squareup.okhttp3:okhttp:3.7.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
-    compile "com.android.support:support-annotations:$supportLibVersion"
-    compile "com.android.support:support-v4:$supportLibVersion"
+    implementation "android.arch.lifecycle:runtime:$gaacVersion"
+    implementation "android.arch.lifecycle:extensions:$gaacVersion"
+    annotationProcessor "android.arch.lifecycle:compiler:$gaacVersion"
+
+    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.2.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.7.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.7.0'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation "com.android.support:support-annotations:$supportLibVersion"
+    implementation "com.android.support:design:$supportLibVersion"
+    implementation "com.android.support:support-v4:$supportLibVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.7.19'
+    testImplementation 'org.assertj:assertj-core:3.8.0'
+    testImplementation "android.arch.core:core-testing:$gaacVersion"
 }

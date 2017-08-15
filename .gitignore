@@ -5,6 +5,7 @@
 .idea/*
 !.idea/copyright/
 !.idea/codeStyleSettings.xml
+!.idea/runConfigurations/
 
 # gradle
 /local.properties
@@ -13,3 +14,6 @@
 
 # osx junk
 .DS_Store
+
+# remove api key from git
+app/src/main/res/values/apikey.xml

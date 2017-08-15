@@ -34,13 +34,7 @@
         <AndroidXmlCodeStyleSettings>
           <option name="USE_CUSTOM_SETTINGS" value="true" />
         </AndroidXmlCodeStyleSettings>
-        <MarkdownNavigatorCodeStyleSettings>
-          <option name="RIGHT_MARGIN" value="72" />
-        </MarkdownNavigatorCodeStyleSettings>
         <Objective-C-extensions>
-          <option name="GENERATE_INSTANCE_VARIABLES_FOR_PROPERTIES" value="ASK" />
-          <option name="RELEASE_STYLE" value="IVAR" />
-          <option name="TYPE_QUALIFIERS_PLACEMENT" value="BEFORE" />
           <file>
             <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Import" />
             <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Macro" />
@@ -66,11 +60,14 @@
           </extensions>
         </Objective-C-extensions>
         <XML>
+          <option name="XML_KEEP_LINE_BREAKS" value="false" />
+          <option name="XML_ALIGN_ATTRIBUTES" value="false" />
+          <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="true" />
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
         <codeStyleSettings language="JAVA">
           <option name="ALIGN_GROUP_FIELD_DECLARATIONS" value="true" />
-          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="ALIGN_CONSECUTIVE_VARIABLE_DECLARATIONS" value="true" />
           <indentOptions>
             <option name="USE_TAB_CHARACTER" value="true" />
           </indentOptions>
@@ -87,7 +84,7 @@
                   <match>
                     <AND>
                       <NAME>xmlns:android</NAME>
-                      <XML_NAMESPACE>Namespace:</XML_NAMESPACE>
+                      <XML_NAMESPACE>^$</XML_NAMESPACE>
                     </AND>
                   </match>
                 </rule>
@@ -97,7 +94,7 @@
                   <match>
                     <AND>
                       <NAME>xmlns:.*</NAME>
-                      <XML_NAMESPACE>Namespace:</XML_NAMESPACE>
+                      <XML_NAMESPACE>^$</XML_NAMESPACE>
                     </AND>
                   </match>
                   <order>BY_NAME</order>
@@ -235,6 +232,5 @@
       </value>
     </option>
     <option name="USE_PER_PROJECT_SETTINGS" value="true" />
-    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default (2)" />
   </component>
 </project>

@@ -1,33 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2015 - 2016
+  ~   Copyright (c) 2015 - 2017
   ~
-  ~  Maximilian Hille <mh@lambdasoup.com>
-  ~ Juliane Lehmann <jl@lambdasoup.com>
+  ~   Maximilian Hille <mh@lambdasoup.com>
+  ~   Juliane Lehmann <jl@lambdasoup.com>
   ~
-  ~ This file is part of Watch Later.
+  ~   This file is part of Watch Later.
   ~
-  ~ Watch Later is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~   Watch Later is free software: you can redistribute it and/or modify
+  ~   it under the terms of the GNU General Public License as published by
+  ~   the Free Software Foundation, either version 3 of the License, or
+  ~   (at your option) any later version.
   ~
-  ~ Watch Later is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
+  ~   Watch Later is distributed in the hope that it will be useful,
+  ~   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~   GNU General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+  ~   You should have received a copy of the GNU General Public License
+  ~   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.lambdasoup.watchlater.AddActivity">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.lambdasoup.watchlater.ui.AddActivity">
 
     <item
-        android:id="@+id/menu_open_with_youtube"
-        android:icon="@drawable/ic_play_circle_outline_white_36dp"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_open" />
+        android:id="@+id/menu_help"
+        android:title="@string/menu_help"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_about"
+        android:title="@string/menu_about"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/menu_privacy"
+        android:title="@string/menu_privacypolicy"
+        app:showAsAction="never"
+        />
 
 </menu>

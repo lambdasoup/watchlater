@@ -1,41 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2015 - 2016
+  ~   Copyright (c) 2015 - 2017
   ~
-  ~  Maximilian Hille <mh@lambdasoup.com>
-  ~ Juliane Lehmann <jl@lambdasoup.com>
+  ~   Maximilian Hille <mh@lambdasoup.com>
+  ~   Juliane Lehmann <jl@lambdasoup.com>
   ~
-  ~ This file is part of Watch Later.
+  ~   This file is part of Watch Later.
   ~
-  ~ Watch Later is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~   Watch Later is free software: you can redistribute it and/or modify
+  ~   it under the terms of the GNU General Public License as published by
+  ~   the Free Software Foundation, either version 3 of the License, or
+  ~   (at your option) any later version.
   ~
-  ~ Watch Later is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
+  ~   Watch Later is distributed in the hope that it will be useful,
+  ~   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~   GNU General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+  ~   You should have received a copy of the GNU General Public License
+  ~   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Holo" />
+    <style name="Theme.WatchLater" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/mat_bluegrey_500</item>
+        <item name="colorPrimaryDark">@color/mat_bluegrey_800</item>
+        <item name="colorAccent">@color/mat_lightblue_600</item>
+    </style>
 
-    <style name="AppTheme.Add" parent="android:Theme.Holo.Dialog">
-        <item name="android:windowIsFloating">false</item>
+    <color name="mat_bluegrey_500">#607D8B</color>
+    <color name="mat_bluegrey_800">#37474F</color>
+    <color name="mat_lightblue_600">#039BE5</color>
+    <color name="mat_green_600">#43A047</color>
+    <color name="mat_red_600">#E53935</color>
+
+    <color name="error_color">@color/mat_red_600</color>
+    <color name="success_color">@color/mat_green_600</color>
+
+    <!-- theme is a customized version of Theme.AppCompat.Dialog.MinWidth -->
+    <style name="Theme.WatchLater.Add">
+        <item name="android:colorBackground">?attr/colorBackgroundFloating</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowTitleStyle">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowSoftInputMode">stateAlwaysHidden</item>
-        <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@style/Animation.AppCompat.Dialog</item>
+        <item name="android:windowSoftInputMode">stateUnspecified|adjustPan</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+
+        <item name="listPreferredItemPaddingLeft">24dip</item>
+        <item name="listPreferredItemPaddingRight">24dip</item>
+
+        <item name="android:listDivider">@null</item>
+
+        <item name="android:windowMinWidthMajor">65%</item>
+        <item name="android:windowMinWidthMinor">95%</item>
     </style>
 
-    <style name="HelpText" parent="android:TextAppearance.Holo.Small.Inverse">
-        <item name="android:textColor">@android:color/holo_blue_light</item>
-    </style>
+    <!--
+        12% white
+        https://material.io/guidelines/components/dividers.html#dividers-types-of-dividers
+     -->
+    <color name="divider_color">#1fffffff</color>
 
-    <color name="medium_gray">#666666</color>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="vertical_text_sep">6sp</dimen>
 
 </resources>

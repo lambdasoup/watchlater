@@ -1,88 +1,125 @@
 <!--
-  ~ Copyright (c) 2015 - 2016
+  ~   Copyright (c) 2015 - 2017
   ~
-  ~  Maximilian Hille <mh@lambdasoup.com>
-  ~ Juliane Lehmann <jl@lambdasoup.com>
+  ~   Maximilian Hille <mh@lambdasoup.com>
+  ~   Juliane Lehmann <jl@lambdasoup.com>
   ~
-  ~ This file is part of Watch Later.
+  ~   This file is part of Watch Later.
   ~
-  ~ Watch Later is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~   Watch Later is free software: you can redistribute it and/or modify
+  ~   it under the terms of the GNU General Public License as published by
+  ~   the Free Software Foundation, either version 3 of the License, or
+  ~   (at your option) any later version.
   ~
-  ~ Watch Later is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
+  ~   Watch Later is distributed in the hope that it will be useful,
+  ~   but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~   GNU General Public License for more details.
   ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+  ~   You should have received a copy of the GNU General Public License
+  ~   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="top"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.lambdasoup.watchlater.LauncherActivity">
+    tools:context="com.lambdasoup.watchlater.ui.LauncherActivity">
 
-    <TextView
-        android:id="@+id/explanation"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:text="@string/explanation" />
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/example_link_button"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            elevation="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            tools:title="@string/app_name" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:onClick="onClickExampleLink"
-        android:text="@string/button_example" />
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <TextView
-        android:id="@+id/defaults_advice"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:layout_marginTop="@dimen/vertical_text_sep"
-        tools:text="The advice text for the defaults will be set programmatically after detection." />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:divider="@drawable/divider_vertical"
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/settings_youtube_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:onClick="onClickSettingsYoutube"
-        android:text="@string/button_settings_youtube" />
+            <LinearLayout
+                android:id="@+id/launcher_youtube_action"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:orientation="vertical">
 
-    <Button
-        android:id="@+id/settings_watchlater_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:onClick="onClickSettingsWatchlater"
-        android:text="@string/button_settings_watchlater" />
+                <TextView
+                    android:id="@+id/launcher_youtube_action_action_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/vertical_text_sep"
+                    android:layout_marginTop="@dimen/vertical_text_sep"
+                    android:text="@string/launcher_youtube_action_title"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Title" />
 
-    <Button
-        android:id="@+id/settings_all_apps_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/vertical_text_sep"
-        android:onClick="onClickSettingsAllApps"
-        android:text="@string/button_settings_all_apps" />
+                <TextView
+                    android:id="@+id/launcher_youtube_action_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/vertical_text_sep"
+                    android:layout_marginTop="@dimen/vertical_text_sep"
+                    android:text="@string/launcher_youtube_action_text" />
 
-</LinearLayout>
+                <Button
+                    android:id="@+id/launcher_youtube_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/vertical_text_sep"
+                    android:text="@string/launcher_youtube_action_button" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/launcher_example_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/vertical_text_sep"
+                    android:layout_marginTop="@dimen/vertical_text_sep"
+                    android:text="@string/launcher_example_title"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Title" />
+
+                <TextView
+                    android:id="@+id/launcher_example_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/vertical_text_sep"
+                    android:layout_marginTop="@dimen/vertical_text_sep"
+                    android:text="@string/launcher_example_text" />
+
+                <Button
+                    android:id="@+id/launcher_example_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/vertical_text_sep"
+                    android:text="@string/launcher_example_button" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</android.support.design.widget.CoordinatorLayout>

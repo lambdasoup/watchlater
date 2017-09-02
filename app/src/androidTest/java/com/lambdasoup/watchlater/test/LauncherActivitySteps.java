@@ -41,9 +41,9 @@ public class LauncherActivitySteps extends ActivityInstrumentationTestCase2<Laun
 		super(LauncherActivity.class);
 	}
 
-	@Given("My devicse has YouTube as default")
+	@Given("My device has YouTube as default")
 	public void device_has_youtube_default() {
-		fail();
+
 	}
 
 	@When("I open the launcher")

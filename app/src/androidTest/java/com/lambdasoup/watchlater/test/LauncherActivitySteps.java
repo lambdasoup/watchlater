@@ -20,9 +20,11 @@
  *   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lambdasoup.watchlater.ui;
+package com.lambdasoup.watchlater.test;
 
 import android.test.ActivityInstrumentationTestCase2;
+
+import com.lambdasoup.watchlater.ui.LauncherActivity;
 
 import cucumber.api.CucumberOptions;
 import cucumber.api.java.en.Given;
@@ -30,8 +32,7 @@ import cucumber.api.java.en.When;
 
 @CucumberOptions(
 		features = "features",
-		glue = "com.lambdasoup.watchlater.test",
-		tags = "@launcher"
+		glue = "com.lambdasoup.watchlater.test"
 )
 public class LauncherActivitySteps extends ActivityInstrumentationTestCase2<LauncherActivity> {
 
@@ -40,9 +41,9 @@ public class LauncherActivitySteps extends ActivityInstrumentationTestCase2<Laun
 		super(LauncherActivity.class);
 	}
 
-	@Given("My device has YouTube as default")
+	@Given("My devicse has YouTube as default")
 	public void device_has_youtube_default() {
-
+		fail();
 	}
 
 	@When("I open the launcher")

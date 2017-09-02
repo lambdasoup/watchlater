@@ -29,7 +29,9 @@ import cucumber.api.android.CucumberInstrumentationCore;
 
 public class CucumberTestRunner extends MonitoringInstrumentation {
 
-	private final CucumberInstrumentationCore instrumentationCore = new CucumberInstrumentationCore(this);
+	private final static String TAG = CucumberTestRunner.class.getName();
+
+	private CucumberInstrumentationCore instrumentationCore = new CucumberInstrumentationCore(this);
 
 	@Override
 	public void onCreate(Bundle arguments) {

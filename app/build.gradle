@@ -41,10 +41,16 @@ android {
         targetSdkVersion 26
         versionCode version_major * 10000 + version_minor * 100 + version_patch * 1
         versionName "$version_major.$version_minor.$version_patch"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.lambdasoup.watchlater.CucumberTestRunner"
     }
 
+    sourceSets {
+        androidTest {
+            assets.srcDirs = ['src/androidTest/assets']
+        }
+    }
 }
+
 
 dependencies {
     def supportLibVersion = '26.1.0'

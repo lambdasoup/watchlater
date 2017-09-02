@@ -58,6 +58,8 @@ dependencies {
     androidTestImplementation "com.android.support.test.espresso:espresso-intents:3.0.1"
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.1'
+    androidTestImplementation 'info.cukes:cucumber-android:1.2.0@jar'
+    androidTestImplementation 'info.cukes:cucumber-picocontainer:1.2.0'
 
     implementation "android.arch.lifecycle:runtime:$gaacVersion"
     implementation "android.arch.lifecycle:extensions:$gaacVersion"

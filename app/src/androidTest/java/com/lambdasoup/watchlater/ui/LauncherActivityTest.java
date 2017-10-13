@@ -26,7 +26,6 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
@@ -48,13 +47,11 @@ import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.intending;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasData;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -64,9 +61,9 @@ import static org.mockito.Mockito.when;
 @LargeTest
 public class LauncherActivityTest extends WatchLaterActivityTest {
 
-	private final LauncherViewModel                 mockViewModel = mock(LauncherViewModel.class);
 	@Rule
-	public        IntentsTestRule<LauncherActivity> rule          = new IntentsTestRule<>(LauncherActivity.class, false, false);
+	public final  IntentsTestRule<LauncherActivity> rule          = new IntentsTestRule<>(LauncherActivity.class, false, false);
+	private final LauncherViewModel                 mockViewModel = mock(LauncherViewModel.class);
 	private MutableLiveData<IntentResolverRepository.ResolverState> resolverStateLiveData;
 
 	@Before

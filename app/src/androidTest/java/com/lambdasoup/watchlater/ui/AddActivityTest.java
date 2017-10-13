@@ -66,7 +66,7 @@ import static org.mockito.Mockito.when;
 public class AddActivityTest extends WatchLaterActivityTest {
 
 	@Rule
-	public IntentsTestRule<AddActivity> rule = new IntentsTestRule<>(AddActivity.class, false, false);
+	public final IntentsTestRule<AddActivity> rule = new IntentsTestRule<>(AddActivity.class, false, false);
 
 	private AddViewModel mockViewModel;
 	private MutableLiveData<Account> accountLiveData;

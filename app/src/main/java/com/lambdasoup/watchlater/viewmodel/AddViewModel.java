@@ -95,7 +95,7 @@ public class AddViewModel extends WatchLaterViewModel
 	public void setPermissionNeeded(boolean needsPermission) {
 		// only reset add state when permission state changes to positive
 		Boolean oldValue = permissionNeeded.getValue();
-		if (oldValue != null && oldValue == true && needsPermission == false) {
+		if (oldValue != null && oldValue && !needsPermission) {
 			videoAdd.setValue(VideoAdd.IDLE());
 		}
 

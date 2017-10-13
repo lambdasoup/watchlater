@@ -23,16 +23,15 @@
 <resources>
 
     <style name="Theme.WatchLater" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/mat_bluegrey_500</item>
-        <item name="colorPrimaryDark">@color/mat_bluegrey_800</item>
+        <item name="colorPrimary">@color/mat_red_600</item>
+        <item name="colorPrimaryDark">@color/mat_red_700</item>
         <item name="colorAccent">@color/mat_lightblue_600</item>
     </style>
 
-    <color name="mat_bluegrey_500">#607D8B</color>
-    <color name="mat_bluegrey_800">#37474F</color>
     <color name="mat_lightblue_600">#039BE5</color>
     <color name="mat_green_600">#43A047</color>
     <color name="mat_red_600">#E53935</color>
+    <color name="mat_red_700">#D32F2F</color>
 
     <color name="error_color">@color/mat_red_600</color>
     <color name="success_color">@color/mat_green_600</color>

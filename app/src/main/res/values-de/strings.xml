@@ -48,7 +48,7 @@
     <string name="could_not_add">Konnte Video nicht hinzufügen: %s</string>
     <string name="could_not_load">Konnte Vorschau nicht laden (%s)</string>
     <string name="account_empty">Kein Konto ausgewählt</string>
-    <string name="account_set">Konto wählen</string>
+    <string name="account_set">ändern</string>
     <string name="add_permissions_rationale">Die App wird nicht auf Deine Kontakte zugreifen. Die Berechtigung ist notwending, um mit Deinem YouTube-Konto zu kommunizieren.</string>
     <string name="launcher_youtube_action_title">Bitte einstellen</string>
     <string name="launcher_youtube_action_text">Dein Gerät ist konfiguriert, YouTube-Links immer mit der YouTube-App zu öffnen. Öffne die YouTube-Einstellungen und stelle sicher, dass \'Unterstützte Links öffnen\' auf \'Jedes Mal fragen\' steht.</string>

@@ -25,11 +25,12 @@ package com.lambdasoup.watchlater.ui;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.support.v7.app.AppCompatActivity;
 
 import com.lambdasoup.watchlater.WatchLaterApplication;
 
 
-public abstract class WatchLaterActivity extends LifecycleAppcompatActivity {
+public abstract class WatchLaterActivity extends AppCompatActivity {
 
 	<T extends ViewModel> T getViewModel(Class<T> viewModelClass) {
 		WatchLaterApplication     application = (WatchLaterApplication) getApplication();

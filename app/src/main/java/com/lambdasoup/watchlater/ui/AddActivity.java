@@ -27,6 +27,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.arch.lifecycle.Lifecycle;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -47,6 +48,8 @@ import static android.widget.Toast.LENGTH_SHORT;
 
 
 public class AddActivity extends WatchLaterActivity implements ActionView.ActionListener {
+
+	private static final String TAG = WatchLaterActivity.class.getName();
 
 	private static final int                        PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
 	private static final int                        REQUEST_ACCOUNT                  = 1;
@@ -130,6 +133,12 @@ public class AddActivity extends WatchLaterActivity implements ActionView.Action
 
 		boolean needsPermission = needsPermission();
 		viewModel.setPermissionNeeded(needsPermission);
+
+		// Workaround for https://issuetracker.google.com/issues/65665621
+		Lifecycle.State currentState = getLifecycle().getCurrentState();
+		if (Build.VERSION.SDK_INT == 23 && currentState == Lifecycle.State.CREATED) {
+			onPermissionNeededChanged(needsPermission);
+		}
 	}
 
 	@Override

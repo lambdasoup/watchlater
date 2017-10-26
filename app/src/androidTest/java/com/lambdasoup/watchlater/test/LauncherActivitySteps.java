@@ -24,7 +24,10 @@ package com.lambdasoup.watchlater.test;
 
 import android.test.ActivityInstrumentationTestCase2;
 
+import com.lambdasoup.watchlater.CucumberTestRunner;
 import com.lambdasoup.watchlater.ui.LauncherActivity;
+
+import org.junit.runner.RunWith;
 
 import cucumber.api.CucumberOptions;
 import cucumber.api.java.en.Given;

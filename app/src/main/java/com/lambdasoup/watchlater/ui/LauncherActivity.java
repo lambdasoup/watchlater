@@ -42,9 +42,9 @@ import static android.net.Uri.parse;
 
 public class LauncherActivity extends WatchLaterActivity {
 
-	private static final Uri    EXAMPLE_URI             = parse("https://www.youtube.com/watch?v=tntOCGkgt98");
+	private static final Uri    EXAMPLE_URI             = parse("https://www.youtube.com/watch?v=dGFSjKuJfrI");
+	public static final  Intent EXAMPLE_INTENT          = new Intent(Intent.ACTION_VIEW, EXAMPLE_URI);
 	private static final Intent INTENT_YOUTUBE_APP      = new Intent().setData(EXAMPLE_URI).setPackage("com.google.android.youtube");
-	public static final Intent EXAMPLE_INTENT           = new Intent(Intent.ACTION_VIEW, EXAMPLE_URI);
 	private static final Intent INTENT_YOUTUBE_SETTINGS = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:com.google.android.youtube"));
 
 	private LauncherViewModel viewModel;

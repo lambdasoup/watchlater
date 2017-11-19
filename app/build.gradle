@@ -24,7 +24,7 @@ apply plugin: 'com.android.application'
 
 def version_major = 2
 def version_minor = 0
-def version_patch = 0
+def version_patch = 1
 
 android {
     compileSdkVersion 27

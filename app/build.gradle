@@ -46,8 +46,8 @@ android {
 }
 
 dependencies {
-    def supportLibVersion = '27.0.0'
-    def gaacVersion = '1.0.0-rc1'
+    def supportLibVersion = '27.0.1'
+    def gaacVersion = '1.0.0'
 
     androidTestImplementation "com.android.support:support-annotations:$supportLibVersion"
     androidTestImplementation 'junit:junit:4.12'

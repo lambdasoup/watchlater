@@ -32,6 +32,10 @@
     <!-- for pre-26 -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
+<uses-sdk android:minSdkVersion="18"
+          android:targetSdkVersion="27"
+          android:maxSdkVersion="27" />
+
     <application
         android:name=".WatchLaterApplication"
         android:allowBackup="true"

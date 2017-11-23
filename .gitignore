@@ -12,6 +12,9 @@
 .gradle
 /build
 
+# bazel
+bazel-*
+
 # osx junk
 .DS_Store
 

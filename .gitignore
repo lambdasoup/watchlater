@@ -7,6 +7,9 @@
 !.idea/codeStyleSettings.xml
 !.idea/runConfigurations/
 
+# vi
+*.swp
+
 # gradle
 /local.properties
 .gradle

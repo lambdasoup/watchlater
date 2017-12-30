@@ -12,10 +12,11 @@ maven_aar(
 maven_aar(
 	name = "support-design",
 	artifact = "com.android.support:design:27.0.1",
+	deps = ["@appcompat//aar"]
 )
 maven_aar(
 	name = "support-v4",
 	artifact = "com.android.support:support-v4:27.0.1",
 )
 
-see github.com/pubref/rules_kotlin
+# see github.com/pubref/rules_kotlin

@@ -24,7 +24,6 @@ package com.lambdasoup.watchlater.data;
 
 import android.content.Context;
 
-import com.lambdasoup.watchlater.BuildConfig;
 import com.lambdasoup.watchlater.R;
 
 import java.io.IOException;
@@ -33,7 +32,6 @@ import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Converter;
@@ -57,11 +55,12 @@ public class YoutubeRepository {
 	public YoutubeRepository(Context context) {
 		OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
-		if (BuildConfig.DEBUG) {
-			HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-			loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-			httpClient.networkInterceptors().add(loggingInterceptor);
-		}
+// TODO
+//		if (BuildConfig.DEBUG) {
+//			HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+//			loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+//			httpClient.networkInterceptors().add(loggingInterceptor);
+//		}
 
 		apiKey = context.getString(R.string.youtube_api_key);
 

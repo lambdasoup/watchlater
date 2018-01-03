@@ -1,9 +1,29 @@
 android_binary(
-	name = "android",
-        custom_package = "com.lambdasoup.watchlater",
-	manifest = "app/src/main/AndroidManifest.xml",
-	resource_files = glob(["app/src/main/res/**"]),
-	deps = ["@appcompat//aar", "@support-design//aar", "@support-v4//aar"]
+    name = "app",
+    srcs = glob(["app/src/main/java/**"]),
+    custom_package = "com.lambdasoup.watchlater",
+    manifest = "app/src/main/AndroidManifest.xml",
+    manifest_values = {
+        "versionCode": "20001",
+    },
+    resource_files = glob(["app/src/main/res/**"]),
+    deps = [
+        "@aarch-lifecycle-ext//aar",
+        "@aarch-lifecycle-runtime//aar",
+        "@aarch_lifecycle_common//jar",
+        "@gson//jar",
+        "@okhttp//jar",
+        "@okhttp_logging//jar",
+        "@picasso//jar",
+        "@retrofit//jar",
+        "@retrofit_gson//jar",
+        "@support-appcompat//aar",
+        "@support-compat//aar",
+        "@support-core-ui//aar",
+        "@support-core-utils//aar",
+        "@support-core//aar",
+        "@support-design//aar",
+        "@support-fragment//aar",
+        "@support_annotations//jar",
+    ],
 )
-
-

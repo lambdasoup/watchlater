@@ -199,8 +199,7 @@ public class AddActivity extends WatchLaterActivity implements ActionView.Action
 
 		// below 26 we need GET_ACCOUNTS
 		if (Build.VERSION.SDK_INT < 26) {
-			boolean supportsRuntimePermissions = Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1;
-			return supportsRuntimePermissions && !hasAccountsPermission();
+			return !hasAccountsPermission();
 		}
 
 		// starting with O we don't need any permissions at runtime

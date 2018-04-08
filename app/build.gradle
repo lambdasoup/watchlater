@@ -46,8 +46,8 @@ android {
 }
 
 dependencies {
-    def supportLibVersion = '27.0.1'
-    def gaacVersion = '1.0.0'
+    def supportLibVersion = '27.1.0'
+    def gaacVersion = '1.1.1'
 
     androidTestImplementation "com.android.support:support-annotations:$supportLibVersion"
     androidTestImplementation 'junit:junit:4.12'
@@ -58,7 +58,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.1'
 
-    implementation "android.arch.lifecycle:runtime:1.0.3"
+    implementation "android.arch.lifecycle:runtime:$gaacVersion"
     implementation "android.arch.lifecycle:extensions:$gaacVersion"
     annotationProcessor "android.arch.lifecycle:compiler:$gaacVersion"
 

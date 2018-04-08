@@ -55,6 +55,9 @@ public class ResultView extends android.support.v7.widget.AppCompatTextView
 			case ERROR:
 				setError(videoAdd.errorType);
 				break;
+			case INTENT:
+				setResult(true, getResources().getString(R.string.needs_youtube_permissions));
+				break;
 		}
 	}
 

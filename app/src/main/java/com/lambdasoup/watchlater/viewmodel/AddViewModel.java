@@ -25,6 +25,7 @@ package com.lambdasoup.watchlater.viewmodel;
 import android.accounts.Account;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Intent;
 import android.net.Uri;
 
 import com.lambdasoup.watchlater.WatchLaterApplication;
@@ -33,192 +34,203 @@ import com.lambdasoup.watchlater.data.YoutubeRepository;
 import com.lambdasoup.watchlater.util.VideoIdParser;
 
 public class AddViewModel extends WatchLaterViewModel
-		implements AccountRepository.TokenCallback, YoutubeRepository.AddVideoCallback,
-		YoutubeRepository.VideoInfoCallback {
+        implements AccountRepository.TokenCallback, YoutubeRepository.AddVideoCallback,
+        YoutubeRepository.VideoInfoCallback {
 
-	private final AccountRepository accountRepository;
-	private final YoutubeRepository youtubeRepository;
-	private final VideoIdParser     videoIdParser;
+    private final AccountRepository accountRepository;
+    private final YoutubeRepository youtubeRepository;
+    private final VideoIdParser videoIdParser;
 
-	private final MutableLiveData<Boolean> permissionNeeded = new MutableLiveData<>();
-	private final LiveData<Account> account;
-	private final MutableLiveData<VideoAdd>  videoAdd  = new MutableLiveData<>();
-	private final MutableLiveData<VideoInfo> videoInfo = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> permissionNeeded = new MutableLiveData<>();
+    private final LiveData<Account> account;
+    private final MutableLiveData<VideoAdd> videoAdd = new MutableLiveData<>();
+    private final MutableLiveData<VideoInfo> videoInfo = new MutableLiveData<>();
 
-	private boolean tokenRetried;
-	private String  videoId;
+    private boolean tokenRetried;
+    private String videoId;
 
-	@SuppressWarnings("WeakerAccess")
-	public AddViewModel(WatchLaterApplication application) {
-		super(application);
+    @SuppressWarnings("WeakerAccess")
+    public AddViewModel(WatchLaterApplication application) {
+        super(application);
 
-		accountRepository = application.getAccountRepository();
-		account = accountRepository.get();
+        accountRepository = application.getAccountRepository();
+        account = accountRepository.get();
 
-		youtubeRepository = application.getYoutubeRepository();
-		videoIdParser = application.getVideoIdParser();
+        youtubeRepository = application.getYoutubeRepository();
+        videoIdParser = application.getVideoIdParser();
 
-		videoAdd.setValue(VideoAdd.IDLE());
-		videoInfo.setValue(new VideoInfo(VideoInfo.State.PROGRESS, null, null));
-	}
+        videoAdd.setValue(VideoAdd.IDLE());
+        videoInfo.setValue(new VideoInfo(VideoInfo.State.PROGRESS, null, null));
+    }
 
-	public LiveData<Account> getAccount() {
-		return account;
-	}
+    public LiveData<Account> getAccount() {
+        return account;
+    }
 
-	public void setAccount(Account account) {
-		accountRepository.put(account);
-		videoAdd.setValue(VideoAdd.IDLE());
-	}
+    public void setAccount(Account account) {
+        accountRepository.put(account);
+        videoAdd.setValue(VideoAdd.IDLE());
+    }
 
-	void removeAccount() {
-		accountRepository.clear();
-	}
+    void removeAccount() {
+        accountRepository.clear();
+    }
 
-	public void setVideoUri(Uri uri) {
-		videoId = videoIdParser.parseVideoId(uri);
-		youtubeRepository.getVideoInfo(videoId, this);
-	}
+    public void setVideoUri(Uri uri) {
+        videoId = videoIdParser.parseVideoId(uri);
+        youtubeRepository.getVideoInfo(videoId, this);
+    }
 
-	public LiveData<VideoInfo> getVideoInfo() {
-		return videoInfo;
-	}
+    public LiveData<VideoInfo> getVideoInfo() {
+        return videoInfo;
+    }
 
-	public LiveData<VideoAdd> getVideoAdd() {
-		return videoAdd;
-	}
+    public LiveData<VideoAdd> getVideoAdd() {
+        return videoAdd;
+    }
 
-	public LiveData<Boolean> getPermissionNeeded() {
-		return permissionNeeded;
-	}
+    public LiveData<Boolean> getPermissionNeeded() {
+        return permissionNeeded;
+    }
 
-	public void setPermissionNeeded(boolean needsPermission) {
-		// only reset add state when permission state changes to positive
-		Boolean oldValue = permissionNeeded.getValue();
-		if (oldValue != null && oldValue && !needsPermission) {
-			videoAdd.setValue(VideoAdd.IDLE());
-		}
+    public void setPermissionNeeded(boolean needsPermission) {
+        // only reset add state when permission state changes to positive
+        Boolean oldValue = permissionNeeded.getValue();
+        if (oldValue != null && oldValue && !needsPermission) {
+            videoAdd.setValue(VideoAdd.IDLE());
+        }
 
-		permissionNeeded.setValue(needsPermission);
-	}
+        permissionNeeded.setValue(needsPermission);
+    }
 
-	public void watchLater() {
-		videoAdd.setValue(VideoAdd.PROGRESS());
+    public void watchLater() {
+        videoAdd.setValue(VideoAdd.PROGRESS());
 
-		if (account.getValue() == null) {
-			videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.NO_ACCOUNT));
-			return;
-		}
+        if (account.getValue() == null) {
+            videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.NO_ACCOUNT));
+            return;
+        }
 
-		if (permissionNeeded.getValue() != null && permissionNeeded.getValue()) {
-			videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.NO_PERMISSION));
-			return;
-		}
+        if (permissionNeeded.getValue() != null && permissionNeeded.getValue()) {
+            videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.NO_PERMISSION));
+            return;
+        }
 
-		accountRepository.getToken(this);
-	}
+        accountRepository.getToken(this);
+    }
 
-	@Override
-	public void onToken(boolean hasError, String token) {
-		if (hasError) {
-			videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.NO_ACCOUNT));
-			return;
-		}
+    @Override
+    public void onToken(boolean hasError, String token, Intent intent) {
+        if (hasError && intent != null) {
+            videoAdd.setValue(VideoAdd.INTENT(intent));
+            return;
+        }
 
-		if (videoId == null) {
-			throw new IllegalStateException("cannot query video without id");
-		}
+        if (hasError) {
+            videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.NO_ACCOUNT));
+            return;
+        }
 
-		youtubeRepository.addVideo(videoId, token, this);
-	}
+        if (videoId == null) {
+            throw new IllegalStateException("cannot query video without id");
+        }
 
-	@Override
-	public void onAddResult(YoutubeRepository.ErrorType errorType, String token) {
-		if (errorType == null) {
-			videoAdd.setValue(VideoAdd.SUCCESS());
-			return;
-		}
+        youtubeRepository.addVideo(videoId, token, this);
+    }
 
-		switch (errorType) {
-			case INVALID_TOKEN:
-				if (tokenRetried) {
-					videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.OTHER));
-					return;
-				}
-				tokenRetried = true;
-				accountRepository.invalidateToken(token);
-				accountRepository.getToken(this);
-				return;
+    @Override
+    public void onAddResult(YoutubeRepository.ErrorType errorType, String token) {
+        if (errorType == null) {
+            videoAdd.setValue(VideoAdd.SUCCESS());
+            return;
+        }
 
-			case ALREADY_IN_PLAYLIST:
-				videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.YOUTUBE_ALREADY_IN_PLAYLIST));
-				return;
+        switch (errorType) {
+            case INVALID_TOKEN:
+                if (tokenRetried) {
+                    videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.OTHER));
+                    return;
+                }
+                tokenRetried = true;
+                accountRepository.invalidateToken(token);
+                accountRepository.getToken(this);
+                return;
 
-			default:
-				videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.OTHER));
-		}
-	}
+            case ALREADY_IN_PLAYLIST:
+                videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.YOUTUBE_ALREADY_IN_PLAYLIST));
+                return;
 
-	@Override
-	public void onVideoInfoResult(YoutubeRepository.ErrorType errorType, YoutubeRepository.Videos.Item item) {
-		if (errorType != null) {
-			videoInfo.setValue(new VideoInfo(VideoInfo.State.ERROR, null, errorType));
-		} else {
-			videoInfo.setValue(new VideoInfo(VideoInfo.State.LOADED, item, null));
-		}
-	}
+            default:
+                videoAdd.setValue(VideoAdd.ERROR(VideoAdd.ErrorType.OTHER));
+        }
+    }
 
-	public static class VideoAdd {
+    @Override
+    public void onVideoInfoResult(YoutubeRepository.ErrorType errorType, YoutubeRepository.Videos.Item item) {
+        if (errorType != null) {
+            videoInfo.setValue(new VideoInfo(VideoInfo.State.ERROR, null, errorType));
+        } else {
+            videoInfo.setValue(new VideoInfo(VideoInfo.State.LOADED, item, null));
+        }
+    }
 
-		public final State     state;
-		public final ErrorType errorType;
+    public static class VideoAdd {
 
-		private VideoAdd(State state, ErrorType errorType) {
-			this.state = state;
-			this.errorType = errorType;
-		}
+        public final State state;
+        public final ErrorType errorType;
+        public final Intent intent;
 
-		public static VideoAdd SUCCESS() {
-			return new VideoAdd(State.SUCCESS, null);
-		}
+        private VideoAdd(State state, ErrorType errorType, Intent intent) {
+            this.state = state;
+            this.errorType = errorType;
+            this.intent = intent;
+        }
 
-		public static VideoAdd ERROR(ErrorType errorType) {
-			return new VideoAdd(State.ERROR, errorType);
-		}
+        public static VideoAdd SUCCESS() {
+            return new VideoAdd(State.SUCCESS, null, null);
+        }
 
-		static VideoAdd IDLE() {
-			return new VideoAdd(State.IDLE, null);
-		}
+        public static VideoAdd ERROR(ErrorType errorType) {
+            return new VideoAdd(State.ERROR, errorType, null);
+        }
 
-		static VideoAdd PROGRESS() {
-			return new VideoAdd(State.PROGRESS, null);
-		}
+        static VideoAdd IDLE() {
+            return new VideoAdd(State.IDLE, null, null);
+        }
 
-		public enum State {
-			IDLE, PROGRESS, SUCCESS, ERROR
-		}
+        static VideoAdd PROGRESS() {
+            return new VideoAdd(State.PROGRESS, null, null);
+        }
 
-		public enum ErrorType {
-			OTHER, NO_ACCOUNT, NO_PERMISSION, YOUTUBE_ALREADY_IN_PLAYLIST
-		}
-	}
+        public static VideoAdd INTENT(Intent intent) {
+            return new VideoAdd(State.INTENT, null, intent);
+        }
 
-	public static class VideoInfo {
+        public enum State {
+            IDLE, PROGRESS, SUCCESS, ERROR, INTENT
+        }
 
-		public final State                         state;
-		public final YoutubeRepository.Videos.Item data;
-		public final YoutubeRepository.ErrorType   error;
+        public enum ErrorType {
+            OTHER, NO_ACCOUNT, NO_PERMISSION, YOUTUBE_ALREADY_IN_PLAYLIST
+        }
+    }
 
-		public VideoInfo(State state, YoutubeRepository.Videos.Item data, YoutubeRepository.ErrorType error) {
-			this.state = state;
-			this.data = data;
-			this.error = error;
-		}
+    public static class VideoInfo {
 
-		public enum State {
-			PROGRESS, LOADED, ERROR
-		}
+        public final State state;
+        public final YoutubeRepository.Videos.Item data;
+        public final YoutubeRepository.ErrorType error;
 
-	}
+        public VideoInfo(State state, YoutubeRepository.Videos.Item data, YoutubeRepository.ErrorType error) {
+            this.state = state;
+            this.data = data;
+            this.error = error;
+        }
+
+        public enum State {
+            PROGRESS, LOADED, ERROR
+        }
+
+    }
 
 }

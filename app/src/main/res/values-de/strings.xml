@@ -58,5 +58,6 @@
     <string name="launcher_example_title">Ausprobieren</string>
     <string name="action_watchnow">Jetzt ansehen</string>
     <string name="action_watchlater">Später ansehen</string>
+    <string name="needs_youtube_permissions">Bitte YouTube-Zugriff erlauben</string>
 
 </resources>

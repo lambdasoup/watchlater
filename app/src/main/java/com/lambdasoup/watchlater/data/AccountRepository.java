@@ -29,6 +29,7 @@ import android.accounts.OperationCanceledException;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -89,7 +90,7 @@ public class AccountRepository implements SharedPreferences.OnSharedPreferenceCh
 	public void getToken(TokenCallback callback) {
 		if (!isAccountOk()) {
 			clear();
-			callback.onToken(true, null);
+			callback.onToken(true, null, null);
 			return;
 		}
 
@@ -97,7 +98,12 @@ public class AccountRepository implements SharedPreferences.OnSharedPreferenceCh
 				SCOPE_YOUTUBE, null, false, accountManagerFuture -> {
 					try {
 						Bundle result = accountManagerFuture.getResult();
-						callback.onToken(false, result.getString(AccountManager.KEY_AUTHTOKEN));
+						Intent intent = result.getParcelable(AccountManager.KEY_INTENT);
+						if (intent != null) {
+							callback.onToken(true, null, intent);
+							return;
+						}
+						callback.onToken(false, result.getString(AccountManager.KEY_AUTHTOKEN), null);
 					} catch (OperationCanceledException | IOException | AuthenticatorException e) {
 						throw new RuntimeException("could not get token", e);
 					}
@@ -119,7 +125,7 @@ public class AccountRepository implements SharedPreferences.OnSharedPreferenceCh
 	}
 
 	public interface TokenCallback {
-		void onToken(boolean hasError, String token);
+		void onToken(boolean hasError, String token, Intent intent);
 	}
 
 }

@@ -55,6 +55,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -256,6 +257,42 @@ public class AddActivityTest extends WatchLaterActivityTest {
 	}
 
 	@Test
+	public void should_start_intent_when_add_result_intent() {
+		Intent intent = new Intent("android.content.pm.action.REQUEST_PERMISSIONS");
+		intent.setPackage("com.google.android.packageinstaller");
+
+		intending(hasAction(intent.getAction()))
+				.respondWith(new Instrumentation.ActivityResult(
+						Activity.RESULT_CANCELED,
+						null));
+
+		AddViewModel.VideoAdd result = AddViewModel.VideoAdd.INTENT(intent);
+		videoAddLiveData.postValue(result);
+
+		String expectedText = rule.getActivity().getString(R.string.needs_youtube_permissions);
+		onView(withId(R.id.add_result)).check(matches(withText(expectedText)));
+		onView(withId(R.id.action_watchlater)).check(matches(isDisplayed()));
+
+		intended(hasAction(intent.getAction()));
+	}
+
+	@Test
+	public void should_retry_video_add_after_youtube_permissions_ok() {
+		Intent intent = new Intent("android.content.pm.action.REQUEST_PERMISSIONS");
+
+		intending(equalTo(intent))
+				.respondWith(new Instrumentation.ActivityResult(
+						Activity.RESULT_OK,
+						null));
+
+		AddViewModel.VideoAdd result = AddViewModel.VideoAdd.INTENT(intent);
+		videoAddLiveData.postValue(result);
+
+		onView(withId(R.id.action_watchnow)).check(matches(isDisplayed()));
+		verify(mockViewModel).watchLater();
+	}
+
+	@Test
 	public void should_show_result_success() {
 		AddViewModel.VideoAdd result = AddViewModel.VideoAdd.SUCCESS();
 		videoAddLiveData.postValue(result);
@@ -270,13 +307,11 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		Intent resultData = new Intent();
 		Instrumentation.ActivityResult result =
 				new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
-		intending(toPackage("com.android.packageinstaller")).respondWith(result);
+		intending(hasAction("android.content.pm.action.REQUEST_PERMISSIONS")).respondWith(result);
 
 		onView(withText(R.string.add_permissions_grant)).perform(click());
 
-		intended(allOf(
-				hasAction("android.content.pm.action.REQUEST_PERMISSIONS"),
-				toPackage("com.android.packageinstaller")));
+		intended(hasAction("android.content.pm.action.REQUEST_PERMISSIONS"));
 	}
 
 	@Test

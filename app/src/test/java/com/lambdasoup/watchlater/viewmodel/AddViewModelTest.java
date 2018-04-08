@@ -26,6 +26,7 @@ import android.accounts.Account;
 import android.arch.core.executor.testing.InstantTaskExecutorRule;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Intent;
 import android.net.Uri;
 
 import com.lambdasoup.watchlater.WatchLaterApplication;
@@ -170,8 +171,8 @@ public class AddViewModelTest {
 	}
 
 	@Test
-	public void should_error_when_token_has_error() {
-		viewModel.onToken(true, null);
+	public void should_error_when_token_result_has_error() {
+		viewModel.onToken(true, null, null);
 
 		AddViewModel.VideoAdd videoAdd = viewModel.getVideoAdd().getValue();
 		assertThat(videoAdd).isNotNull();
@@ -179,9 +180,20 @@ public class AddViewModelTest {
 		assertThat(videoAdd.errorType).isEqualTo(AddViewModel.VideoAdd.ErrorType.NO_ACCOUNT);
 	}
 
+	@Test
+	public void should_intent_when_token_result_has_intent() {
+		Intent intent = mock(Intent.class);
+		viewModel.onToken(true, null, intent);
+
+		AddViewModel.VideoAdd videoAdd = viewModel.getVideoAdd().getValue();
+		assertThat(videoAdd).isNotNull();
+		assertThat(videoAdd.state).isEqualTo(AddViewModel.VideoAdd.State.INTENT);
+		assertThat(videoAdd.intent).isEqualTo(intent);
+	}
+
 	@Test(expected = IllegalStateException.class)
 	public void should_throw_when_token_but_no_videoid() {
-		viewModel.onToken(false, "test");
+		viewModel.onToken(false, "test", null);
 	}
 
 	@Test
@@ -190,7 +202,7 @@ public class AddViewModelTest {
 		when(videoIdParser.parseVideoId(uri)).thenReturn("video-id");
 		viewModel.setVideoUri(uri);
 
-		viewModel.onToken(false, "token");
+		viewModel.onToken(false, "token", null);
 
 		verify(youtubeRepository).addVideo("video-id", "token", viewModel);
 	}

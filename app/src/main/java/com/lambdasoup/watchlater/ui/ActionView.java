@@ -58,6 +58,7 @@ public class ActionView extends LinearLayout implements View.OnClickListener {
 			case IDLE:
 			case ERROR:
 			case SUCCESS:
+			case INTENT:
 				setProgress(false);
 				break;
 		}

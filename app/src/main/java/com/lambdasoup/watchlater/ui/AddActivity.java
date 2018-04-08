@@ -51,14 +51,15 @@ public class AddActivity extends WatchLaterActivity implements ActionView.Action
 
 	private static final String TAG = WatchLaterActivity.class.getName();
 
-	private static final int                        PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
-	private static final int                        REQUEST_ACCOUNT                  = 1;
-	private static final String                     ACCOUNT_TYPE_GOOGLE              = "com.google";
+	private static final int PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
+	private static final int REQUEST_ACCOUNT = 1;
+	private static final int REQUEST_ACCOUNT_INTENT = 2;
+	private static final String ACCOUNT_TYPE_GOOGLE = "com.google";
 
 	private ActionView actionView;
 	private PermissionsView permissionsView;
 	private AddViewModel viewModel;
-	private VideoView    videoView;
+	private VideoView videoView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +106,10 @@ public class AddActivity extends WatchLaterActivity implements ActionView.Action
 			throw new IllegalArgumentException("add status should never be null");
 		}
 
+		if (videoAdd.state == AddViewModel.VideoAdd.State.INTENT) {
+			startActivityForResult(videoAdd.intent, REQUEST_ACCOUNT_INTENT);
+		}
+
 		actionView.setState(videoAdd.state);
 	}
 
@@ -113,6 +118,10 @@ public class AddActivity extends WatchLaterActivity implements ActionView.Action
 		switch (requestCode) {
 			case REQUEST_ACCOUNT:
 				onRequestAccountResult(resultCode, data);
+				return;
+
+			case REQUEST_ACCOUNT_INTENT:
+				onRequestAccountIntentResult(resultCode);
 				return;
 		}
 		super.onActivityResult(requestCode, resultCode, data);
@@ -124,6 +133,13 @@ public class AddActivity extends WatchLaterActivity implements ActionView.Action
 				String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
 				String type = data.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
 				viewModel.setAccount(new Account(name, type));
+		}
+	}
+
+	private void onRequestAccountIntentResult(int resultCode) {
+		switch (resultCode) {
+			case Activity.RESULT_OK:
+				viewModel.watchLater();
 		}
 	}
 

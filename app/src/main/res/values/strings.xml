@@ -63,5 +63,6 @@
     <string name="launcher_example_title">Try it out!</string>
     <string name="action_watchnow">Watch now</string>
     <string name="action_watchlater">Watch later</string>
+    <string name="needs_youtube_permissions">Please confirm YouTube permission request</string>
 
 </resources>

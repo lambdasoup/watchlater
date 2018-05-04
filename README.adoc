@@ -1,15 +1,11 @@
-Watch Later
-===========
+= Watch Later
 
 image:https://raw.githubusercontent.com/lambdasoup/watchlater/master/web_hi_res_512.png["app icon",width=128, height=128]
 
 Watch Later is an Android app which lets you add videos to your Watch Later list instead of watching them now.
 
-YouTube API key
----------------
-This app needs a YouYube API key. For convenience, the file resource file `values/api.xml` is in .gitignore to put the key in there.
+== YouTube API key
+This app needs a YouYube API key. For convenience, the file resource file `values/apikey.xml` is in .gitignore to put the key in there.
 
-License
--------
-
+== License
 This app is licensed under GPL3+

@@ -23,11 +23,12 @@
 package com.lambdasoup.watchlater.viewmodel;
 
 import android.accounts.Account;
-import android.arch.core.executor.testing.InstantTaskExecutorRule;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Intent;
 import android.net.Uri;
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.lambdasoup.watchlater.WatchLaterApplication;
 import com.lambdasoup.watchlater.data.AccountRepository;

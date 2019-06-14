@@ -23,9 +23,10 @@
 package com.lambdasoup.watchlater.ui;
 
 import android.app.Instrumentation;
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
-import android.support.test.InstrumentationRegistry;
+
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.test.InstrumentationRegistry;
 
 import com.lambdasoup.watchlater.WatchLaterApplication;
 

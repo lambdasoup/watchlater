@@ -22,16 +22,17 @@
 
 package com.lambdasoup.watchlater.ui;
 
-import android.arch.lifecycle.Observer;
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
+
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 
 import com.lambdasoup.watchlater.R;
 import com.lambdasoup.watchlater.viewmodel.AddViewModel;
 
-public class ResultView extends android.support.v7.widget.AppCompatTextView
+public class ResultView extends androidx.appcompat.widget.AppCompatTextView
 		implements Observer<AddViewModel.VideoAdd> {
 
 	public ResultView(Context context, AttributeSet attrs) {

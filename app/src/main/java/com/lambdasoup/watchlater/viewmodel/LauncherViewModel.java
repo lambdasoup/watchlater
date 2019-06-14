@@ -22,7 +22,7 @@
 
 package com.lambdasoup.watchlater.viewmodel;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 
 import com.lambdasoup.watchlater.WatchLaterApplication;
 import com.lambdasoup.watchlater.data.IntentResolverRepository;

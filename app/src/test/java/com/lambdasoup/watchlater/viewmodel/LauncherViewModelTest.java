@@ -22,8 +22,8 @@
 
 package com.lambdasoup.watchlater.viewmodel;
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule;
-import android.arch.lifecycle.LiveData;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.lifecycle.LiveData;
 
 import com.lambdasoup.watchlater.WatchLaterApplication;
 import com.lambdasoup.watchlater.data.IntentResolverRepository;

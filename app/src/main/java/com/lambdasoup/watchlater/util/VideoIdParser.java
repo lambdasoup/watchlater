@@ -23,7 +23,8 @@
 package com.lambdasoup.watchlater.util;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 import static android.net.Uri.decode;
 import static android.net.Uri.parse;

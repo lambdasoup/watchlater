@@ -22,7 +22,7 @@
 
 package com.lambdasoup.watchlater.viewmodel;
 
-import android.arch.lifecycle.AndroidViewModel;
+import androidx.lifecycle.AndroidViewModel;
 
 import com.lambdasoup.watchlater.WatchLaterApplication;
 

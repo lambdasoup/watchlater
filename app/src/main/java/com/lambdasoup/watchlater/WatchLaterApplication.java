@@ -23,10 +23,11 @@
 package com.lambdasoup.watchlater;
 
 import android.app.Application;
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
-import android.arch.lifecycle.ViewModelProviders;
-import android.support.annotation.VisibleForTesting;
+
+import androidx.annotation.VisibleForTesting;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.lambdasoup.watchlater.data.AccountRepository;
 import com.lambdasoup.watchlater.data.IntentResolverRepository;

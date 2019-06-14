@@ -23,11 +23,12 @@
 package com.lambdasoup.watchlater.ui;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+
+import androidx.annotation.Nullable;
 
 import com.lambdasoup.watchlater.R;
 import com.lambdasoup.watchlater.viewmodel.AddViewModel;

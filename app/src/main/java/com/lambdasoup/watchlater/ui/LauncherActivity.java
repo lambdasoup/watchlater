@@ -27,12 +27,13 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.Toolbar;
 
 import com.lambdasoup.watchlater.R;
 import com.lambdasoup.watchlater.data.IntentResolverRepository;

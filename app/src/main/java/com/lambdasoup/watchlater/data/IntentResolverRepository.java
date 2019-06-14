@@ -22,13 +22,14 @@
 
 package com.lambdasoup.watchlater.data;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 public class IntentResolverRepository {
 

@@ -27,8 +27,8 @@ def version_minor = 0
 def version_patch = 2
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.0'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -38,7 +38,7 @@ android {
     defaultConfig {
         applicationId "com.lambdasoup.watchlater"
         minSdkVersion 19
-        targetSdkVersion 27
+        targetSdkVersion 29
         versionCode version_major * 10000 + version_minor * 100 + version_patch * 1
         versionName "$version_major.$version_minor.$version_patch"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

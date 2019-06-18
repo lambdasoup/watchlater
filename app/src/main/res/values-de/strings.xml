@@ -33,6 +33,7 @@
     <string name="error_no_account">Kein Konto ausgewählt</string>
     <string name="error_youtube_player_missing">Kann YouYube-App nicht starten. Ist die App installiert?</string>
     <string name="menu_help">Hilfe</string>
+    <string name="menu_store">Bewerten &amp; Teilen</string>
     <string name="title_activity_help">Hilfe</string>
     <string name="no_youtube_settings_activity">Kann YouTube-Einstellungen nicht starten. Ist die App installiert?</string>
     <string name="no_youtube_installed">The YouTube app is not installed.</string>

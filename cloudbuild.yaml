@@ -43,7 +43,7 @@ steps:
 #
 - name: 'gcr.io/$PROJECT_ID/android:29'
   id: build
-  args: ["./gradlew", "assembleDebug", "lint"]
+  args: ["./gradlew", "assembleDebug", "lint", "test"]
   env:
     - 'TERM=dumb'
     - 'JAVA_TOOL_OPTIONS="-Xmx3g"'

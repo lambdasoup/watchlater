@@ -43,6 +43,10 @@ android {
         versionName "$version_major.$version_minor.$version_patch"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    lintOptions {
+        warningsAsErrors true
+    }
 }
 
 dependencies {
@@ -56,7 +60,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
-    debugImplementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation "androidx.annotation:annotation:$androidannotationsVersion"
     implementation 'com.google.android.material:material:1.0.0'

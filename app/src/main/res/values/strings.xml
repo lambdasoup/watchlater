@@ -38,6 +38,7 @@
     <string name="error_no_account">No account set</string>
     <string name="error_youtube_player_missing">Cannot launch the YouTube app: it is probably not installed on your device.</string>
     <string name="menu_help">Help</string>
+    <string name="menu_store">Rate &amp; Share</string>
     <string name="title_activity_help">Help</string>
     <string name="no_youtube_settings_activity">Could not open settings for YouTube. it is probably not installed on your device.</string>
     <string name="no_youtube_installed">The YouTube app is not installed.</string>

@@ -1,23 +1,23 @@
 /*
- *   Copyright (c) 2015 - 2017
+ * Copyright (c) 2015 - 2019
  *
- *   Maximilian Hille <mh@lambdasoup.com>
- *   Juliane Lehmann <jl@lambdasoup.com>
+ * Maximilian Hille <mh@lambdasoup.com>
+ * Juliane Lehmann <jl@lambdasoup.com>
  *
- *   This file is part of Watch Later.
+ * This file is part of Watch Later.
  *
- *   Watch Later is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
+ * Watch Later is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *   Watch Later is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
+ * Watch Later is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *   You should have received a copy of the GNU General Public License
- *   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.lambdasoup.watchlater.ui;
@@ -38,9 +38,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Lifecycle;
 
+import com.lambdasoup.watchlater.BuildConfig;
 import com.lambdasoup.watchlater.R;
 import com.lambdasoup.watchlater.viewmodel.AddViewModel;
 
@@ -49,8 +51,6 @@ import static android.widget.Toast.LENGTH_SHORT;
 
 
 public class AddActivity extends WatchLaterActivity implements ActionView.ActionListener {
-
-	private static final String TAG = WatchLaterActivity.class.getName();
 
 	private static final int PERMISSIONS_REQUEST_GET_ACCOUNTS = 100;
 	private static final int REQUEST_ACCOUNT = 1;
@@ -129,18 +129,16 @@ public class AddActivity extends WatchLaterActivity implements ActionView.Action
 	}
 
 	private void onRequestAccountResult(int resultCode, Intent data) {
-		switch (resultCode) {
-			case Activity.RESULT_OK:
-				String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-				String type = data.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
-				viewModel.setAccount(new Account(name, type));
+        if (resultCode == Activity.RESULT_OK) {
+            String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+            String type = data.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
+            viewModel.setAccount(new Account(name, type));
 		}
 	}
 
 	private void onRequestAccountIntentResult(int resultCode) {
-		switch (resultCode) {
-			case Activity.RESULT_OK:
-				viewModel.watchLater();
+        if (resultCode == Activity.RESULT_OK) {
+            viewModel.watchLater();
 		}
 	}
 
@@ -166,7 +164,7 @@ public class AddActivity extends WatchLaterActivity implements ActionView.Action
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menu_about:
 				startActivity(new Intent(this, AboutActivity.class));
@@ -177,6 +175,9 @@ public class AddActivity extends WatchLaterActivity implements ActionView.Action
 			case R.id.menu_privacy:
 				startActivity(new Intent(Intent.ACTION_VIEW, parse("https://lambdasoup.com/privacypolicy-watchlater/")));
 				return true;
+            case R.id.menu_store:
+                startActivity(new Intent(Intent.ACTION_VIEW, parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)));
+                return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}

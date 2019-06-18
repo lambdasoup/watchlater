@@ -33,7 +33,6 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
-            elevation="4dp"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             tools:title="@string/app_name" />
@@ -52,7 +51,7 @@
             android:id="@+id/add_account"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="0dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin" />
 
         <com.lambdasoup.watchlater.ui.PermissionsView
@@ -60,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_marginEnd="0dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginTop="8dp"
             android:visibility="gone"

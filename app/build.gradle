@@ -28,7 +28,6 @@ def version_patch = 0
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '29.0.0'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -42,10 +41,6 @@ android {
         versionCode version_major * 10000 + version_minor * 100 + version_patch * 1
         versionName "$version_major.$version_minor.$version_patch"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    lintOptions {
-        warningsAsErrors true
     }
 }
 

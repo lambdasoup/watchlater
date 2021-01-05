@@ -58,7 +58,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation "androidx.annotation:annotation:$androidannotationsVersion"
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.2.1'
 
     def mockitoVersion = '2.28.2'
     def junitVersion = '4.12'

@@ -26,7 +26,7 @@
     tools:layout_width="match_parent"
     tools:parentTag="android.widget.LinearLayout">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/action_watchnow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/action_watchlater"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,6 +57,5 @@
             android:visibility="invisible" />
 
     </FrameLayout>
-
 
 </merge>

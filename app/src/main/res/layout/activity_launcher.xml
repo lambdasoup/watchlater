@@ -31,11 +31,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
-            elevation="4dp"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
             tools:title="@string/app_name" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -49,74 +48,83 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
-            android:divider="@drawable/divider_vertical"
             android:orientation="vertical">
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/launcher_youtube_action"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:orientation="vertical">
+                app:cardElevation="4dp"
+                app:contentPadding="8dp">
 
-                <TextView
-                    android:id="@+id/launcher_youtube_action_action_title"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/vertical_text_sep"
-                    android:layout_marginTop="@dimen/vertical_text_sep"
-                    android:text="@string/launcher_youtube_action_title"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Title" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/launcher_youtube_action_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/vertical_text_sep"
-                    android:layout_marginTop="@dimen/vertical_text_sep"
-                    android:text="@string/launcher_youtube_action_text" />
+                    <TextView
+                        android:id="@+id/launcher_youtube_action_action_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:text="@string/launcher_youtube_action_title"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 
-                <Button
-                    android:id="@+id/launcher_youtube_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/vertical_text_sep"
-                    android:text="@string/launcher_youtube_action_button" />
+                    <TextView
+                        android:id="@+id/launcher_youtube_action_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:text="@string/launcher_youtube_action_text" />
 
-            </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/launcher_youtube_button"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/launcher_youtube_action_button" />
 
+                </LinearLayout>
 
-            <LinearLayout
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/activity_vertical_margin"
-                android:orientation="vertical">
+                app:cardElevation="4dp"
+                app:contentPadding="8dp">
 
-                <TextView
-                    android:id="@+id/launcher_example_title"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/vertical_text_sep"
-                    android:layout_marginTop="@dimen/vertical_text_sep"
-                    android:text="@string/launcher_example_title"
-                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Title" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/launcher_example_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/vertical_text_sep"
-                    android:layout_marginTop="@dimen/vertical_text_sep"
-                    android:text="@string/launcher_example_text" />
+                    <TextView
+                        android:id="@+id/launcher_example_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:text="@string/launcher_example_title"
+                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 
-                <Button
-                    android:id="@+id/launcher_example_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/vertical_text_sep"
-                    android:text="@string/launcher_example_button" />
+                    <TextView
+                        android:id="@+id/launcher_example_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:text="@string/launcher_example_text" />
 
-            </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/launcher_example_button"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/launcher_example_button" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 

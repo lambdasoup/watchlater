@@ -22,19 +22,23 @@
 
 <resources>
 
-    <style name="Theme.WatchLater" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="Theme.WatchLater" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/mat_red_600</item>
-        <item name="colorPrimaryDark">@color/mat_red_700</item>
-        <item name="colorAccent">@color/mat_lightblue_600</item>
+        <item name="colorPrimaryVariant">@color/mat_red_600_dark</item>
+        <item name="colorSecondary">@color/mat_lightblue_600</item>
+        <item name="colorSecondaryVariant">@color/mat_lightblue_600_dark</item>
     </style>
 
     <color name="mat_lightblue_600">#039BE5</color>
+    <color name="mat_lightblue_600_dark">#006DB3</color>
     <color name="mat_green_600">#43A047</color>
     <color name="mat_red_600">#E53935</color>
-    <color name="mat_red_700">#D32F2F</color>
+    <color name="mat_red_600_dark">#AB000D</color>
+    <color name="mat_yellow_200_10p">#30fff59d</color>
 
     <color name="error_color">@color/mat_red_600</color>
     <color name="success_color">@color/mat_green_600</color>
+    <color name="cardview_highlight">@color/mat_yellow_200_10p</color>
 
     <!-- theme is a customized version of Theme.AppCompat.Dialog.MinWidth -->
     <style name="Theme.WatchLater.Add">

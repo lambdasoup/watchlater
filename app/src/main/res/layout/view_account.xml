@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~   Copyright (c) 2015 - 2017
   ~
   ~   Maximilian Hille <mh@lambdasoup.com>
@@ -22,10 +21,10 @@
   -->
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools"
-       tools:layout_height="wrap_content"
-       tools:layout_width="match_parent"
-       tools:parentTag="android.widget.LinearLayout">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:layout_height="wrap_content"
+    tools:layout_width="match_parent"
+    tools:parentTag="android.widget.LinearLayout">
 
     <TextView
         android:id="@+id/view_account_label"
@@ -33,13 +32,13 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        tools:text="@string/account_empty"/>
+        tools:text="@string/account_empty" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/view_account_set"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/account_set"/>
+        android:text="@string/account_set" />
 
 </merge>

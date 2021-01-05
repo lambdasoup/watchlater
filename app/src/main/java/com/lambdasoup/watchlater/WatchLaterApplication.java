@@ -1,33 +1,33 @@
 /*
- *   Copyright (c) 2015 - 2017
+ * Copyright (c) 2015 - 2021
  *
- *   Maximilian Hille <mh@lambdasoup.com>
- *   Juliane Lehmann <jl@lambdasoup.com>
+ * Maximilian Hille <mh@lambdasoup.com>
+ * Juliane Lehmann <jl@lambdasoup.com>
  *
- *   This file is part of Watch Later.
+ * This file is part of Watch Later.
  *
- *   Watch Later is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
+ * Watch Later is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *   Watch Later is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
+ * Watch Later is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *   You should have received a copy of the GNU General Public License
- *   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.lambdasoup.watchlater;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.lambdasoup.watchlater.data.AccountRepository;
 import com.lambdasoup.watchlater.data.IntentResolverRepository;
@@ -82,7 +82,7 @@ public class WatchLaterApplication extends Application {
 		this.viewModelProviderFactory = factory;
 	}
 
-	private static class WatchLaterFactory extends ViewModelProviders.DefaultFactory {
+	private static class WatchLaterFactory extends ViewModelProvider.AndroidViewModelFactory {
 
 		private final WatchLaterApplication application;
 
@@ -92,7 +92,8 @@ public class WatchLaterApplication extends Application {
 		}
 
 		@Override
-		public <T extends ViewModel> T create(Class<T> modelClass) {
+		@NonNull
+		public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
 			if (WatchLaterViewModel.class.isAssignableFrom(modelClass)) {
 				//noinspection TryWithIdenticalCatches
 				try {

@@ -1,23 +1,23 @@
 /*
- *   Copyright (c) 2015 - 2017
+ * Copyright (c) 2015 - 2021
  *
- *   Maximilian Hille <mh@lambdasoup.com>
- *   Juliane Lehmann <jl@lambdasoup.com>
+ * Maximilian Hille <mh@lambdasoup.com>
+ * Juliane Lehmann <jl@lambdasoup.com>
  *
- *   This file is part of Watch Later.
+ * This file is part of Watch Later.
  *
- *   Watch Later is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
+ * Watch Later is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *   Watch Later is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
+ * Watch Later is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *   You should have received a copy of the GNU General Public License
- *   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.lambdasoup.watchlater.ui;
@@ -29,10 +29,12 @@ import android.app.Instrumentation;
 import android.content.Intent;
 import android.net.Uri;
 
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
-import androidx.test.espresso.intent.rule.IntentsTestRule;
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.intent.Intents;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
-import androidx.test.runner.AndroidJUnit4;
 
 import com.lambdasoup.watchlater.R;
 import com.lambdasoup.watchlater.data.YoutubeRepository;
@@ -40,7 +42,6 @@ import com.lambdasoup.watchlater.viewmodel.AddViewModel;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -67,9 +68,6 @@ import static org.mockito.Mockito.when;
 @LargeTest
 public class AddActivityTest extends WatchLaterActivityTest {
 
-	@Rule
-	public final IntentsTestRule<AddActivity> rule = new IntentsTestRule<>(AddActivity.class, false, false);
-
 	private AddViewModel mockViewModel;
 	private MutableLiveData<Account> accountLiveData;
 	private MutableLiveData<AddViewModel.VideoInfo> videoInfoLiveData;
@@ -93,12 +91,15 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		setViewModel(mockViewModel);
 
 		intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=tntOCGkgt98"));
-		rule.launchActivity(intent);
+		Intents.init();
+		ActivityScenario<LauncherActivity> scenario =
+				ActivityScenario.launch(intent);
+		scenario.moveToState(Lifecycle.State.RESUMED);
 	}
 
 	@After
 	public void teardown() {
-		rule.finishActivity();
+		Intents.release();
 	}
 
 	@Test
@@ -111,8 +112,8 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		permissionNeededLiveData.postValue(true);
 
 		onView(withId(R.id.view_permissions_grant)).check(matches(isDisplayed()));
-		onView(withId(R.id.permission_title)).check(matches(withText(rule.getActivity().getString(R.string.add_permissions_description))));
-		onView(withId(R.id.permission_information)).check(matches(withText(rule.getActivity().getString(R.string.add_permissions_rationale))));
+		onView(withId(R.id.permission_title)).check(matches(withText(R.string.add_permissions_description)));
+		onView(withId(R.id.permission_information)).check(matches(withText(R.string.add_permissions_rationale)));
 	}
 
 	@Test
@@ -129,7 +130,7 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		accountLiveData.postValue(null);
 
 		onView(withId(R.id.view_account_set)).check(matches(isDisplayed()));
-		onView(withId(R.id.view_account_label)).check(matches(withText(rule.getActivity().getString(R.string.account_empty))));
+		onView(withId(R.id.view_account_label)).check(matches(withText(R.string.account_empty)));
 	}
 
 	@Test
@@ -168,8 +169,8 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		AddViewModel.VideoInfo videoInfo = new AddViewModel.VideoInfo(AddViewModel.VideoInfo.State.ERROR, null, YoutubeRepository.ErrorType.NETWORK);
 		videoInfoLiveData.postValue(videoInfo);
 
-		onView(withId(R.id.reason_title)).check(matches(withText(rule.getActivity().getString(R.string.video_error_title))));
-		onView(withId(R.id.reason)).check(matches(withText(rule.getActivity().getString(R.string.error_network))));
+		onView(withId(R.id.reason_title)).check(matches(withText(R.string.video_error_title)));
+		onView(withId(R.id.reason)).check(matches(withText(R.string.error_network)));
 	}
 
 	@Test
@@ -177,8 +178,8 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		AddViewModel.VideoInfo videoInfo = new AddViewModel.VideoInfo(AddViewModel.VideoInfo.State.ERROR, null, YoutubeRepository.ErrorType.VIDEO_NOT_FOUND);
 		videoInfoLiveData.postValue(videoInfo);
 
-		onView(withId(R.id.reason_title)).check(matches(withText(rule.getActivity().getString(R.string.video_error_title))));
-		onView(withId(R.id.reason)).check(matches(withText(rule.getActivity().getString(R.string.error_video_not_found))));
+		onView(withId(R.id.reason_title)).check(matches(withText(R.string.video_error_title)));
+		onView(withId(R.id.reason)).check(matches(withText(R.string.error_video_not_found)));
 	}
 
 	@Test
@@ -186,8 +187,8 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		AddViewModel.VideoInfo videoInfo = new AddViewModel.VideoInfo(AddViewModel.VideoInfo.State.ERROR, null, YoutubeRepository.ErrorType.ALREADY_IN_PLAYLIST);
 		videoInfoLiveData.postValue(videoInfo);
 
-		onView(withId(R.id.reason_title)).check(matches(withText(rule.getActivity().getString(R.string.video_error_title))));
-		String expectedText = rule.getActivity().getString(R.string.could_not_load, YoutubeRepository.ErrorType.ALREADY_IN_PLAYLIST.toString());
+		onView(withId(R.id.reason_title)).check(matches(withText(R.string.video_error_title)));
+		String expectedText = getString(R.string.could_not_load, YoutubeRepository.ErrorType.ALREADY_IN_PLAYLIST.toString());
 		onView(withId(R.id.reason)).check(matches(withText(expectedText)));
 	}
 
@@ -225,7 +226,7 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		AddViewModel.VideoAdd result = AddViewModel.VideoAdd.ERROR(AddViewModel.VideoAdd.ErrorType.YOUTUBE_ALREADY_IN_PLAYLIST);
 		videoAddLiveData.postValue(result);
 
-		String expectedText = rule.getActivity().getString(R.string.could_not_add, rule.getActivity().getString(R.string.error_already_in_playlist));
+		String expectedText = getString(R.string.could_not_add, getString(R.string.error_already_in_playlist));
 		onView(withId(R.id.add_result)).check(matches(withText(expectedText)));
 	}
 
@@ -234,7 +235,7 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		AddViewModel.VideoAdd result = AddViewModel.VideoAdd.ERROR(AddViewModel.VideoAdd.ErrorType.NO_ACCOUNT);
 		videoAddLiveData.postValue(result);
 
-		String expectedText = rule.getActivity().getString(R.string.could_not_add, rule.getActivity().getString(R.string.error_no_account));
+		String expectedText = getString(R.string.could_not_add, getString(R.string.error_no_account));
 		onView(withId(R.id.add_result)).check(matches(withText(expectedText)));
 	}
 
@@ -243,7 +244,7 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		AddViewModel.VideoAdd result = AddViewModel.VideoAdd.ERROR(AddViewModel.VideoAdd.ErrorType.NO_PERMISSION);
 		videoAddLiveData.postValue(result);
 
-		String expectedText = rule.getActivity().getString(R.string.could_not_add, rule.getActivity().getString(R.string.error_no_permission));
+		String expectedText = getString(R.string.could_not_add, getString(R.string.error_no_permission));
 		onView(withId(R.id.add_result)).check(matches(withText(expectedText)));
 	}
 
@@ -252,8 +253,8 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		AddViewModel.VideoAdd result = AddViewModel.VideoAdd.ERROR(AddViewModel.VideoAdd.ErrorType.OTHER);
 		videoAddLiveData.postValue(result);
 
-		String error = rule.getActivity().getString(R.string.error_general, AddViewModel.VideoAdd.ErrorType.OTHER.toString());
-		String expectedText = rule.getActivity().getString(R.string.could_not_add, error);
+		String error = getString(R.string.error_general, AddViewModel.VideoAdd.ErrorType.OTHER.toString());
+		String expectedText = getString(R.string.could_not_add, error);
 		onView(withId(R.id.add_result)).check(matches(withText(expectedText)));
 	}
 
@@ -270,7 +271,7 @@ public class AddActivityTest extends WatchLaterActivityTest {
 		AddViewModel.VideoAdd result = AddViewModel.VideoAdd.INTENT(intent);
 		videoAddLiveData.postValue(result);
 
-		String expectedText = rule.getActivity().getString(R.string.needs_youtube_permissions);
+		String expectedText = getString(R.string.needs_youtube_permissions);
 		onView(withId(R.id.add_result)).check(matches(withText(expectedText)));
 		onView(withId(R.id.action_watchlater)).check(matches(isDisplayed()));
 

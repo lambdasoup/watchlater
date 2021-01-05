@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~   Copyright (c) 2015 - 2017
+  ~ Copyright (c) 2015 - 2021
   ~
-  ~   Maximilian Hille <mh@lambdasoup.com>
-  ~   Juliane Lehmann <jl@lambdasoup.com>
+  ~ Maximilian Hille <mh@lambdasoup.com>
+  ~ Juliane Lehmann <jl@lambdasoup.com>
   ~
-  ~   This file is part of Watch Later.
+  ~ This file is part of Watch Later.
   ~
-  ~   Watch Later is free software: you can redistribute it and/or modify
-  ~   it under the terms of the GNU General Public License as published by
-  ~   the Free Software Foundation, either version 3 of the License, or
-  ~   (at your option) any later version.
+  ~ Watch Later is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
   ~
-  ~   Watch Later is distributed in the hope that it will be useful,
-  ~   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~   GNU General Public License for more details.
+  ~ Watch Later is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
   ~
-  ~   You should have received a copy of the GNU General Public License
-  ~   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <resources>
@@ -34,11 +34,9 @@
     <color name="mat_green_600">#43A047</color>
     <color name="mat_red_600">#E53935</color>
     <color name="mat_red_600_dark">#AB000D</color>
-    <color name="mat_yellow_200_10p">#30fff59d</color>
 
     <color name="error_color">@color/mat_red_600</color>
     <color name="success_color">@color/mat_green_600</color>
-    <color name="cardview_highlight">@color/mat_yellow_200_10p</color>
 
     <!-- theme is a customized version of Theme.AppCompat.Dialog.MinWidth -->
     <style name="Theme.WatchLater.Add">
@@ -74,7 +72,5 @@
 
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-
-    <dimen name="vertical_text_sep">6sp</dimen>
 
 </resources>

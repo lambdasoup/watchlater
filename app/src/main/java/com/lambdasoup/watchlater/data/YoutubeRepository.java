@@ -1,23 +1,23 @@
 /*
- *   Copyright (c) 2015 - 2017
+ * Copyright (c) 2015 - 2021
  *
- *   Maximilian Hille <mh@lambdasoup.com>
- *   Juliane Lehmann <jl@lambdasoup.com>
+ * Maximilian Hille <mh@lambdasoup.com>
+ * Juliane Lehmann <jl@lambdasoup.com>
  *
- *   This file is part of Watch Later.
+ * This file is part of Watch Later.
  *
- *   Watch Later is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
+ * Watch Later is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *   Watch Later is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
+ * Watch Later is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *   You should have received a copy of the GNU General Public License
- *   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.lambdasoup.watchlater.data;
@@ -128,7 +128,7 @@ public class YoutubeRepository {
 
 	}
 
-	@SuppressWarnings({"SameParameterValue", "unused"})
+	@SuppressWarnings("SameParameterValue")
 	public static class Videos {
 
 		final List<Item> items;
@@ -138,8 +138,8 @@ public class YoutubeRepository {
 		}
 
 		public static class Item {
-			public final String         id;
-			public final Snippet        snippet;
+			public final String id;
+			public final Snippet snippet;
 			public final ContentDetails contentDetails;
 
 			public Item(String id, Snippet snippet, ContentDetails contentDetails) {
@@ -186,7 +186,7 @@ public class YoutubeRepository {
 		}
 	}
 
-	@SuppressWarnings({"SameParameterValue", "unused"})
+	@SuppressWarnings("SameParameterValue")
 	static class PlaylistItem {
 		final Snippet snippet;
 
@@ -195,10 +195,10 @@ public class YoutubeRepository {
 		}
 
 		public static class Snippet {
-			public final String     title;
-			final        String     description;
-			final        String     playlistId;
-			final        ResourceId resourceId;
+			public final String title;
+			final String description;
+			final String playlistId;
+			final ResourceId resourceId;
 
 			Snippet(String playlistId, ResourceId resourceId, String title, String description) {
 				this.playlistId = playlistId;
@@ -219,7 +219,7 @@ public class YoutubeRepository {
 		}
 	}
 
-	@SuppressWarnings({"SameParameterValue", "unused"})
+	@SuppressWarnings("SameParameterValue")
 	static class YouTubeError {
 		final RootError error;
 
@@ -228,8 +228,8 @@ public class YoutubeRepository {
 		}
 
 		class RootError {
-			final int               code;
-			final String            message;
+			final int code;
+			final String message;
 			final List<ErrorDetail> errors;
 
 			public RootError(int code, String message, List<ErrorDetail> errors) {

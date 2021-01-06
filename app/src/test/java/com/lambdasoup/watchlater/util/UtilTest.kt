@@ -19,22 +19,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.lambdasoup.watchlater.util
 
-package com.lambdasoup.watchlater.ui;
+import com.google.common.truth.Truth.assertThat
+import org.junit.Test
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
+class UtilTest {
 
-import com.lambdasoup.watchlater.WatchLaterApplication;
-
-
-public abstract class WatchLaterActivity extends AppCompatActivity {
-
-    <T extends ViewModel> T getViewModel(Class<T> viewModelClass) {
-        WatchLaterApplication application = (WatchLaterApplication) getApplication();
-        ViewModelProvider.Factory factory = application.getViewModelProviderFactory();
-        return factory.create(viewModelClass);
+    @Test
+    fun test_format_duration() {
+        val actual = formatDuration("PT22H23M2S")
+        assertThat(actual).isEqualTo("22h 23m 2s")
     }
 
 }

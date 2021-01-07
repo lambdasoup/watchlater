@@ -36,13 +36,13 @@
     <string name="menu_store">Bewerten &amp; Teilen</string>
     <string name="title_activity_help">Hilfe</string>
     <string name="no_youtube_settings_activity">Kann YouTube-Einstellungen nicht starten. Ist die App installiert?</string>
-    <string name="no_youtube_installed">The YouTube app is not installed.</string>
+    <string name="no_youtube_installed">YouTube App ist nicht installiert.</string>
     <string name="menu_privacypolicy">Datenschutzerklärung</string>
     <string name="thumbnail_cd">Video-Vorschau-Bild</string>
     <string name="video_error_title">Konnte Video-Vorschau nicht laden</string>
     <string name="error_network">Netwerkfehler - Bitte die Verbindung überprüfen</string>
     <string name="error_general">Ein Fehler ist aufgetreten (%s)</string>
-    <string name="add_permissions_description">Dieser App benötigt Berechtigungen erteilt werden</string>
+    <string name="add_permissions_description">Diese App benötigt Berechtigungen</string>
     <string name="add_permissions_grant">Erteilen</string>
     <string name="error_no_permission">Berechtigungen fehlen</string>
     <string name="could_not_add">Konnte Video nicht hinzufügen: %s</string>

@@ -186,6 +186,7 @@ class AddActivity : WatchLaterActivity(), ActionView.ActionListener {
                 == PackageManager.PERMISSION_GRANTED)
     }
 
+    @Suppress("DEPRECATION")
     private fun newChooseAccountIntent(): Intent {
         val types = arrayOf(ACCOUNT_TYPE_GOOGLE)
         val title = getString(R.string.choose_account)

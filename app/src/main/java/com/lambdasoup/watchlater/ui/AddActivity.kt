@@ -36,7 +36,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Lifecycle
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
@@ -127,12 +126,6 @@ class AddActivity : WatchLaterActivity(), ActionView.ActionListener {
         super.onResume()
         val needsPermission = needsPermission()
         viewModel.setPermissionNeeded(needsPermission)
-
-        // Workaround for https://issuetracker.google.com/issues/65665621
-        val currentState = lifecycle.currentState
-        if (Build.VERSION.SDK_INT == 23 && currentState == Lifecycle.State.CREATED) {
-            onPermissionNeededChanged(needsPermission)
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

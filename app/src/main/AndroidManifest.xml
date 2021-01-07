@@ -26,9 +26,6 @@
     <!-- protection level normal -> granted automatically on install -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- for pre-23 -->
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
-
     <!-- for pre-26 -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 

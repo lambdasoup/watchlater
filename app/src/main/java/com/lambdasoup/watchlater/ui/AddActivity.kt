@@ -161,23 +161,18 @@ class AddActivity : WatchLaterActivity(), ActionView.ActionListener {
         startActivityForResult(intent, REQUEST_ACCOUNT)
     }
 
-    @TargetApi(23)
     private fun tryAcquireAccountsPermission() {
         requestPermissions(arrayOf(Manifest.permission.GET_ACCOUNTS), PERMISSIONS_REQUEST_GET_ACCOUNTS)
     }
 
     private fun needsPermission(): Boolean {
-        // below 23 permissions are granted at install time
-        if (Build.VERSION.SDK_INT < 23) {
-            return false
-        }
-
-        // below 26 we need GET_ACCOUNTS
         return if (Build.VERSION.SDK_INT < 26) {
+            // below 26 we need GET_ACCOUNTS
             !hasAccountsPermission()
-        } else false
-
-        // starting with O we don't need any permissions at runtime
+        } else {
+            // starting with O we don't need any permissions at runtime
+            false
+        }
     }
 
     @TargetApi(23)

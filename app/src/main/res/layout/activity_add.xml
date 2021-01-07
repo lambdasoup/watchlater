@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="4dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textAppearance="@style/TextAppearance.WatchLater.Result"
             android:visibility="gone"
             tools:background="@color/error_color"
             tools:text="Could not add video. Please check your network connection and try again."

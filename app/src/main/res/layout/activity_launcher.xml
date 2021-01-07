@@ -80,7 +80,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/launcher_youtube_button"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        style="?attr/borderlessButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/launcher_youtube_action_button" />
@@ -118,7 +118,7 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/launcher_example_button"
-                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        style="?attr/borderlessButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/launcher_example_button" />

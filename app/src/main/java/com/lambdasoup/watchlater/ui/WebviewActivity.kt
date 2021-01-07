@@ -37,7 +37,7 @@ abstract class WebviewActivity : WatchLaterActivity() {
         val actionBar = supportActionBar
                 ?: throw IllegalStateException("this activity must have an action bar")
         actionBar.setDisplayHomeAsUpEnabled(true)
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white_24dp)
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_close_24)
     }
 
     fun loadUrl(url: String?) {

@@ -36,7 +36,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/view_account_set"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/account_set" />

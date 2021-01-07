@@ -25,15 +25,51 @@
     <style name="Theme.WatchLater" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/mat_red_600</item>
         <item name="colorPrimaryVariant">@color/mat_red_600_dark</item>
+        <item name="colorPrimaryDark">@color/statusBar</item>
         <item name="colorSecondary">@color/mat_lightblue_600</item>
         <item name="colorSecondaryVariant">@color/mat_lightblue_600_dark</item>
+        <item name="android:colorBackground">@color/mat_card_window_background</item>
+        <item name="toolbarStyle">@style/Widget.WatchLater.Toolbar</item>
+        <item name="actionOverflowButtonStyle">@style/Widget.WatchLater.ActionButton.Overflow</item>
+        <item name="toolbarNavigationButtonStyle">@style/Widget.WatchLater.Toolbar.NavigationButton</item>
+        <item name="materialButtonStyle">@style/Widget.WatchLater.Button</item>
+        <item name="borderlessButtonStyle">@style/Widget.WatchLater.Button.TextButton</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.WatchLater.Button.TextButton</item>
     </style>
+
+    <style name="Widget.WatchLater.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
+    </style>
+
+    <style name="Widget.WatchLater.ActionButton.Overflow" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="Widget.WatchLater.Toolbar.NavigationButton" parent="@style/Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">@android:color/white</item>
+    </style>
+
+    <style name="Widget.WatchLater.Button" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">?attr/colorSecondary</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="Widget.WatchLater.Button.TextButton" parent="@style/Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="rippleColor">?attr/colorSecondary</item>
+    </style>
+
+    <style name="TextAppearance.WatchLater.Result" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+    
+    <color name="statusBar">@color/mat_red_600</color>
 
     <color name="mat_lightblue_600">#039BE5</color>
     <color name="mat_lightblue_600_dark">#006DB3</color>
     <color name="mat_green_600">#43A047</color>
     <color name="mat_red_600">#E53935</color>
     <color name="mat_red_600_dark">#AB000D</color>
+    <color name="mat_card_window_background">#F0F0F0</color>
 
     <color name="error_color">@color/mat_red_600</color>
     <color name="success_color">@color/mat_green_600</color>

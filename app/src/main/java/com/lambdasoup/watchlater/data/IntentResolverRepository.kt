@@ -24,13 +24,15 @@ package com.lambdasoup.watchlater.data
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 class IntentResolverRepository(context: Context) {
 
-    private val packageManager: PackageManager = context.packageManager
+    private val pm: PackageManager = context.packageManager
 
     private val _resolverState = MutableLiveData<ResolverState>()
 
@@ -38,9 +40,15 @@ class IntentResolverRepository(context: Context) {
         return _resolverState
     }
 
+    private val _resolverState2 = MutableLiveData<List<ResolvedApp>>()
+
+    fun getResolverState2(): LiveData<List<ResolvedApp>> {
+        return _resolverState2
+    }
+
     fun update() {
         val resolveIntent = Intent(Intent.ACTION_VIEW, Uri.parse(EXAMPLE_URI))
-        val resolveInfo = packageManager.resolveActivity(resolveIntent, PackageManager.MATCH_DEFAULT_ONLY)
+        val resolveInfo = pm.resolveActivity(resolveIntent, PackageManager.MATCH_ALL)
         when (resolveInfo?.activityInfo?.name) {
             ACTIVITY_YOUTUBE -> {
 
@@ -53,11 +61,26 @@ class IntentResolverRepository(context: Context) {
                 _resolverState.setValue(ResolverState.OK)
             }
         }
+
+        val queryIntentActivities = pm.queryIntentActivities(resolveIntent, PackageManager.MATCH_ALL)
+        _resolverState2.value = queryIntentActivities.map(this::buildResolvedApp)
+    }
+
+    private fun buildResolvedApp(info: ResolveInfo): ResolvedApp {
+        return ResolvedApp(
+                name = info.loadLabel(pm),
+                icon = info.loadIcon(pm),
+        )
     }
 
     enum class ResolverState {
         OK, YOUTUBE_ONLY
     }
+
+    data class ResolvedApp(
+            val name: CharSequence,
+            val icon: Drawable,
+    )
 
     companion object {
         private const val ACTIVITY_YOUTUBE = "com.google.android.youtube.UrlActivity"

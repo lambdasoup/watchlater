@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~   Copyright (c) 2015 - 2017
+  ~ Copyright (c) 2015 - 2021
   ~
-  ~   Maximilian Hille <mh@lambdasoup.com>
-  ~   Juliane Lehmann <jl@lambdasoup.com>
+  ~ Maximilian Hille <mh@lambdasoup.com>
+  ~ Juliane Lehmann <jl@lambdasoup.com>
   ~
-  ~   This file is part of Watch Later.
+  ~ This file is part of Watch Later.
   ~
-  ~   Watch Later is free software: you can redistribute it and/or modify
-  ~   it under the terms of the GNU General Public License as published by
-  ~   the Free Software Foundation, either version 3 of the License, or
-  ~   (at your option) any later version.
+  ~ Watch Later is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
   ~
-  ~   Watch Later is distributed in the hope that it will be useful,
-  ~   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~   GNU General Public License for more details.
+  ~ Watch Later is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
   ~
-  ~   You should have received a copy of the GNU General Public License
-  ~   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -87,15 +87,24 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data android:scheme="vnd.youtube"/>
-                <data android:scheme="vnd.youtube.launch"/>
+                <data android:scheme="vnd.youtube.launch" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.AboutActivity"
-            android:label="@string/title_activity_about"/>
+            android:label="@string/title_activity_about" />
         <activity
             android:name=".ui.HelpActivity"
-            android:label="@string/title_activity_help"/>
+            android:label="@string/title_activity_help" />
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data
+                android:host="www.youtube.com"
+                android:scheme="https" />
+        </intent>
+    </queries>
 
 </manifest>

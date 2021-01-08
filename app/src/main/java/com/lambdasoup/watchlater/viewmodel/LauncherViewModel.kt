@@ -28,6 +28,7 @@ class LauncherViewModel(application: WatchLaterApplication) : WatchLaterViewMode
     private val intentResolverRepository = application.intentResolverRepository
 
     val resolverState = intentResolverRepository.getResolverState()
+    val resolverState2 = intentResolverRepository.getResolverState2()
 
     fun update() {
         intentResolverRepository.update()

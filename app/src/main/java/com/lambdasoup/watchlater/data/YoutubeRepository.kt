@@ -62,6 +62,11 @@ class YoutubeRepository(context: Context) {
             }
 
             override fun success(result: Videos) {
+                if (result.items.isEmpty()) {
+                    callback.onVideoInfoResult(ErrorType.VideoNotFound, null)
+                    return
+                }
+
                 callback.onVideoInfoResult(null, result.items[0])
             }
         }

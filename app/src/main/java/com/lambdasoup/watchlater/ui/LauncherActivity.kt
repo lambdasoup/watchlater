@@ -47,8 +47,8 @@ class LauncherActivity : WatchLaterActivity() {
         setSupportActionBar(toolbar)
         viewModel = getViewModel(LauncherViewModel::class.java)
         viewModel.resolverState.observe(this, { resolverState: ResolverState -> onResolverStateChanged(resolverState) })
-        findViewById<View>(R.id.launcher_youtube_button).setOnClickListener { v: View? -> openYoutubeSettings() }
-        findViewById<View>(R.id.launcher_example_button).setOnClickListener { v: View? -> openExampleVideo() }
+        findViewById<View>(R.id.launcher_youtube_button).setOnClickListener { openYoutubeSettings() }
+        findViewById<View>(R.id.launcher_example_button).setOnClickListener { openExampleVideo() }
     }
 
     private fun onResolverStateChanged(resolverState: ResolverState) {

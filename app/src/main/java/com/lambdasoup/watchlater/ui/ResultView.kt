@@ -60,9 +60,9 @@ class ResultView @JvmOverloads constructor(
     private fun setResult(error: Boolean, msg: String) {
         visibility = VISIBLE
         if (error) {
-            setBackgroundColor(resources.getColor(R.color.error_color))
+            setBackgroundColor(resources.getColor(R.color.error_color, context.theme))
         } else {
-            setBackgroundColor(resources.getColor(R.color.success_color))
+            setBackgroundColor(resources.getColor(R.color.success_color, context.theme))
         }
         text = msg
     }

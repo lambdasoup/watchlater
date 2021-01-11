@@ -46,6 +46,17 @@ android {
     }
 
     buildTypes {
+        r8debug {
+            initWith buildTypes.debug
+
+            shrinkResources true
+            minifyEnabled true
+
+            proguardFiles getDefaultProguardFile(
+                    'proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+        }
+
         release {
             shrinkResources true
             minifyEnabled true

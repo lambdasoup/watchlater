@@ -25,11 +25,12 @@ import android.content.Context
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository.PlaylistItem.Snippet.ResourceId
+import com.squareup.moshi.JsonClass
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.*
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 import java.io.IOException
 
@@ -47,9 +48,10 @@ class YoutubeRepository(context: Context) {
             httpClient.networkInterceptors().add(loggingInterceptor)
         }
         apiKey = context.getString(R.string.youtube_api_key)
+        
         val retrofitBuilder = Retrofit.Builder()
                 .baseUrl(YOUTUBE_ENDPOINT)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create())
                 .client(httpClient.build())
         retrofit = retrofitBuilder.build()
         api = retrofit.create(YoutubeApi::class.java)
@@ -109,29 +111,83 @@ class YoutubeRepository(context: Context) {
         fun listVideos(@Query("id") id: String, @Query("key") apiKey: String): Call<Videos>
     }
 
-    class Videos(val items: List<Item>) {
-        class Item(val id: String, val snippet: Snippet, val contentDetails: ContentDetails) {
-            class Snippet(val title: String, val description: String, val thumbnails: Thumbnails) {
-                class Thumbnails(val medium: Thumbnail) {
-                    class Thumbnail(val url: String)
+    @JsonClass(generateAdapter = true)
+    data class Videos(
+            val items: List<Item>,
+    ) {
+
+        @JsonClass(generateAdapter = true)
+        data class Item(
+                val id: String,
+                val snippet: Snippet,
+                val contentDetails: ContentDetails,
+        ) {
+
+            @JsonClass(generateAdapter = true)
+            data class Snippet(
+                    val title: String,
+                    val description: String,
+                    val thumbnails: Thumbnails,
+            ) {
+
+                @JsonClass(generateAdapter = true)
+                data class Thumbnails(
+                        val medium: Thumbnail,
+                ) {
+
+                    @JsonClass(generateAdapter = true)
+                    data class Thumbnail(
+                            val url: String,
+                    )
                 }
             }
 
-            class ContentDetails(val duration: String)
+            @JsonClass(generateAdapter = true)
+            data class ContentDetails(
+                    val duration: String,
+            )
         }
     }
 
-    internal class PlaylistItem(val snippet: Snippet) {
-        class Snippet internal constructor(val playlistId: String, val resourceId: ResourceId, val title: String?, val description: String?) {
-            internal class ResourceId(val videoId: String?) {
-                val kind = "youtube#video"
-            }
+    @JsonClass(generateAdapter = true)
+    data class PlaylistItem(
+            val snippet: Snippet,
+    ) {
+
+        @JsonClass(generateAdapter = true)
+        data class Snippet(
+                val playlistId: String,
+                val resourceId: ResourceId,
+                                           val title: String?,
+                                           val description: String?,
+        ) {
+
+            @JsonClass(generateAdapter = true)
+            data class ResourceId(
+                    val videoId: String?,
+                    val kind: String = "youtube#video",
+            )
         }
     }
 
-    internal class YouTubeError(val error: RootError) {
-        internal inner class RootError(val code: Int, val message: String, val errors: List<ErrorDetail>?) {
-            internal inner class ErrorDetail(val domain: String, val reason: String, val message: String)
+    @JsonClass(generateAdapter = true)
+    data class YouTubeError(
+            val error: RootError,
+    ) {
+
+        @JsonClass(generateAdapter = true)
+        data class RootError(
+                val code: Int,
+                val message: String,
+                val errors: List<ErrorDetail>?,
+        ) {
+
+            @JsonClass(generateAdapter = true)
+            data class ErrorDetail(
+                    val domain: String,
+                    val reason: String,
+                    val message: String,
+            )
         }
     }
 

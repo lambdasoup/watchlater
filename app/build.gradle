@@ -22,6 +22,7 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 def version_major = 2
 def version_minor = 1
@@ -42,6 +43,17 @@ android {
         versionCode version_major * 10000 + version_minor * 100 + version_patch * 1
         versionName "$version_major.$version_minor.$version_patch"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            shrinkResources true
+            minifyEnabled true
+
+            proguardFiles getDefaultProguardFile(
+                    'proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+        }
     }
 }
 

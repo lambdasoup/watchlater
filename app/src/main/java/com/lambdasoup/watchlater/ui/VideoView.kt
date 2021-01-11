@@ -30,13 +30,14 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository.ErrorType
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos
 import com.lambdasoup.watchlater.util.formatDuration
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoInfo.*
-import com.squareup.picasso.Picasso
 
 class VideoView @JvmOverloads constructor(
         context: Context,
@@ -75,8 +76,9 @@ class VideoView @JvmOverloads constructor(
         val formatted: String = formatDuration(item.contentDetails.duration)
         duration.text = formatted
         val thumbnailView: ImageView = findViewById(R.id.thumbnail)
-        Picasso.with(context)
+        Glide.with(context)
                 .load(item.snippet.thumbnails.medium.url)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(thumbnailView)
     }
 

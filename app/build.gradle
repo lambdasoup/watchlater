@@ -36,6 +36,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
     defaultConfig {
         applicationId "com.lambdasoup.watchlater"
         minSdkVersion 23
@@ -84,6 +88,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     implementation "androidx.core:core-ktx:1.3.2"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
+    implementation 'androidx.activity:activity-ktx:1.1.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.preference:preference-ktx:1.1.1"
 

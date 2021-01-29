@@ -41,7 +41,7 @@ class WatchLaterApplication : Application() {
     lateinit var videoIdParser: VideoIdParser
 
     @VisibleForTesting
-    var viewModelProviderFactory: ViewModelProvider.Factory? = null
+    lateinit var viewModelProviderFactory: ViewModelProvider.Factory
 
     override fun onCreate() {
         super.onCreate()

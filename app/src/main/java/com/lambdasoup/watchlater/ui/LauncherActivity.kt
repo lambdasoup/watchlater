@@ -30,22 +30,26 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
+import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverState
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
 
-class LauncherActivity : WatchLaterActivity() {
+class LauncherActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: LauncherViewModel
+    val viewModel: LauncherViewModel by viewModels {
+        (applicationContext as WatchLaterApplication).viewModelProviderFactory
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        viewModel = getViewModel(LauncherViewModel::class.java)
         viewModel.resolverState.observe(this, { resolverState: ResolverState -> onResolverStateChanged(resolverState) })
         findViewById<View>(R.id.launcher_youtube_button).setOnClickListener { openYoutubeSettings() }
         findViewById<View>(R.id.launcher_example_button).setOnClickListener { openExampleVideo() }

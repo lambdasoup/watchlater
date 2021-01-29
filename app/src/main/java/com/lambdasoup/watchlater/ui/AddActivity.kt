@@ -35,18 +35,24 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
+import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoAdd
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoInfo
 
-class AddActivity : WatchLaterActivity(), ActionView.ActionListener {
+class AddActivity : AppCompatActivity(), ActionView.ActionListener {
+
+    val viewModel: AddViewModel by viewModels {
+        (applicationContext as WatchLaterApplication).viewModelProviderFactory
+    }
 
     private lateinit var actionView: ActionView
     private lateinit var permissionsView: PermissionsView
-    private lateinit var viewModel: AddViewModel
     private lateinit var videoView: VideoView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +69,6 @@ class AddActivity : WatchLaterActivity(), ActionView.ActionListener {
         actionView = findViewById(R.id.add_action)
         actionView.listener = this
         videoView = findViewById(R.id.add_video)
-        viewModel = getViewModel(AddViewModel::class.java)
         viewModel.getVideoAdd().observe(this, { videoAdd: VideoAdd -> onAddStatusChanged(videoAdd) })
         val resultView = findViewById<ResultView>(R.id.add_result)
         viewModel.getVideoAdd().observe(this, resultView)

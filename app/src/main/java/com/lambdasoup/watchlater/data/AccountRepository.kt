@@ -26,12 +26,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.os.Bundle
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import java.io.IOException
-import java.util.*
 
 class AccountRepository(context: Context?) : OnSharedPreferenceChangeListener {
 
@@ -65,30 +64,29 @@ class AccountRepository(context: Context?) : OnSharedPreferenceChangeListener {
         return account
     }
 
-    fun getToken(callback: TokenCallback) {
+    @WorkerThread
+    fun getAuthToken(): AuthTokenResult {
         if (!isAccountOk) {
             clear()
-            callback.onToken(true, null, null)
-            return
+            return AuthTokenResult.Error
         }
-        manager.getAuthToken(account.value,
-                SCOPE_YOUTUBE, null, false, { accountManagerFuture: AccountManagerFuture<Bundle> ->
-            try {
-                val result = accountManagerFuture.result
-                val intent = result.getParcelable<Intent>(AccountManager.KEY_INTENT)
-                if (intent != null) {
-                    callback.onToken(true, null, intent)
-                    return@getAuthToken
-                }
-                callback.onToken(false, result.getString(AccountManager.KEY_AUTHTOKEN), null)
-            } catch (e: OperationCanceledException) {
-                throw RuntimeException("could not get token", e)
-            } catch (e: IOException) {
-                throw RuntimeException("could not get token", e)
-            } catch (e: AuthenticatorException) {
-                throw RuntimeException("could not get token", e)
+
+        val future = manager.getAuthToken(account.value, SCOPE_YOUTUBE, null, false, null, null)
+
+        try {
+            val result = future.result
+            val intent = result.getParcelable<Intent>(AccountManager.KEY_INTENT)
+            if (intent != null) {
+                return AuthTokenResult.HasIntent(intent)
             }
-        }, null)
+            return AuthTokenResult.AuthToken(result.getString(AccountManager.KEY_AUTHTOKEN)!!)
+        } catch (e: OperationCanceledException) {
+            throw RuntimeException("could not get token", e)
+        } catch (e: IOException) {
+            throw RuntimeException("could not get token", e)
+        } catch (e: AuthenticatorException) {
+            throw RuntimeException("could not get token", e)
+        }
     }
 
     fun invalidateToken(token: String?) {
@@ -105,8 +103,10 @@ class AccountRepository(context: Context?) : OnSharedPreferenceChangeListener {
         load()
     }
 
-    interface TokenCallback {
-        fun onToken(hasError: Boolean, token: String?, intent: Intent?)
+    sealed class AuthTokenResult {
+        object Error: AuthTokenResult()
+        data class AuthToken(val token: String): AuthTokenResult()
+        data class HasIntent(val intent: Intent): AuthTokenResult()
     }
 
     companion object {

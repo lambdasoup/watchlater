@@ -24,4 +24,5 @@ package com.lambdasoup.watchlater.viewmodel
 import androidx.lifecycle.AndroidViewModel
 import com.lambdasoup.watchlater.WatchLaterApplication
 
-abstract class WatchLaterViewModel internal constructor(application: WatchLaterApplication?) : AndroidViewModel(application!!)
+abstract class WatchLaterViewModel internal constructor(application: WatchLaterApplication)
+    : AndroidViewModel(application)

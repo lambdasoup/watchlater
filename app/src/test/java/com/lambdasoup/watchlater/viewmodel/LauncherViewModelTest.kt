@@ -22,11 +22,13 @@
 package com.lambdasoup.watchlater.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
+import com.lambdasoup.tea.TeaTestEngineRule
 import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverState
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Model
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -42,30 +44,37 @@ import org.mockito.junit.MockitoJUnitRunner
 class LauncherViewModelTest {
 
     @get:Rule
-    val rule: TestRule = InstantTaskExecutorRule()
+    val aacRule: TestRule = InstantTaskExecutorRule()
+    
+    @get:Rule
+    var teaRule: TestRule = TeaTestEngineRule()
 
     private val application: WatchLaterApplication = mock()
     private val intentResolverRepository: IntentResolverRepository = mock()
-    private val resolverState: LiveData<ResolverState> = mock()
+    private val liveData = MutableLiveData<ResolverState>()
 
     private lateinit var viewModel: LauncherViewModel
 
     @Before
     fun setup() {
         initMocks(this)
-        whenever(intentResolverRepository.getResolverState()).thenReturn(resolverState)
+        whenever(intentResolverRepository.getResolverState()).thenReturn(liveData)
         whenever(application.intentResolverRepository).thenReturn(intentResolverRepository)
         viewModel = LauncherViewModel(application)
     }
 
     @Test
     fun `should update intentresolverrepository`() {
-        viewModel.update()
+        viewModel.onResume()
         verify(intentResolverRepository).update()
     }
 
     @Test
     fun `should return intentresolverstate`() {
-        assertThat(viewModel.resolverState).isEqualTo(resolverState)
+        val resolverState: ResolverState = mock()
+        liveData.postValue(resolverState)
+
+        assertThat(viewModel.model.value)
+                .isEqualTo(Model(resolverState = resolverState))
     }
 }

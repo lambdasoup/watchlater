@@ -42,12 +42,10 @@ import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
-import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoAdd
-import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoInfo
 
 class AddActivity : AppCompatActivity(), ActionView.ActionListener {
 
-    val viewModel: AddViewModel by viewModels {
+    private val vm: AddViewModel by viewModels {
         (applicationContext as WatchLaterApplication).viewModelProviderFactory
     }
 
@@ -69,19 +67,34 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         actionView = findViewById(R.id.add_action)
         actionView.listener = this
         videoView = findViewById(R.id.add_video)
-        viewModel.getVideoAdd().observe(this, { videoAdd: VideoAdd -> onAddStatusChanged(videoAdd) })
         val resultView = findViewById<ResultView>(R.id.add_result)
-        viewModel.getVideoAdd().observe(this, resultView)
         val accountView = findViewById<AccountView>(R.id.add_account)
-        viewModel.account.observe(this, accountView)
         accountView!!.listener = object : AccountView.Listener {
             override fun onSetAccount() {
                 askForAccount()
             }
         }
-        viewModel.setVideoUri(intent.data!!)
-        viewModel.getVideoInfo().observe(this, { info: VideoInfo -> videoView.setVideoInfo(info) })
-        viewModel.getPermissionNeeded().observe(this, { permissionNeeded: Boolean -> onPermissionNeededChanged(permissionNeeded) })
+        vm.setVideoUri(intent.data!!)
+        vm.model.observe(this, {
+            videoView.setVideoInfo(it.videoInfo)
+
+            if (it.permissionNeeded != null) {
+                onPermissionNeededChanged(it.permissionNeeded)
+            }
+
+            accountView.onChanged(it.account)
+
+            resultView.onChanged(it.videoAdd)
+            actionView.setState(it.videoAdd, it.videoId)
+        })
+
+        vm.events.observe(this) { event ->
+            when (event) {
+                is AddViewModel.Event.OpenAuthIntent -> {
+                    startActivityForResult(event.intent, REQUEST_ACCOUNT_INTENT)
+                }
+            }
+        }
     }
 
     private fun onPermissionNeededChanged(permissionNeeded: Boolean) {
@@ -90,13 +103,6 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         } else {
             permissionsView.visibility = View.VISIBLE
         }
-    }
-
-    private fun onAddStatusChanged(videoAdd: VideoAdd) {
-        if (videoAdd is VideoAdd.HasIntent) {
-            startActivityForResult(videoAdd.intent, REQUEST_ACCOUNT_INTENT)
-        }
-        actionView.setState(videoAdd)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -117,20 +123,20 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         if (resultCode == RESULT_OK) {
             val name = data!!.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
             val type = data.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
-            viewModel.setAccount(Account(name, type))
+            vm.setAccount(Account(name, type))
         }
     }
 
     private fun onRequestAccountIntentResult(resultCode: Int) {
         if (resultCode == RESULT_OK) {
-            viewModel.watchLater()
+            vm.onAccountPermissionGranted()
         }
     }
 
     override fun onResume() {
         super.onResume()
         val needsPermission = needsPermission()
-        viewModel.setPermissionNeeded(needsPermission)
+        vm.setPermissionNeeded(needsPermission)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -215,8 +221,8 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         openWithYoutube()
     }
 
-    override fun onWatchLaterClicked() {
-        viewModel.watchLater()
+    override fun onWatchLaterClicked(videoId: String) {
+        vm.watchLater(videoId)
     }
 
     companion object {

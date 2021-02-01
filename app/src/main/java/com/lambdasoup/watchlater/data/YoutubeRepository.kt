@@ -29,7 +29,10 @@ import com.squareup.moshi.JsonClass
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.*
+import retrofit2.Call
+import retrofit2.Converter
+import retrofit2.Response
+import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 import java.io.IOException
@@ -48,7 +51,7 @@ class YoutubeRepository(context: Context) {
             httpClient.networkInterceptors().add(loggingInterceptor)
         }
         apiKey = context.getString(R.string.youtube_api_key)
-        
+
         val retrofitBuilder = Retrofit.Builder()
                 .baseUrl(YOUTUBE_ENDPOINT)
                 .addConverterFactory(MoshiConverterFactory.create())
@@ -57,50 +60,67 @@ class YoutubeRepository(context: Context) {
         api = retrofit.create(YoutubeApi::class.java)
     }
 
-    fun getVideoInfo(videoId: String, callback: VideoInfoCallback) {
-        val value = object : ErrorTranslatingCallback<Videos>(retrofit) {
-            override fun failure(errorType: ErrorType) {
-                callback.onVideoInfoResult(errorType, null)
-            }
+    private val youtubeErrorConverter: Converter<ResponseBody?, YouTubeError> =
+            retrofit.responseBodyConverter(YouTubeError::class.java, arrayOfNulls(0))
 
-            override fun success(result: Videos) {
-                if (result.items.isEmpty()) {
-                    callback.onVideoInfoResult(ErrorType.VideoNotFound, null)
-                    return
-                }
-
-                callback.onVideoInfoResult(null, result.items[0])
-            }
+    fun getVideoInfo(videoId: String): VideoInfoResult {
+        val response: Response<Videos>
+        try {
+            response = api.listVideos(videoId, apiKey).execute()
+        } catch (e: IOException) {
+            return VideoInfoResult.Error(ErrorType.Network)
         }
-        api.listVideos(videoId, apiKey).enqueue(value)
+
+        if (!response.isSuccessful) {
+            return VideoInfoResult.Error(translateError(response))
+        }
+
+        val videos = response.body() ?: return VideoInfoResult.Error(ErrorType.Other)
+
+        if (videos.items.isEmpty()) {
+            return VideoInfoResult.Error(ErrorType.VideoNotFound)
+        }
+
+        return VideoInfoResult.VideoInfo(videos.items[0])
     }
 
-    fun addVideo(videoId: String?, token: String, callback: AddVideoCallback) {
+    fun addVideo(videoId: String?, token: String): AddVideoResult {
         val resourceId = ResourceId(videoId)
         val snippet = PlaylistItem.Snippet("WL", resourceId, null, null)
         val item = PlaylistItem(snippet)
         val auth = "Bearer $token"
-        api.insertPlaylistItem(item, auth).enqueue(object : ErrorTranslatingCallback<PlaylistItem?>(retrofit) {
-            override fun failure(errorType: ErrorType) {
-                callback.onAddResult(errorType, token)
-            }
 
-            override fun success(result: PlaylistItem?) {
-                callback.onAddResult(null, token)
-            }
-        })
+        val response: Response<PlaylistItem?>
+        try {
+            response = api.insertPlaylistItem(item, auth).execute()
+        } catch (e: IOException) {
+            return AddVideoResult.Error(ErrorType.Network, token)
+        }
+
+        if (!response.isSuccessful) {
+            return AddVideoResult.Error(translateError(response), token)
+        }
+
+        return AddVideoResult.Success
     }
 
     enum class ErrorType {
         NeedAccess, Network, Other, PlaylistFull, InvalidToken, VideoNotFound, AlreadyInPlaylist
     }
 
-    interface VideoInfoCallback {
-        fun onVideoInfoResult(errorType: ErrorType?, item: Videos.Item?)
+    sealed class AddVideoResult {
+        object Success : AddVideoResult()
+        data class Error(
+                val type: ErrorType,
+                val token: String,
+        ) : AddVideoResult()
     }
 
-    interface AddVideoCallback {
-        fun onAddResult(errorType: ErrorType?, token: String?)
+    sealed class VideoInfoResult {
+        data class VideoInfo(val item: Videos.Item) : VideoInfoResult()
+        data class Error(
+                val type: ErrorType
+        ) : VideoInfoResult()
     }
 
     private interface YoutubeApi {
@@ -158,8 +178,8 @@ class YoutubeRepository(context: Context) {
         data class Snippet(
                 val playlistId: String,
                 val resourceId: ResourceId,
-                                           val title: String?,
-                                           val description: String?,
+                val title: String?,
+                val description: String?,
         ) {
 
             @JsonClass(generateAdapter = true)
@@ -191,71 +211,48 @@ class YoutubeRepository(context: Context) {
         }
     }
 
-    internal abstract class ErrorTranslatingCallback<T>(retrofit: Retrofit) : Callback<T> {
-        private val youTubeErrorConverter: Converter<ResponseBody?, YouTubeError> =
-                retrofit.responseBodyConverter(YouTubeError::class.java, arrayOfNulls(0))
-
-        private fun translateError(errorResponse: Response<T>): ErrorType {
-            val youtubeError: YouTubeError = try {
-                youTubeErrorConverter.convert(errorResponse.errorBody()!!)
-            } catch (e: IOException) {
-                return ErrorType.Other
-            } ?: return ErrorType.Other
-            var errorDetail = ""
-            if (youtubeError.error.errors != null
-                    && youtubeError.error.errors.isNotEmpty()) {
-                errorDetail = youtubeError.error.errors[0].reason
-            }
-            return when (errorResponse.code()) {
-                401 -> ErrorType.InvalidToken
-                403 -> {
-                    when (errorDetail) {
-                        DAILY_LIMIT_EXCEEDED_UNREG -> return ErrorType.InvalidToken
-                        PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS -> return ErrorType.PlaylistFull
-                    }
-                    ErrorType.NeedAccess
+    private fun <T> translateError(errorResponse: Response<T>): ErrorType {
+        val youtubeError: YouTubeError = try {
+            youtubeErrorConverter.convert(errorResponse.errorBody()!!)
+        } catch (e: IOException) {
+            return ErrorType.Other
+        } ?: return ErrorType.Other
+        var errorDetail = ""
+        if (youtubeError.error.errors != null
+                && youtubeError.error.errors.isNotEmpty()) {
+            errorDetail = youtubeError.error.errors[0].reason
+        }
+        return when (errorResponse.code()) {
+            401 -> ErrorType.InvalidToken
+            403 -> {
+                when (errorDetail) {
+                    DAILY_LIMIT_EXCEEDED_UNREG -> return ErrorType.InvalidToken
+                    PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS -> return ErrorType.PlaylistFull
                 }
-                404 -> {
-                    when (errorDetail) {
-                        VIDEO_NOT_FOUND -> return ErrorType.VideoNotFound
-                    }
-                    ErrorType.Other
-                }
-                409 -> {
-                    when (errorDetail) {
-                        VIDEO_ALREADY_IN_PLAYLIST -> return ErrorType.AlreadyInPlaylist
-                    }
-                    ErrorType.Other
-                }
-                else -> ErrorType.Other
+                ErrorType.NeedAccess
             }
-        }
-
-        override fun onFailure(call: Call<T>, t: Throwable) {
-            failure(ErrorType.Network)
-        }
-
-        override fun onResponse(call: Call<T>, response: Response<T>) {
-            if (response.isSuccessful) {
-                success(response.body()!!)
-            } else {
-                failure(translateError(response))
+            404 -> {
+                when (errorDetail) {
+                    VIDEO_NOT_FOUND -> return ErrorType.VideoNotFound
+                }
+                ErrorType.Other
             }
+            409 -> {
+                when (errorDetail) {
+                    VIDEO_ALREADY_IN_PLAYLIST -> return ErrorType.AlreadyInPlaylist
+                }
+                ErrorType.Other
+            }
+            else -> ErrorType.Other
         }
-
-        protected abstract fun failure(errorType: ErrorType)
-        protected abstract fun success(result: T)
-
-        companion object {
-            const val DAILY_LIMIT_EXCEEDED_UNREG = "dailyLimitExceededUnreg"
-            const val VIDEO_ALREADY_IN_PLAYLIST = "videoAlreadyInPlaylist"
-            const val PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos"
-            const val VIDEO_NOT_FOUND = "videoNotFound"
-        }
-
     }
 
     companion object {
         private const val YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3/"
+
+        const val DAILY_LIMIT_EXCEEDED_UNREG = "dailyLimitExceededUnreg"
+        const val VIDEO_ALREADY_IN_PLAYLIST = "videoAlreadyInPlaylist"
+        const val PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos"
+        const val VIDEO_NOT_FOUND = "videoNotFound"
     }
 }

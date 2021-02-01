@@ -73,6 +73,8 @@ android {
 }
 
 dependencies {
+    implementation project(':tea')
+    
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.11.0'
     implementation "com.squareup.moshi:moshi:1.11.0"
 
@@ -92,6 +94,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.preference:preference-ktx:1.1.1"
 
+    testImplementation project(':tea')
     testImplementation 'junit:junit:4.12'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
     testImplementation 'com.google.truth:truth:1.0'

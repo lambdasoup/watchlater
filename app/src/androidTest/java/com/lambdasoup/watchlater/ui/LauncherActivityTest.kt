@@ -25,7 +25,6 @@ import android.app.Activity
 import android.app.Instrumentation.ActivityResult
 import android.content.Intent
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView

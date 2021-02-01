@@ -33,20 +33,34 @@ class ActionView @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr), View.OnClickListener {
+) : LinearLayout(context, attrs, defStyleAttr) {
 
     var listener: ActionListener? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_action, this)
-        findViewById<View>(R.id.action_watchnow).setOnClickListener(this)
-        findViewById<View>(R.id.action_watchlater).setOnClickListener(this)
+    }
+    
+    private val watchNowButton = findViewById<View>(R.id.action_watchnow)
+    init {
+        watchNowButton.setOnClickListener { listener?.onWatchNowClicked() }
     }
 
-    fun setState(state: VideoAdd) {
+    private val watchLaterButton = findViewById<View>(R.id.action_watchlater)
+
+    fun setState(state: VideoAdd, videoId: String?) {
         when (state) {
             VideoAdd.Progress -> setProgress(true)
             else -> setProgress(false)
+        }
+
+        if (videoId != null) {
+            watchLaterButton.isEnabled = true
+            watchNowButton.isEnabled = true
+            watchLaterButton.setOnClickListener { listener?.onWatchLaterClicked(videoId) }
+        } else {
+            watchLaterButton.isEnabled = false
+            watchNowButton.isEnabled = false
         }
     }
 
@@ -55,15 +69,8 @@ class ActionView @JvmOverloads constructor(
         findViewById<View>(R.id.action_progress).visibility = if (progress) VISIBLE else INVISIBLE
     }
 
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.action_watchlater -> listener?.onWatchLaterClicked()
-            R.id.action_watchnow -> listener?.onWatchNowClicked()
-        }
-    }
-
     interface ActionListener {
         fun onWatchNowClicked()
-        fun onWatchLaterClicked()
+        fun onWatchLaterClicked(videoId: String)
     }
 }

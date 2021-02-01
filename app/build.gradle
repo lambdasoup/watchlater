@@ -95,7 +95,7 @@ dependencies {
     implementation "androidx.preference:preference-ktx:1.1.1"
 
     testImplementation project(':tea')
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.1'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
     testImplementation 'com.google.truth:truth:1.0'
     testImplementation 'org.mockito:mockito-inline:3.3.3'

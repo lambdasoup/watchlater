@@ -36,12 +36,13 @@ import androidx.appcompat.widget.Toolbar
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.WatchLaterApplication
-import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverState
+import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Event
 
 class LauncherActivity : AppCompatActivity() {
 
-    val viewModel: LauncherViewModel by viewModels {
+    private val vm: LauncherViewModel by viewModels {
         (applicationContext as WatchLaterApplication).viewModelProviderFactory
     }
 
@@ -50,22 +51,30 @@ class LauncherActivity : AppCompatActivity() {
         setContentView(R.layout.activity_launcher)
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        viewModel.resolverState.observe(this, { resolverState: ResolverState -> onResolverStateChanged(resolverState) })
-        findViewById<View>(R.id.launcher_youtube_button).setOnClickListener { openYoutubeSettings() }
-        findViewById<View>(R.id.launcher_example_button).setOnClickListener { openExampleVideo() }
+
+        vm.model.observe(this, { render(it) })
+        vm.events.observe(this, { event ->
+            when (event) {
+                Event.OpenYouTubeSettings -> openYoutubeSettings()
+                Event.OpenExample -> openExampleVideo()
+            }
+        })
     }
 
-    private fun onResolverStateChanged(resolverState: ResolverState) {
+    private fun render(model: LauncherViewModel.Model) {
+        findViewById<View>(R.id.launcher_youtube_button).setOnClickListener { vm.onYoutubeSettings() }
+        findViewById<View>(R.id.launcher_example_button).setOnClickListener { vm.onTryExample() }
+
         val view = findViewById<View>(R.id.launcher_youtube_action)
-        when (resolverState) {
-            ResolverState.OK -> view.visibility = View.GONE
-            ResolverState.YOUTUBE_ONLY -> view.visibility = View.VISIBLE
+        when (model.resolverState) {
+            IntentResolverRepository.ResolverState.OK -> view.visibility = View.GONE
+            IntentResolverRepository.ResolverState.YOUTUBE_ONLY -> view.visibility = View.VISIBLE
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.update()
+        vm.onResume()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

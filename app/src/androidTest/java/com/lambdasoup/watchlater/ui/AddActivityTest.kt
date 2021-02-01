@@ -42,6 +42,8 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.*
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos
@@ -57,10 +59,10 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations.initMocks
+import java.lang.Thread.sleep
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -288,6 +290,10 @@ class AddActivityTest : WatchLaterActivityTest() {
         vm.model.postValue(vm.model.value!!.copy(
                 videoAdd = VideoAdd.HasIntent(intent),
         ))
+        runOnUiThread {
+            vm.events.submit(Event.OpenAuthIntent(intent))
+        }
+        sleep(500)
 
         val expectedText = getString(R.string.needs_youtube_permissions)
         onView(withId(R.id.add_result)).check(matches(withText(expectedText)))
@@ -302,14 +308,13 @@ class AddActivityTest : WatchLaterActivityTest() {
                 .respondWith(ActivityResult(
                         Activity.RESULT_OK,
                         null))
+        
+        runOnUiThread {
+            vm.events.submit(Event.OpenAuthIntent(intent))
+        }
+        sleep(500)
 
-        vm.model.postValue(vm.model.value!!.copy(
-                videoAdd = VideoAdd.HasIntent(intent),
-        ))
-
-        onView(withId(R.id.action_watchnow)).check(matches(isDisplayed()))
-
-        verify(vm).watchLater(videoId)
+        verify(vm).onAccountPermissionGranted()
     }
 
     @Test

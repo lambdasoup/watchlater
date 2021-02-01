@@ -33,7 +33,9 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.intent.Intents.*
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
@@ -45,9 +47,9 @@ import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos.Item.ContentDetails
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos.Item.Snippet.Thumbnails.Thumbnail
+import com.lambdasoup.watchlater.util.EventSource
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
-import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoAdd
-import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoInfo
+import com.lambdasoup.watchlater.viewmodel.AddViewModel.*
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -55,53 +57,59 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.mockito.MockitoAnnotations.initMocks
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class AddActivityTest : WatchLaterActivityTest() {
 
-    private val mockViewModel: AddViewModel = mock()
-    private lateinit var accountLiveData: MutableLiveData<Account>
-    private lateinit var videoInfoLiveData: MutableLiveData<VideoInfo>
-    private lateinit var permissionNeededLiveData: MutableLiveData<Boolean>
-    private lateinit var videoAddLiveData: MutableLiveData<VideoAdd>
+    private val vm: AddViewModel = mock()
+    private val model = MutableLiveData<Model>()
+    private val events = EventSource<Event>()
+    
     private lateinit var intent: Intent
+    private val videoId = "test-video-id"
 
     @Before
     fun setup() {
         initMocks(this)
-        accountLiveData = MutableLiveData()
-        videoInfoLiveData = MutableLiveData()
-        permissionNeededLiveData = MutableLiveData()
-        videoAddLiveData = MutableLiveData()
-        whenever(mockViewModel.account).thenReturn(accountLiveData)
-        whenever(mockViewModel.getPermissionNeeded()).thenReturn(permissionNeededLiveData)
-        whenever(mockViewModel.getVideoAdd()).thenReturn(videoAddLiveData)
-        whenever(mockViewModel.getVideoInfo()).thenReturn(videoInfoLiveData)
-        setViewModel(mockViewModel)
+        model.postValue(Model(
+                videoId = videoId,
+                videoAdd = VideoAdd.Idle,
+                videoInfo = VideoInfo.Progress,
+                account = null,
+                permissionNeeded = null,
+                tokenRetried = false,
+        ))
+        events.clear()
+        whenever(vm.model).thenReturn(model)
+        whenever(vm.events).thenReturn(events)
+        setViewModel(vm)
         intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=tntOCGkgt98"))
-        init()
         val scenario = ActivityScenario.launch<LauncherActivity>(intent)
         scenario.moveToState(Lifecycle.State.RESUMED)
+        Intents.init()
     }
 
     @After
     fun teardown() {
-        release()
+        Intents.release()
     }
 
     @Test
     fun should_set_uri() {
-        verify(mockViewModel).setVideoUri(eq(Uri.parse("https://www.youtube.com/watch?v=tntOCGkgt98")))
+        verify(vm).setVideoUri(eq(Uri.parse("https://www.youtube.com/watch?v=tntOCGkgt98")))
     }
 
     @Test
     fun should_show_permission_needed_box() {
-        permissionNeededLiveData.postValue(true)
+        vm.model.postValue(
+                vm.model.value!!.copy(permissionNeeded = true)
+        )
+
         onView(withId(R.id.view_permissions_grant)).check(matches(isDisplayed()))
         onView(withId(R.id.permission_title)).check(matches(withText(R.string.add_permissions_description)))
         onView(withId(R.id.permission_information)).check(matches(withText(R.string.add_permissions_rationale)))
@@ -109,23 +117,33 @@ class AddActivityTest : WatchLaterActivityTest() {
 
     @Test
     fun should_not_show_permission_needed_box_after_clicking_grant_button() {
-        permissionNeededLiveData.postValue(true)
+        model.postValue(model.value?.copy(
+                permissionNeeded = true,
+        ))
         onView(withId(R.id.add_permissions)).perform(ViewActions.click())
-        permissionNeededLiveData.postValue(false)
+
+        model.postValue(model.value?.copy(
+                permissionNeeded = false,
+        ))
         onView(withId(R.id.add_permissions)).check(matches(Matchers.not(isDisplayed())))
     }
 
     @Test
     fun should_show_account_not_selected_box() {
-        accountLiveData.postValue(null)
+        model.postValue(model.value?.copy(
+                account = null,
+        ))
+
         onView(withId(R.id.view_account_set)).check(matches(isDisplayed()))
         onView(withId(R.id.view_account_label)).check(matches(withText(R.string.account_empty)))
     }
 
     @Test
     fun should_show_progress_circle_while_getting_video_information() {
-        val videoInfo = VideoInfo.Progress
-        videoInfoLiveData.postValue(videoInfo)
+        model.postValue(model.value?.copy(
+                videoInfo = VideoInfo.Progress,
+        ))
+
         onView(withId(R.id.video_progress)).check(matches(isDisplayed()))
     }
 
@@ -141,8 +159,12 @@ class AddActivityTest : WatchLaterActivityTest() {
         val snippet = Videos.Item.Snippet(expectedTitle, expectedDescription, thumbnails)
         val contentDetails = ContentDetails(givenDuration)
         val item = Videos.Item("123456789", snippet, contentDetails)
-        val videoInfo = VideoInfo.Loaded(item)
-        videoInfoLiveData.postValue(videoInfo)
+
+
+        model.postValue(model.value?.copy(
+                videoInfo = VideoInfo.Loaded(item),
+        ))
+
         onView(withId(R.id.title)).check(matches(withText(expectedTitle)))
         onView(withId(R.id.description)).check(matches(withText(expectedDescription)))
         onView(withId(R.id.duration)).check(matches(withText(expectedDuration)))
@@ -150,24 +172,30 @@ class AddActivityTest : WatchLaterActivityTest() {
 
     @Test
     fun should_show_network_error() {
-        val videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.Network)
-        videoInfoLiveData.postValue(videoInfo)
+        model.postValue(model.value!!.copy(
+                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.Network),
+        ))
+
         onView(withId(R.id.reason_title)).check(matches(withText(R.string.video_error_title)))
         onView(withId(R.id.reason)).check(matches(withText(R.string.error_network)))
     }
 
     @Test
     fun should_show_video_not_found_error() {
-        val videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.VideoNotFound)
-        videoInfoLiveData.postValue(videoInfo)
+        model.postValue(model.value!!.copy(
+                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.VideoNotFound),
+        ))
+
         onView(withId(R.id.reason_title)).check(matches(withText(R.string.video_error_title)))
         onView(withId(R.id.reason)).check(matches(withText(R.string.error_video_not_found)))
     }
 
     @Test
     fun should_show_default_error() {
-        val videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.AlreadyInPlaylist)
-        videoInfoLiveData.postValue(videoInfo)
+        model.postValue(model.value!!.copy(
+                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.AlreadyInPlaylist),
+        ))
+
         onView(withId(R.id.reason_title)).check(matches(withText(R.string.video_error_title)))
         val expectedText = getString(R.string.could_not_load, YoutubeRepository.ErrorType.AlreadyInPlaylist.toString())
         onView(withId(R.id.reason)).check(matches(withText(expectedText)))
@@ -175,16 +203,23 @@ class AddActivityTest : WatchLaterActivityTest() {
 
     @Test
     fun should_show_watch_buttons_on_default_error() {
-        val videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.Other)
-        videoInfoLiveData.postValue(videoInfo)
+        model.postValue(model.value!!.copy(
+                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.Other),
+        ))
+
         onView(withId(R.id.action_watchnow)).check(matches(isDisplayed()))
         onView(withId(R.id.action_watchlater)).check(matches(isDisplayed()))
     }
 
     @Test
     fun should_add_video() {
+        val videoId = "test-video-id"
+        vm.model.postValue(
+                vm.model.value!!.copy(videoId = videoId)
+        )
+
         onView(withId(R.id.action_watchlater)).perform(ViewActions.click())
-        verify(mockViewModel).watchLater()
+        verify(vm).watchLater(videoId)
     }
 
     @Test
@@ -192,7 +227,9 @@ class AddActivityTest : WatchLaterActivityTest() {
         val resultData = Intent()
         val result = ActivityResult(Activity.RESULT_OK, resultData)
         intending(toPackage("com.google.android.youtube")).respondWith(result)
+        
         onView(withId(R.id.action_watchnow)).perform(ViewActions.click())
+        
         intended(Matchers.allOf(
                 hasData(intent.data),
                 toPackage("com.google.android.youtube")))
@@ -200,32 +237,40 @@ class AddActivityTest : WatchLaterActivityTest() {
 
     @Test
     fun should_show_add_video_result_error_already_in_playlist() {
-        val result = VideoAdd.Error(VideoAdd.ErrorType.YoutubeAlreadyInPlaylist)
-        videoAddLiveData.postValue(result)
+        vm.model.postValue(
+                vm.model.value!!.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.YoutubeAlreadyInPlaylist))
+        )
+
         val expectedText = getString(R.string.could_not_add, getString(R.string.error_already_in_playlist))
         onView(withId(R.id.add_result)).check(matches(withText(expectedText)))
     }
 
     @Test
     fun should_show_add_video_result_error_no_account() {
-        val result = VideoAdd.Error(VideoAdd.ErrorType.NoAccount)
-        videoAddLiveData.postValue(result)
+        vm.model.postValue(
+                vm.model.value!!.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoAccount))
+        )
+
         val expectedText = getString(R.string.could_not_add, getString(R.string.error_no_account))
         onView(withId(R.id.add_result)).check(matches(withText(expectedText)))
     }
 
     @Test
     fun should_show_add_video_result_error_no_permission() {
-        val result = VideoAdd.Error(VideoAdd.ErrorType.NoPermission)
-        videoAddLiveData.postValue(result)
+        vm.model.postValue(
+                vm.model.value!!.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoPermission))
+        )
+
         val expectedText = getString(R.string.could_not_add, getString(R.string.error_no_permission))
         onView(withId(R.id.add_result)).check(matches(withText(expectedText)))
     }
 
     @Test
     fun should_show_add_video_result_error_default() {
-        val result = VideoAdd.Error(VideoAdd.ErrorType.Other)
-        videoAddLiveData.postValue(result)
+        vm.model.postValue(
+                vm.model.value!!.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other))
+        )
+
         val error = getString(R.string.error_general, VideoAdd.ErrorType.Other.toString())
         val expectedText = getString(R.string.could_not_add, error)
         onView(withId(R.id.add_result)).check(matches(withText(expectedText)))
@@ -239,8 +284,11 @@ class AddActivityTest : WatchLaterActivityTest() {
                 .respondWith(ActivityResult(
                         Activity.RESULT_CANCELED,
                         null))
-        val result = VideoAdd.HasIntent(intent)
-        videoAddLiveData.postValue(result)
+
+        vm.model.postValue(vm.model.value!!.copy(
+                videoAdd = VideoAdd.HasIntent(intent),
+        ))
+
         val expectedText = getString(R.string.needs_youtube_permissions)
         onView(withId(R.id.add_result)).check(matches(withText(expectedText)))
         onView(withId(R.id.action_watchlater)).check(matches(isDisplayed()))
@@ -254,22 +302,31 @@ class AddActivityTest : WatchLaterActivityTest() {
                 .respondWith(ActivityResult(
                         Activity.RESULT_OK,
                         null))
-        val result = VideoAdd.HasIntent(intent)
-        videoAddLiveData.postValue(result)
+
+        vm.model.postValue(vm.model.value!!.copy(
+                videoAdd = VideoAdd.HasIntent(intent),
+        ))
+
         onView(withId(R.id.action_watchnow)).check(matches(isDisplayed()))
-        verify(mockViewModel).watchLater()
+
+        verify(vm).watchLater(videoId)
     }
 
     @Test
     fun should_show_result_success() {
-        val result = VideoAdd.Success
-        videoAddLiveData.postValue(result)
+        vm.model.postValue(vm.model.value!!.copy(
+                videoAdd = VideoAdd.Success,
+        ))
+
         onView(withText(R.string.success_added_video)).check(matches(isDisplayed()))
     }
 
     @Test
     fun should_request_permissions() {
-        permissionNeededLiveData.postValue(true)
+        vm.model.postValue(vm.model.value!!.copy(
+                permissionNeeded = true,
+        ))
+
         val resultData = Intent()
         val result = ActivityResult(Activity.RESULT_OK, resultData)
         intending(IntentMatchers.hasAction("android.content.pm.action.REQUEST_PERMISSIONS")).respondWith(result)
@@ -285,6 +342,6 @@ class AddActivityTest : WatchLaterActivityTest() {
         val result = ActivityResult(Activity.RESULT_OK, resultData)
         intending(toPackage("android")).respondWith(result)
         onView(withText(R.string.account_set)).perform(ViewActions.click())
-        verify(mockViewModel).setAccount(ArgumentMatchers.eq(Account("hans@example.com", "example_account")))
+        verify(vm).setAccount(eq(Account("hans@example.com", "example_account")))
     }
 }

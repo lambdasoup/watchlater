@@ -25,6 +25,7 @@ import android.app.Activity
 import android.app.Instrumentation.ActivityResult
 import android.content.Intent
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
@@ -38,7 +39,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverState
+import com.lambdasoup.watchlater.util.EventSource
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Event
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Model
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -55,18 +59,23 @@ import org.mockito.Mockito.reset
 class LauncherActivityTest : WatchLaterActivityTest() {
 
     private val mockViewModel: LauncherViewModel = mock()
-
-    private lateinit var resolverStateLiveData: MutableLiveData<ResolverState>
+    
+    private val	model = MutableLiveData<Model>()
+    private val events = EventSource<Event>()
 
     @Before
     fun setup() {
-        resolverStateLiveData = MutableLiveData()
         reset(mockViewModel)
-        whenever(mockViewModel.resolverState).thenReturn(resolverStateLiveData)
+        whenever(mockViewModel.model).thenReturn(model)
+        whenever(mockViewModel.events).thenReturn(events)
         setViewModel(mockViewModel)
-        init()
+
+        model.postValue(Model(resolverState = null))
+        events.clear()
+        
         val scenario = ActivityScenario.launch(LauncherActivity::class.java)
         scenario.moveToState(Lifecycle.State.RESUMED)
+        init()
     }
 
     @After
@@ -76,7 +85,7 @@ class LauncherActivityTest : WatchLaterActivityTest() {
 
     @Test
     fun should_update_viewmodel() {
-        verify(mockViewModel).update()
+        verify(mockViewModel).onResume()
     }
 
     @Test
@@ -91,7 +100,8 @@ class LauncherActivityTest : WatchLaterActivityTest() {
 
     @Test
     fun should_not_display_action_required_but_should_show_example() {
-        resolverStateLiveData.postValue(ResolverState.OK)
+        model.postValue(Model(ResolverState.OK))
+
         onView(withId(R.id.launcher_youtube_action_action_title)).check(matches(not(isDisplayed())))
         onView(withId(R.id.launcher_youtube_action_text)).check(matches(not(isDisplayed())))
         onView(withId(R.id.launcher_youtube_button)).check(matches(not(isDisplayed())))
@@ -101,13 +111,22 @@ class LauncherActivityTest : WatchLaterActivityTest() {
     }
 
     @Test
+    fun should_invoke_try_video() {
+        onView(withId(R.id.launcher_example_button)).perform(click())
+
+        verify(mockViewModel).onTryExample()
+    }
+
+    @Test
     fun should_open_example_video() {
         val resultData = Intent()
         val result = ActivityResult(Activity.RESULT_OK, resultData)
         intending(allOf(
                 hasAction(LauncherActivity.EXAMPLE_INTENT.action),
                 hasData(LauncherActivity.EXAMPLE_INTENT.data))).respondWith(result)
-        onView(withId(R.id.launcher_example_button)).perform(click())
+
+        events.submit(Event.OpenExample)
+
         intended(allOf(
                 hasAction(LauncherActivity.EXAMPLE_INTENT.action),
                 hasData(LauncherActivity.EXAMPLE_INTENT.data)))

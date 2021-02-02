@@ -34,8 +34,7 @@ import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.data.AccountRepository
 import com.lambdasoup.watchlater.data.AccountRepository.AuthTokenResult
 import com.lambdasoup.watchlater.data.YoutubeRepository
-import com.lambdasoup.watchlater.data.YoutubeRepository.AddVideoResult
-import com.lambdasoup.watchlater.data.YoutubeRepository.VideoInfoResult
+import com.lambdasoup.watchlater.data.YoutubeRepository.*
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos.Item
 import com.lambdasoup.watchlater.util.EventSource
 import com.lambdasoup.watchlater.util.VideoIdParser
@@ -50,6 +49,8 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
     private val getVideoInfo = Cmd.task<Msg, String, VideoInfoResult> {
         youtubeRepository.getVideoInfo(it)
     }
+
+    private val getChannels = Cmd.task<Msg, String, ChannelsResult>(youtubeRepository::getChannels)
 
     private val getAuthToken = Cmd.task<Msg, AuthTokenResult> {
         accountRepository.getAuthToken()
@@ -122,7 +123,7 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                     } else {
                         model.copy(
                                 videoId = null,
-                                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.Other),
+                                videoInfo = VideoInfo.Error(ErrorType.Other),
                         ) * Cmd.none()
                     }
                 }
@@ -157,9 +158,12 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                         model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoAccount)) *
                                 Cmd.none()
                     is AuthTokenResult.AuthToken -> model *
-                            addVideo(msg.videoId, msg.result.token) {
-                                OnAddVideoResult(it, msg.videoId)
-                            }
+                            Cmd.batch(
+                                    addVideo(msg.videoId, msg.result.token) {
+                                        OnAddVideoResult(it, msg.videoId)
+                                    },
+                                    getChannels(msg.result.token) { OnChannelsResult(it) }
+                            )
                     is AuthTokenResult.HasIntent ->
                         model.copy(videoAdd = VideoAdd.HasIntent(msg.result.intent)) *
                                 Cmd.event<Msg> { events.submit(Event.OpenAuthIntent(msg.result.intent)) }
@@ -169,7 +173,7 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                     is AddVideoResult.Success -> model.copy(videoAdd = VideoAdd.Success) * Cmd.none()
                     is AddVideoResult.Error ->
                         when (msg.result.type) {
-                            YoutubeRepository.ErrorType.InvalidToken -> {
+                            ErrorType.InvalidToken -> {
                                 if (model.tokenRetried) {
                                     model.copy(
                                             videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)
@@ -181,7 +185,7 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                                     )
                                 }
                             }
-                            YoutubeRepository.ErrorType.AlreadyInPlaylist ->
+                            ErrorType.AlreadyInPlaylist ->
                                 model.copy(
                                         videoAdd = VideoAdd.Error(VideoAdd.ErrorType.YoutubeAlreadyInPlaylist)
                                 ) * Cmd.none()
@@ -190,6 +194,7 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                             -> model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
                         }
                 }
+                is OnChannelsResult -> model * Cmd.none()
             }
 
     private fun subscriptions(model: Model) =
@@ -219,6 +224,7 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
         data class SetVideoUri(val uri: Uri) : Msg()
         data class SetPermissionNeeded(val permissionNeeded: Boolean) : Msg()
         data class OnVideoInfoResult(val result: VideoInfoResult) : Msg()
+        data class OnChannelsResult(val result: ChannelsResult) : Msg()
         data class OnAuthTokenResult(
                 val result: AuthTokenResult,
                 val videoId: String,
@@ -273,6 +279,6 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
     sealed class VideoInfo {
         object Progress : VideoInfo()
         data class Loaded(val data: Item) : VideoInfo()
-        data class Error(val error: YoutubeRepository.ErrorType) : VideoInfo()
+        data class Error(val error: ErrorType) : VideoInfo()
     }
 }

@@ -84,6 +84,25 @@ class YoutubeRepository(context: Context) {
         return VideoInfoResult.VideoInfo(videos.items[0])
     }
 
+    fun getChannels(token: String): ChannelsResult {
+        val auth = "Bearer $token"
+
+        val response: Response<Channels>
+        try {
+            response = api.listChannels(apiKey, auth).execute()
+        } catch (e: IOException) {
+            return ChannelsResult.Error(ErrorType.Network)
+        }
+
+        if (!response.isSuccessful) {
+            return ChannelsResult.Error(translateError(response))
+        }
+
+        val channels = response.body() ?: return ChannelsResult.Error(ErrorType.Other)
+
+        return ChannelsResult.Ok(channels)
+    }
+
     fun addVideo(videoId: String?, token: String): AddVideoResult {
         val resourceId = ResourceId(videoId)
         val snippet = PlaylistItem.Snippet("WL", resourceId, null, null)
@@ -123,12 +142,32 @@ class YoutubeRepository(context: Context) {
         ) : VideoInfoResult()
     }
 
+    sealed class ChannelsResult {
+        data class Ok(val channels: Channels) : ChannelsResult()
+        data class Error(
+                val type: ErrorType
+        ) : ChannelsResult()
+    }
+
     private interface YoutubeApi {
         @POST("playlistItems?part=snippet")
         fun insertPlaylistItem(@Body playlistItem: PlaylistItem, @Header("Authorization") auth: String): Call<PlaylistItem?>
 
         @GET("videos?part=snippet,contentDetails&maxResults=1")
         fun listVideos(@Query("id") id: String, @Query("key") apiKey: String): Call<Videos>
+
+        @GET("channels?mine=1")
+        fun listChannels(@Query("key") apiKey: String, @Header("Authorization") auth: String): Call<Channels>
+    }
+
+    @JsonClass(generateAdapter = true)
+    data class Channels(
+            val channel: List<Channel>,
+    ) {
+        @JsonClass(generateAdapter = true)
+        data class Channel(
+                val id: String,
+        )
     }
 
     @JsonClass(generateAdapter = true)

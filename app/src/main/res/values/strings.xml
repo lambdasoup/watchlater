@@ -22,19 +22,11 @@
 
 <resources>
     <string name="asset_prefix">default</string>
-
     <string name="app_name">Watch Later</string>
-
     <string name="title_activity_about">About</string>
-
     <string name="menu_about">About</string>
-
-    <string name="success_added_video">Video successfully added to your Watch Later list</string>
-
-    <string name="error_already_in_playlist">Video is already in your Watch Later list</string>
+    <string name="success_added_video">Video successfully added to your playlist</string>
     <string name="error_video_not_found">Video not found</string>
-    <string name="error_operation_unsupported">YouTube shut down the ability to insert videos into Watch Later playlists. An app update to use regular playlists instead is in preparation.</string>
-
     <string name="choose_account">Choose account</string>
     <string name="error_no_account">No account set</string>
     <string name="error_youtube_player_missing">Cannot launch the YouTube app: it is probably not installed on your device.</string>
@@ -51,10 +43,12 @@
     <string name="add_permissions_description">This app needs permissions to function.</string>
     <string name="add_permissions_grant">grant</string>
     <string name="error_no_permission">Missing permissions</string>
+    <string name="error_no_playlist">No playlist selected</string>
     <string name="could_not_add">Could not add video: %s</string>
     <string name="could_not_load">Could not load video preview (%s)</string>
     <string name="account_empty">No account selected</string>
     <string name="account_set">Change</string>
+    <string name="playlist_empty">No playlist selected</string>
     <string name="add_permissions_rationale">Note that this app will not actually access any of your contacts. This permission is needed for communicating with your YouTube account.</string>
     <string name="launcher_youtube_action_title">Action required</string>
     <string name="launcher_youtube_action_text">Your system is configured to open YouTube links with the YouTube app by default. Open the YouTube settings and make sure that \'Open Defaults\' is set to \'Ask every time\'.</string>
@@ -65,5 +59,8 @@
     <string name="action_watchnow">Watch now</string>
     <string name="action_watchlater">Watch later</string>
     <string name="needs_youtube_permissions">Please confirm YouTube permission request</string>
-
+    <string name="playlist_selection_message">You don\'t have any playlists in your YouTube account yet. Please create one in the YouTube app first.</string>
+    <string name="playlist_selection_title">Select Playlist</string>
+    <string name="playlist_selection_edit">Edit playlists</string>
+    <string name="playlist_selection_create">Create playlist</string>
 </resources>

@@ -84,6 +84,8 @@ class AddActivityTest : WatchLaterActivityTest() {
                 account = null,
                 permissionNeeded = null,
                 tokenRetried = false,
+                playlistSelection = null,
+                targetPlaylist = null,
         ))
         events.clear()
         whenever(vm.model).thenReturn(model)
@@ -192,17 +194,6 @@ class AddActivityTest : WatchLaterActivityTest() {
     }
 
     @Test
-    fun should_show_default_error() {
-        model.postValue(model.value!!.copy(
-                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.AlreadyInPlaylist),
-        ))
-
-        onView(withId(R.id.reason_title)).check(matches(withText(R.string.video_error_title)))
-        val expectedText = getString(R.string.could_not_load, YoutubeRepository.ErrorType.AlreadyInPlaylist.toString())
-        onView(withId(R.id.reason)).check(matches(withText(expectedText)))
-    }
-
-    @Test
     fun should_show_watch_buttons_on_default_error() {
         model.postValue(model.value!!.copy(
                 videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.Other),
@@ -234,16 +225,6 @@ class AddActivityTest : WatchLaterActivityTest() {
         intended(Matchers.allOf(
                 hasData(intent.data),
                 toPackage("com.google.android.youtube")))
-    }
-
-    @Test
-    fun should_show_add_video_result_error_already_in_playlist() {
-        vm.model.postValue(
-                vm.model.value!!.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.YoutubeAlreadyInPlaylist))
-        )
-
-        val expectedText = getString(R.string.could_not_add, getString(R.string.error_already_in_playlist))
-        onView(withId(R.id.add_result)).check(matches(withText(expectedText)))
     }
 
     @Test

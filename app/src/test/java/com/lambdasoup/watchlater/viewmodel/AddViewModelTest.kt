@@ -32,6 +32,7 @@ import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.data.AccountRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository.AddVideoResult
+import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.Playlist
 import com.lambdasoup.watchlater.data.YoutubeRepository.VideoInfoResult
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos
 import com.lambdasoup.watchlater.util.VideoIdParser
@@ -62,12 +63,14 @@ class AddViewModelTest {
 
     private lateinit var vm: AddViewModel
     private lateinit var accountLiveData: MutableLiveData<Account>
+    private val playlistLiveData = MutableLiveData<Playlist?>()
 
     private val token = "token"
     private val uri: Uri = mock()
     private val videoId = "video-id"
     private val item: Videos.Item = mock()
     private val observedEvents = mutableListOf<Event>()
+    private val playlist: Playlist = mock()
 
     @Before
     fun setup() {
@@ -78,7 +81,9 @@ class AddViewModelTest {
         whenever(application.youtubeRepository).thenReturn(youtubeRepository)
         accountLiveData = MutableLiveData()
         whenever(accountRepository.get()).thenReturn(accountLiveData)
-        
+        whenever(youtubeRepository.targetPlaylist).thenReturn(playlistLiveData)
+        playlistLiveData.value = playlist
+
         vm = AddViewModel(application)
 
         whenever(accountRepository.getAuthToken())
@@ -87,7 +92,7 @@ class AddViewModelTest {
         whenever(videoIdParser.parseVideoId(uri)).thenReturn(videoId)
         whenever(youtubeRepository.getVideoInfo(videoId))
                 .thenReturn(VideoInfoResult.VideoInfo(item))
-        whenever(youtubeRepository.addVideo(videoId, token))
+        whenever(youtubeRepository.addVideo(videoId, playlist, token))
                 .thenReturn(AddVideoResult.Success)
 
         observedEvents.clear()
@@ -204,9 +209,9 @@ class AddViewModelTest {
     fun `should refresh token transparently`() {
         val token2 = "token2"
 
-        whenever(youtubeRepository.addVideo(videoId, token))
+        whenever(youtubeRepository.addVideo(videoId, playlist, token))
                 .thenReturn(AddVideoResult.Error(YoutubeRepository.ErrorType.InvalidToken, token))
-        whenever(youtubeRepository.addVideo(videoId, token2))
+        whenever(youtubeRepository.addVideo(videoId, playlist, token2))
                 .thenReturn(AddVideoResult.Success)
 
         whenever(accountRepository.getAuthToken())
@@ -225,9 +230,9 @@ class AddViewModelTest {
     fun `should error when token refresh fails`() {
         val token2 = "token2"
 
-        whenever(youtubeRepository.addVideo(videoId, token))
+        whenever(youtubeRepository.addVideo(videoId, playlist, token))
                 .thenReturn(AddVideoResult.Error(YoutubeRepository.ErrorType.InvalidToken, token))
-        whenever(youtubeRepository.addVideo(videoId, token2))
+        whenever(youtubeRepository.addVideo(videoId, playlist, token2))
                 .thenReturn(AddVideoResult.Error(YoutubeRepository.ErrorType.InvalidToken, token2))
 
         whenever(accountRepository.getAuthToken())
@@ -243,21 +248,8 @@ class AddViewModelTest {
     }
 
     @Test
-    fun `should handle already in playlist`() {
-        whenever(youtubeRepository.addVideo(videoId, token))
-                .thenReturn(AddVideoResult.Error(YoutubeRepository.ErrorType.AlreadyInPlaylist, token))
-
-        vm.watchLater(videoId)
-
-        val videoAdd = vm.model.value!!.videoAdd
-        assertThat(videoAdd).isNotNull()
-        assertThat(videoAdd).isInstanceOf(VideoAdd.Error::class.java)
-        assertThat((videoAdd as VideoAdd.Error).error).isEqualTo(VideoAdd.ErrorType.YoutubeAlreadyInPlaylist)
-    }
-
-    @Test
     fun `should handle generic error`() {
-        whenever(youtubeRepository.addVideo(videoId, token))
+        whenever(youtubeRepository.addVideo(videoId, playlist, token))
                 .thenReturn(AddVideoResult.Error(YoutubeRepository.ErrorType.Other, token))
 
         vm.watchLater(videoId)

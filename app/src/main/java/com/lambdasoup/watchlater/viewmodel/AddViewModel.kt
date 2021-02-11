@@ -34,8 +34,8 @@ import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.data.AccountRepository
 import com.lambdasoup.watchlater.data.AccountRepository.AuthTokenResult
 import com.lambdasoup.watchlater.data.YoutubeRepository
-import com.lambdasoup.watchlater.data.YoutubeRepository.AddVideoResult
-import com.lambdasoup.watchlater.data.YoutubeRepository.VideoInfoResult
+import com.lambdasoup.watchlater.data.YoutubeRepository.*
+import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.Playlist
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos.Item
 import com.lambdasoup.watchlater.util.EventSource
 import com.lambdasoup.watchlater.util.VideoIdParser
@@ -55,21 +55,35 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
         accountRepository.getAuthToken()
     }
 
-    private val addVideo = Cmd.task<Msg, String, String, AddVideoResult> { videoId, token ->
-        youtubeRepository.addVideo(videoId = videoId, token = token)
+    private val getPlaylists = Cmd.task<Msg, String, PlaylistsResult> {
+        youtubeRepository.getPlaylists(it)
+    }
+
+    private val addVideo = Cmd.task<Msg, String, String, Playlist, AddVideoResult> { videoId, token, playlist ->
+        youtubeRepository.addVideo(videoId = videoId, token = token, playlist = playlist)
     }
 
     private val invalidateAuthToken = Cmd.event<Msg, String> { accountRepository.invalidateToken(it) }
 
     private val onAccountPermissionGranted = Sub.create<Unit, Msg>()
 
-    private val observer: Observer<Account?> = Observer { account -> accountSubscription.submit(account) }
+    private val accountObserver: Observer<Account?> = Observer { account -> accountSubscription.submit(account) }
     private val accountSubscription = Sub.create<Account?, Msg>(
             bind = {
-                accountRepository.get().observeForever(observer)
+                accountRepository.get().observeForever(accountObserver)
             },
             unbind = {
-                accountRepository.get().removeObserver(observer)
+                accountRepository.get().removeObserver(accountObserver)
+            }
+    )
+
+    private val playlistObserver: Observer<Playlist?> = Observer { playlistSubscription.submit(it) }
+    private val playlistSubscription = Sub.create<Playlist?, Msg>(
+            bind = {
+                youtubeRepository.targetPlaylist.observeForever(playlistObserver)
+            },
+            unbind = {
+                youtubeRepository.targetPlaylist.removeObserver(playlistObserver)
             }
     )
 
@@ -90,6 +104,8 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                     account = null,
                     permissionNeeded = null,
                     tokenRetried = false,
+                    targetPlaylist = null,
+                    playlistSelection = null,
             ) * Cmd.none(),
             view = model::postValue,
             update = ::update,
@@ -105,14 +121,36 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                     } else if (model.permissionNeeded != null && model.permissionNeeded) {
                         model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoPermission)) *
                                 Cmd.none()
+                    } else if (model.targetPlaylist == null) {
+                        model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoPlaylistSelected)) *
+                                Cmd.none()
                     } else {
                         model.copy(videoAdd = VideoAdd.Progress) *
-                                getAuthToken { OnAuthTokenResult(it, msg.videoId) }
+                                getAuthToken { OnInsertTokenResult(it, msg.videoId, model.targetPlaylist) }
                     }
                 }
 
                 is SetAccount -> model.copy(videoAdd = VideoAdd.Idle) *
                         Cmd.event<Msg> { accountRepository.put(msg.account) }
+
+                is ChangePlaylist ->
+                    if (model.account == null) {
+                        model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoAccount)) *
+                                Cmd.none()
+                    } else {
+                        model * getAuthToken { OnPlaylistsTokenResult(it) }
+                    }
+
+                is OnPlaylistsTokenResult -> when (msg.result) {
+                    is AuthTokenResult.Error ->
+                        model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoAccount)) *
+                                Cmd.none()
+                    is AuthTokenResult.AuthToken ->
+                        model * getPlaylists(msg.result.token) { OnPlaylistResult(it, msg.result.token) }
+                    is AuthTokenResult.HasIntent ->
+                        model.copy(videoAdd = VideoAdd.HasIntent(msg.result.intent)) *
+                                Cmd.event<Msg> { events.submit(Event.OpenAuthIntent(msg.result.intent)) }
+                }
 
                 is SetVideoUri -> {
                     val videoId = videoIdParser.parseVideoId(msg.uri)
@@ -122,7 +160,7 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                     } else {
                         model.copy(
                                 videoId = null,
-                                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.Other),
+                                videoInfo = VideoInfo.Error(ErrorType.Other),
                         ) * Cmd.none()
                     }
                 }
@@ -152,13 +190,13 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
 
                 is OnAccount -> model.copy(account = msg.account) * Cmd.none()
 
-                is OnAuthTokenResult -> when (msg.result) {
+                is OnInsertTokenResult -> when (msg.result) {
                     is AuthTokenResult.Error ->
                         model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoAccount)) *
                                 Cmd.none()
                     is AuthTokenResult.AuthToken -> model *
-                            addVideo(msg.videoId, msg.result.token) {
-                                OnAddVideoResult(it, msg.videoId)
+                            addVideo(msg.videoId, msg.result.token, msg.targetPlaylist) {
+                                OnAddVideoResult(it, msg.videoId, msg.targetPlaylist)
                             }
                     is AuthTokenResult.HasIntent ->
                         model.copy(videoAdd = VideoAdd.HasIntent(msg.result.intent)) *
@@ -169,7 +207,7 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                     is AddVideoResult.Success -> model.copy(videoAdd = VideoAdd.Success) * Cmd.none()
                     is AddVideoResult.Error ->
                         when (msg.result.type) {
-                            YoutubeRepository.ErrorType.InvalidToken -> {
+                            ErrorType.InvalidToken -> {
                                 if (model.tokenRetried) {
                                     model.copy(
                                             videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)
@@ -177,34 +215,59 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                                 } else {
                                     model.copy(tokenRetried = true) * Cmd.batch(
                                             invalidateAuthToken(msg.result.token),
-                                            getAuthToken { OnAuthTokenResult(it, msg.videoId) }
+                                            getAuthToken { OnInsertTokenResult(it, msg.videoId, msg.targetPlaylist) }
                                     )
                                 }
                             }
-                            YoutubeRepository.ErrorType.AlreadyInPlaylist ->
-                                model.copy(
-                                        videoAdd = VideoAdd.Error(VideoAdd.ErrorType.YoutubeAlreadyInPlaylist)
-                                ) * Cmd.none()
-
-                            YoutubeRepository.ErrorType.PlaylistOperationUnsupported ->
-                                model.copy(
-                                        videoAdd = VideoAdd.Error(VideoAdd.ErrorType.OperationUnsupported)
-                                ) * Cmd.none()
-
                             else
                             -> model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
                         }
                 }
+
+                is OnPlaylistResult ->
+                    when (msg.result) {
+                        is PlaylistsResult.Error -> {
+                            when (msg.result.type) {
+                                ErrorType.InvalidToken -> {
+                                    if (model.tokenRetried) {
+                                        model.copy(
+                                                videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)
+                                        ) * Cmd.none()
+                                    } else {
+                                        model.copy(tokenRetried = true) * Cmd.batch(
+                                                invalidateAuthToken(msg.token),
+                                                getAuthToken { OnPlaylistsTokenResult(it) }
+                                        )
+                                    }
+                                }
+                                else
+                                -> model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
+                            }
+                            model * Cmd.none()
+                        }
+
+                        is PlaylistsResult.Ok -> {
+                            model.copy(playlistSelection = msg.result.playlists) * Cmd.none()
+                        }
+
+                    }
+
+                is OnAccountPermissionGranted -> model.copy(videoAdd = VideoAdd.Idle) * Cmd.none()
+
+                is OnTargetPlaylist -> model.copy(targetPlaylist = msg.playlist) * Cmd.none()
+
+                is SelectPlaylist -> model.copy(playlistSelection = null) *
+                        Cmd.event<Msg> { youtubeRepository.setPlaylist(msg.playlist) }
+
+                is ClearPlaylists -> model.copy(playlistSelection = null) * Cmd.none()
             }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun subscriptions(model: Model) =
             Sub.batch(
                     accountSubscription { OnAccount(it) },
-                    if (model.videoId != null) {
-                        onAccountPermissionGranted { WatchLater(model.videoId) }
-                    } else {
-                        Sub.none()
-                    }
+                    onAccountPermissionGranted { OnAccountPermissionGranted },
+                    playlistSubscription { OnTargetPlaylist(it) },
             )
 
     data class Model(
@@ -214,24 +277,42 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
             val account: Account?,
             val permissionNeeded: Boolean?,
             val tokenRetried: Boolean,
+            val targetPlaylist: Playlist?,
+            val playlistSelection: Playlists?,
     )
 
     sealed class Msg {
         data class WatchLater(val videoId: String) : Msg()
         data class SetAccount(val account: Account) : Msg()
         data class OnAccount(val account: Account?) : Msg()
+        data class OnTargetPlaylist(val playlist: Playlist?) : Msg()
         object RemoveAccount : Msg()
+        object OnAccountPermissionGranted : Msg()
+        object ChangePlaylist : Msg()
+        data class OnPlaylistResult(
+                val result: PlaylistsResult,
+                val token: String,
+        ) : Msg()
+
+        object ClearPlaylists : Msg()
+        data class SelectPlaylist(val playlist: Playlist?) : Msg()
         data class SetVideoUri(val uri: Uri) : Msg()
         data class SetPermissionNeeded(val permissionNeeded: Boolean) : Msg()
         data class OnVideoInfoResult(val result: VideoInfoResult) : Msg()
-        data class OnAuthTokenResult(
+        data class OnInsertTokenResult(
                 val result: AuthTokenResult,
                 val videoId: String,
+                val targetPlaylist: Playlist,
+        ) : Msg()
+
+        data class OnPlaylistsTokenResult(
+                val result: AuthTokenResult,
         ) : Msg()
 
         data class OnAddVideoResult(
                 val result: AddVideoResult,
                 val videoId: String,
+                val targetPlaylist: Playlist,
         ) : Msg()
     }
 
@@ -263,6 +344,18 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
         tea.ui(WatchLater(videoId))
     }
 
+    fun changePlaylist() {
+        tea.ui(ChangePlaylist)
+    }
+
+    fun selectPlaylist(playlist: Playlist) {
+        tea.ui(SelectPlaylist(playlist))
+    }
+
+    fun clearPlaylists() {
+        tea.ui(ClearPlaylists)
+    }
+
     sealed class VideoAdd {
         object Idle : VideoAdd()
         object Progress : VideoAdd()
@@ -271,13 +364,13 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
         data class HasIntent(val intent: Intent) : VideoAdd()
 
         enum class ErrorType {
-            Other, NoAccount, NoPermission, YoutubeAlreadyInPlaylist, OperationUnsupported
+            Other, NoAccount, NoPermission, NoPlaylistSelected
         }
     }
 
     sealed class VideoInfo {
         object Progress : VideoInfo()
         data class Loaded(val data: Item) : VideoInfo()
-        data class Error(val error: YoutubeRepository.ErrorType) : VideoInfo()
+        data class Error(val error: ErrorType) : VideoInfo()
     }
 }

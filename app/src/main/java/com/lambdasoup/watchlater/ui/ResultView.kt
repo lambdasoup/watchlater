@@ -51,8 +51,7 @@ class ResultView @JvmOverloads constructor(
         val errorStr: String = when (errorType) {
             VideoAdd.ErrorType.NoAccount -> resources.getString(R.string.error_no_account)
             VideoAdd.ErrorType.NoPermission -> resources.getString(R.string.error_no_permission)
-            VideoAdd.ErrorType.YoutubeAlreadyInPlaylist -> resources.getString(R.string.error_already_in_playlist)
-            VideoAdd.ErrorType.OperationUnsupported -> resources.getString(R.string.error_operation_unsupported)
+            VideoAdd.ErrorType.NoPlaylistSelected -> resources.getString(R.string.error_no_playlist)
             else -> resources.getString(R.string.error_general, errorType.name)
         }
         setResult(true, resources.getString(R.string.could_not_add, errorStr))

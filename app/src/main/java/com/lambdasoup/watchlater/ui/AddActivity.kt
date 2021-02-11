@@ -25,7 +25,9 @@ import android.Manifest
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.annotation.TargetApi
+import android.app.Dialog
 import android.content.ActivityNotFoundException
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -38,9 +40,12 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.DialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.WatchLaterApplication
+import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 
 class AddActivity : AppCompatActivity(), ActionView.ActionListener {
@@ -74,6 +79,12 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
                 askForAccount()
             }
         }
+        val playlistView: PlaylistView = findViewById(R.id.add_playlist)
+        playlistView.listener = object : PlaylistView.Listener {
+            override fun onChangePlaylist() {
+                vm.changePlaylist()
+            }
+        }
         vm.setVideoUri(intent.data!!)
         vm.model.observe(this, {
             videoView.setVideoInfo(it.videoInfo)
@@ -86,6 +97,10 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
 
             resultView.onChanged(it.videoAdd)
             actionView.setState(it.videoAdd, it.videoId)
+
+            playlistView.onChanged(it.targetPlaylist)
+
+            setPlaylistSelection(it.playlistSelection)
         })
 
         vm.events.observe(this) { event ->
@@ -102,6 +117,76 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
             permissionsView.visibility = View.GONE
         } else {
             permissionsView.visibility = View.VISIBLE
+        }
+    }
+
+    private fun setPlaylistSelection(playlists: YoutubeRepository.Playlists?) {
+        val fragment = supportFragmentManager
+                .findFragmentByTag(PlaylistSelectionDialogFragment.TAG) as PlaylistSelectionDialogFragment?
+
+        if (playlists == null) {
+            fragment?.dismissAllowingStateLoss()
+            return
+        }
+
+        if (fragment == null) {
+            val newFragment = PlaylistSelectionDialogFragment()
+            val ids: List<String> = playlists.items.map { it.id }
+            val titles: List<String> = playlists.items.map { it.snippet.title }
+            val bundle = Bundle()
+            bundle.putStringArray(PlaylistSelectionDialogFragment.ARG_IDS, ids.toTypedArray())
+            bundle.putStringArray(PlaylistSelectionDialogFragment.ARG_TITLES, titles.toTypedArray())
+            newFragment.arguments = bundle
+            newFragment.show(supportFragmentManager,
+                    PlaylistSelectionDialogFragment.TAG)
+        }
+    }
+
+    class PlaylistSelectionDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            val titles = requireArguments().getStringArray(ARG_TITLES)
+
+            val builder = MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.playlist_selection_title)
+
+            if (titles == null || titles.isNotEmpty()) {
+                builder.setItems(titles, this)
+                builder.setNeutralButton(R.string.playlist_selection_edit) { _, _ ->
+                    (context as AddActivity).openWithYoutube(playVideo = false)
+                }
+
+            } else {
+                builder.setMessage(R.string.playlist_selection_message)
+                builder.setNeutralButton(R.string.playlist_selection_create) { _, _ ->
+                    (context as AddActivity).openWithYoutube(playVideo = false)
+                }
+            }
+
+            return builder.create()
+        }
+
+        companion object {
+            const val TAG = "PlaylistSelectionDialog"
+            const val ARG_IDS = "ids"
+            const val ARG_TITLES = "titles"
+        }
+
+        override fun onClick(dialog: DialogInterface, which: Int) {
+            val titles = requireArguments().getStringArray(ARG_TITLES)
+            val ids = requireArguments().getStringArray(ARG_IDS)
+
+            (context as AddActivity).vm.selectPlaylist(YoutubeRepository.Playlists.Playlist(
+                    id = ids!![which],
+                    snippet = YoutubeRepository.Playlists.Playlist.Snippet(
+                            title = titles!![which]
+                    )
+            ))
+        }
+
+        override fun onDismiss(dialog: DialogInterface) {
+            super.onDismiss(dialog)
+
+            (context as AddActivity).vm.clearPlaylists()
         }
     }
 
@@ -205,12 +290,18 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
                 null)
     }
 
-    private fun openWithYoutube() {
+    private fun openWithYoutube(playVideo: Boolean = true) {
         try {
-            val intent = Intent()
-                    .setData(intent.data)
+            val youtubeIntent = Intent()
                     .setPackage("com.google.android.youtube")
-            startActivity(intent)
+
+            if (playVideo) {
+                youtubeIntent.data = intent.data
+            } else {
+                youtubeIntent.data = Uri.parse("https://www.youtube.com/feed/library")
+            }
+
+            startActivity(youtubeIntent)
             finish()
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(this, R.string.error_youtube_player_missing, Toast.LENGTH_SHORT).show()

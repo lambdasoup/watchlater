@@ -21,15 +21,12 @@
   -->
 
 <resources>
-
     <string name="app_name">Später ansehen</string>
     <string name="asset_prefix">de</string>
     <string name="title_activity_about">Über</string>
     <string name="menu_about">Über</string>
-    <string name="success_added_video">Video zu \'Später Ansehen\'-Liste hinzugefügt</string>
-    <string name="error_already_in_playlist">Video ist bereits in \'Später Ansehen\'-Liste</string>
+    <string name="success_added_video">Video zu Liste hinzugefügt</string>
     <string name="error_video_not_found">Video nicht gefunden</string>
-    <string name="error_operation_unsupported">YouTube hat das Hinzufügen zu \"Später Ansehen\" Listen deaktiviert. Ein App-Update welches reguläre Listen nutzt ist in Vorbereitung.</string>
     <string name="choose_account">Konto auswählen</string>
     <string name="error_no_account">Kein Konto ausgewählt</string>
     <string name="error_youtube_player_missing">Kann YouYube-App nicht starten. Ist die App installiert?</string>
@@ -49,6 +46,7 @@
     <string name="could_not_add">Konnte Video nicht hinzufügen: %s</string>
     <string name="could_not_load">Konnte Vorschau nicht laden (%s)</string>
     <string name="account_empty">Kein Konto ausgewählt</string>
+    <string name="playlist_empty">Keine Liste ausgewählt</string>
     <string name="account_set">ändern</string>
     <string name="add_permissions_rationale">Die App wird nicht auf Deine Kontakte zugreifen. Die Berechtigung ist notwending, um mit Deinem YouTube-Konto zu kommunizieren.</string>
     <string name="launcher_youtube_action_title">Bitte einstellen</string>
@@ -60,5 +58,9 @@
     <string name="action_watchnow">Jetzt ansehen</string>
     <string name="action_watchlater">Später ansehen</string>
     <string name="needs_youtube_permissions">Bitte YouTube-Zugriff erlauben</string>
-
+    <string name="error_no_playlist">Keine Liste ausgewählt</string>
+    <string name="playlist_selection_message">Du hast noch keine Wiedergabelisten in deinem YouTube-Account. Bitte lege erst eine an.</string>
+    <string name="playlist_selection_title">Liste auswählen</string>
+    <string name="playlist_selection_edit">Listen editieren</string>
+    <string name="playlist_selection_create">Liste erstellen</string>
 </resources>

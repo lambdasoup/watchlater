@@ -34,13 +34,14 @@ sealed class Cmd<Msg> {
     internal data class Task<Msg>(
             val task: () -> Msg,
     ) : Cmd<Msg>()
-    
+
     internal data class Batch<Msg>(
             val cmds: Set<Cmd<Msg>>
     ) : Cmd<Msg>()
 
     internal class None<Msg> : Cmd<Msg>()
 
+    @Suppress("unused")
     companion object {
         fun <Msg> none(): Cmd<Msg> = None()
         fun <Msg> batch(vararg cmds: Cmd<Msg>): Cmd<Msg> = Batch(setOf(*cmds))
@@ -49,11 +50,17 @@ sealed class Cmd<Msg> {
         fun <Msg, T> task(f: () -> (T)): ((T) -> Msg) -> Cmd<Msg> = { g ->
             Task { g(f()) }
         }
-        fun <Msg, R, T> task(f: (R) -> (T)): (R, (T) -> Msg) -> Cmd<Msg> = { r,g ->
-            Task { g(f(r)) }
+
+        fun <Msg, A, T> task(f: (A) -> (T)): (A, (T) -> Msg) -> Cmd<Msg> = { a, g ->
+            Task { g(f(a)) }
         }
-        fun <Msg, R, S, T> task(f: (R, S) -> (T)): (R, S, (T) -> Msg) -> Cmd<Msg> = { r, s,g ->
-            Task { g(f(r, s)) }
+
+        fun <Msg, A, B, T> task(f: (A, B) -> (T)): (A, B, (T) -> Msg) -> Cmd<Msg> = { a, b, g ->
+            Task { g(f(a, b)) }
+        }
+
+        fun <Msg, A, B, C, T> task(f: (A, B, C) -> (T)): (A, B, C, (T) -> Msg) -> Cmd<Msg> = { a, b, c, g ->
+            Task { g(f(a, b, c)) }
         }
     }
 }

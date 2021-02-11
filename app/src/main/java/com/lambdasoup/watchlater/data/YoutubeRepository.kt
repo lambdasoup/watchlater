@@ -22,9 +22,13 @@
 package com.lambdasoup.watchlater.data
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
+import androidx.preference.PreferenceManager
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository.PlaylistItem.Snippet.ResourceId
+import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.Playlist
 import com.squareup.moshi.JsonClass
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -39,9 +43,51 @@ import java.io.IOException
 
 class YoutubeRepository(context: Context) {
 
+    private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+
     private val retrofit: Retrofit
     private val apiKey: String
     private val api: YoutubeApi
+
+    private val _targetPlaylist = object : LiveData<Playlist?>(), SharedPreferences.OnSharedPreferenceChangeListener {
+        
+        init {
+            update()
+        }
+        
+        private fun update() {
+            val playlistId = prefs.getString(PREF_PLAYLIST_ID, null)
+            val playlistTitle = prefs.getString(PREF_PLAYLIST_TITLE, null)
+
+            if (playlistId == null || playlistTitle == null) {
+                postValue(null)
+                return
+            }
+
+            postValue(Playlist(id = playlistId, snippet = Playlist.Snippet(title = playlistTitle)))
+        }
+        
+        override fun onActive() {
+            super.onActive()
+            prefs.registerOnSharedPreferenceChangeListener(this)
+        }
+
+        override fun onInactive() {
+            prefs.unregisterOnSharedPreferenceChangeListener(this)
+            super.onInactive()
+        }
+
+        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+            if (key !in setOf(PREF_PLAYLIST_ID, PREF_PLAYLIST_TITLE)) {
+                return
+            }
+
+            update()
+        }
+    }
+
+    val targetPlaylist: LiveData<Playlist?>
+        get() = _targetPlaylist
 
     init {
         val httpClient = OkHttpClient.Builder()
@@ -62,6 +108,13 @@ class YoutubeRepository(context: Context) {
 
     private val youtubeErrorConverter: Converter<ResponseBody?, YouTubeError> =
             retrofit.responseBodyConverter(YouTubeError::class.java, arrayOfNulls(0))
+
+    fun setPlaylist(playlist: Playlist?) {
+        prefs.edit()
+                .putString(PREF_PLAYLIST_TITLE, playlist?.snippet?.title)
+                .putString(PREF_PLAYLIST_ID, playlist?.id)
+                .apply()
+    }
 
     fun getVideoInfo(videoId: String): VideoInfoResult {
         val response: Response<Videos>
@@ -84,9 +137,9 @@ class YoutubeRepository(context: Context) {
         return VideoInfoResult.VideoInfo(videos.items[0])
     }
 
-    fun addVideo(videoId: String?, token: String): AddVideoResult {
+    fun addVideo(videoId: String?, playlist: Playlist, token: String): AddVideoResult {
         val resourceId = ResourceId(videoId)
-        val snippet = PlaylistItem.Snippet("WL", resourceId, null, null)
+        val snippet = PlaylistItem.Snippet(playlist.id, resourceId, null, null)
         val item = PlaylistItem(snippet)
         val auth = "Bearer $token"
 
@@ -104,9 +157,27 @@ class YoutubeRepository(context: Context) {
         return AddVideoResult.Success
     }
 
+    fun getPlaylists(token: String): PlaylistsResult {
+        val auth = "Bearer $token"
+
+        val response: Response<Playlists>
+        try {
+            response = api.getPlaylists(maxResults = 50, auth = auth).execute()
+        } catch (e: IOException) {
+            return PlaylistsResult.Error(ErrorType.Network)
+        }
+
+        if (!response.isSuccessful) {
+            return PlaylistsResult.Error(translateError(response))
+        }
+
+        val playlists = response.body() ?: return PlaylistsResult.Error(ErrorType.Other)
+
+        return PlaylistsResult.Ok(playlists)
+    }
+
     enum class ErrorType {
-        NeedAccess, Network, Other, PlaylistFull, InvalidToken, VideoNotFound, AlreadyInPlaylist,
-        PlaylistOperationUnsupported
+        NeedAccess, Network, Other, PlaylistFull, InvalidToken, VideoNotFound
     }
 
     sealed class AddVideoResult {
@@ -124,12 +195,30 @@ class YoutubeRepository(context: Context) {
         ) : VideoInfoResult()
     }
 
+    sealed class PlaylistsResult {
+        data class Ok(val playlists: Playlists) : PlaylistsResult()
+        data class Error(
+                val type: ErrorType,
+        ) : PlaylistsResult()
+    }
+
     private interface YoutubeApi {
         @POST("playlistItems?part=snippet")
-        fun insertPlaylistItem(@Body playlistItem: PlaylistItem, @Header("Authorization") auth: String): Call<PlaylistItem?>
+        fun insertPlaylistItem(
+                @Body playlistItem: PlaylistItem,
+                @Header("Authorization") auth: String,
+        ): Call<PlaylistItem?>
 
         @GET("videos?part=snippet,contentDetails&maxResults=1")
-        fun listVideos(@Query("id") id: String, @Query("key") apiKey: String): Call<Videos>
+        fun listVideos(
+                @Query("id") id: String, @Query("key") apiKey: String,
+        ): Call<Videos>
+
+        @GET("playlists?part=snippet&mine=true")
+        fun getPlaylists(
+                @Query("maxResults") maxResults: Int,
+                @Header("Authorization") auth: String,
+        ): Call<Playlists>
     }
 
     @JsonClass(generateAdapter = true)
@@ -212,6 +301,24 @@ class YoutubeRepository(context: Context) {
         }
     }
 
+    @JsonClass(generateAdapter = true)
+    data class Playlists(
+            val items: List<Playlist>,
+    ) {
+
+        @JsonClass(generateAdapter = true)
+        data class Playlist(
+                val id: String,
+                val snippet: Snippet,
+        ) {
+
+            @JsonClass(generateAdapter = true)
+            data class Snippet(
+                    val title: String,
+            )
+        }
+    }
+
     private fun <T> translateError(errorResponse: Response<T>): ErrorType {
         val youtubeError: YouTubeError = try {
             youtubeErrorConverter.convert(errorResponse.errorBody()!!)
@@ -224,12 +331,6 @@ class YoutubeRepository(context: Context) {
             errorDetail = youtubeError.error.errors[0].reason
         }
         return when (errorResponse.code()) {
-            400 -> {
-                when (errorDetail) {
-                    PlAYLIST_OPERATION_UNSUPPORTED -> return ErrorType.PlaylistOperationUnsupported
-                }
-                ErrorType.Other
-            }
             401 -> ErrorType.InvalidToken
             403 -> {
                 when (errorDetail) {
@@ -244,12 +345,6 @@ class YoutubeRepository(context: Context) {
                 }
                 ErrorType.Other
             }
-            409 -> {
-                when (errorDetail) {
-                    VIDEO_ALREADY_IN_PLAYLIST -> return ErrorType.AlreadyInPlaylist
-                }
-                ErrorType.Other
-            }
             else -> ErrorType.Other
         }
     }
@@ -257,10 +352,11 @@ class YoutubeRepository(context: Context) {
     companion object {
         private const val YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3/"
 
-        const val DAILY_LIMIT_EXCEEDED_UNREG = "dailyLimitExceededUnreg"
-        const val VIDEO_ALREADY_IN_PLAYLIST = "videoAlreadyInPlaylist"
-        const val PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos"
-        const val VIDEO_NOT_FOUND = "videoNotFound"
-        const val PlAYLIST_OPERATION_UNSUPPORTED = "playlistOperationUnsupported"
+        private const val DAILY_LIMIT_EXCEEDED_UNREG = "dailyLimitExceededUnreg"
+        private const val PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos"
+        private const val VIDEO_NOT_FOUND = "videoNotFound"
+
+        private const val PREF_PLAYLIST_ID = "playlist-id"
+        private const val PREF_PLAYLIST_TITLE = "playlist-title"
     }
 }

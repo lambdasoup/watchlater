@@ -42,8 +42,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.*
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos

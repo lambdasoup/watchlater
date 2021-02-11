@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2015 - 2019
+  ~ Copyright (c) 2015 - 2021
   ~
   ~ Maximilian Hille <mh@lambdasoup.com>
   ~ Juliane Lehmann <jl@lambdasoup.com>
@@ -29,6 +29,7 @@
     <string name="success_added_video">Video zu \'Später Ansehen\'-Liste hinzugefügt</string>
     <string name="error_already_in_playlist">Video ist bereits in \'Später Ansehen\'-Liste</string>
     <string name="error_video_not_found">Video nicht gefunden</string>
+    <string name="error_operation_unsupported">YouTube hat das Hinzufügen zu \"Später Ansehen\" Listen deaktiviert. Ein App-Update welches reguläre Listen nutzt ist in Vorbereitung.</string>
     <string name="choose_account">Konto auswählen</string>
     <string name="error_no_account">Kein Konto ausgewählt</string>
     <string name="error_youtube_player_missing">Kann YouYube-App nicht starten. Ist die App installiert?</string>

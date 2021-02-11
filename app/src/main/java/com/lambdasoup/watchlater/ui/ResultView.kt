@@ -52,6 +52,7 @@ class ResultView @JvmOverloads constructor(
             VideoAdd.ErrorType.NoAccount -> resources.getString(R.string.error_no_account)
             VideoAdd.ErrorType.NoPermission -> resources.getString(R.string.error_no_permission)
             VideoAdd.ErrorType.YoutubeAlreadyInPlaylist -> resources.getString(R.string.error_already_in_playlist)
+            VideoAdd.ErrorType.OperationUnsupported -> resources.getString(R.string.error_operation_unsupported)
             else -> resources.getString(R.string.error_general, errorType.name)
         }
         setResult(true, resources.getString(R.string.could_not_add, errorStr))

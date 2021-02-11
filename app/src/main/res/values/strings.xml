@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2015 - 2019
+  ~ Copyright (c) 2015 - 2021
   ~
   ~ Maximilian Hille <mh@lambdasoup.com>
   ~ Juliane Lehmann <jl@lambdasoup.com>
@@ -33,6 +33,7 @@
 
     <string name="error_already_in_playlist">Video is already in your Watch Later list</string>
     <string name="error_video_not_found">Video not found</string>
+    <string name="error_operation_unsupported">YouTube shut down the ability to insert videos into Watch Later playlists. An app update to use regular playlists instead is in preparation.</string>
 
     <string name="choose_account">Choose account</string>
     <string name="error_no_account">No account set</string>

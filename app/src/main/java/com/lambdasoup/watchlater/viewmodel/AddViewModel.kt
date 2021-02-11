@@ -186,6 +186,11 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                                         videoAdd = VideoAdd.Error(VideoAdd.ErrorType.YoutubeAlreadyInPlaylist)
                                 ) * Cmd.none()
 
+                            YoutubeRepository.ErrorType.PlaylistOperationUnsupported ->
+                                model.copy(
+                                        videoAdd = VideoAdd.Error(VideoAdd.ErrorType.OperationUnsupported)
+                                ) * Cmd.none()
+
                             else
                             -> model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
                         }
@@ -266,7 +271,7 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
         data class HasIntent(val intent: Intent) : VideoAdd()
 
         enum class ErrorType {
-            Other, NoAccount, NoPermission, YoutubeAlreadyInPlaylist
+            Other, NoAccount, NoPermission, YoutubeAlreadyInPlaylist, OperationUnsupported
         }
     }
 

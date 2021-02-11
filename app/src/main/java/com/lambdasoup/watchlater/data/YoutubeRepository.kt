@@ -105,7 +105,8 @@ class YoutubeRepository(context: Context) {
     }
 
     enum class ErrorType {
-        NeedAccess, Network, Other, PlaylistFull, InvalidToken, VideoNotFound, AlreadyInPlaylist
+        NeedAccess, Network, Other, PlaylistFull, InvalidToken, VideoNotFound, AlreadyInPlaylist,
+        PlaylistOperationUnsupported
     }
 
     sealed class AddVideoResult {
@@ -223,6 +224,12 @@ class YoutubeRepository(context: Context) {
             errorDetail = youtubeError.error.errors[0].reason
         }
         return when (errorResponse.code()) {
+            400 -> {
+                when (errorDetail) {
+                    PlAYLIST_OPERATION_UNSUPPORTED -> return ErrorType.PlaylistOperationUnsupported
+                }
+                ErrorType.Other
+            }
             401 -> ErrorType.InvalidToken
             403 -> {
                 when (errorDetail) {
@@ -254,5 +261,6 @@ class YoutubeRepository(context: Context) {
         const val VIDEO_ALREADY_IN_PLAYLIST = "videoAlreadyInPlaylist"
         const val PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos"
         const val VIDEO_NOT_FOUND = "videoNotFound"
+        const val PlAYLIST_OPERATION_UNSUPPORTED = "playlistOperationUnsupported"
     }
 }

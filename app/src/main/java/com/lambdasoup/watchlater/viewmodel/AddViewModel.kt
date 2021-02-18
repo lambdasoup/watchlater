@@ -186,8 +186,6 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                     ) * Cmd.none()
                 }
 
-                is RemoveAccount -> model * Cmd.event<Msg> { accountRepository.clear() }
-
                 is OnAccount -> model.copy(account = msg.account) * Cmd.none()
 
                 is OnInsertTokenResult -> when (msg.result) {
@@ -219,31 +217,28 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                                     )
                                 }
                             }
-                            else
-                            -> model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
+                            else ->
+                                model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
                         }
                 }
 
                 is OnPlaylistResult ->
                     when (msg.result) {
-                        is PlaylistsResult.Error -> {
-                            when (msg.result.type) {
-                                ErrorType.InvalidToken -> {
-                                    if (model.tokenRetried) {
-                                        model.copy(
-                                                videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)
-                                        ) * Cmd.none()
-                                    } else {
-                                        model.copy(tokenRetried = true) * Cmd.batch(
-                                                invalidateAuthToken(msg.token),
-                                                getAuthToken { OnPlaylistsTokenResult(it) }
-                                        )
-                                    }
+                        is PlaylistsResult.Error -> when (msg.result.type) {
+                            ErrorType.InvalidToken -> {
+                                if (model.tokenRetried) {
+                                    model.copy(
+                                            videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)
+                                    ) * Cmd.none()
+                                } else {
+                                    model.copy(tokenRetried = true) * Cmd.batch(
+                                            invalidateAuthToken(msg.token),
+                                            getAuthToken { OnPlaylistsTokenResult(it) }
+                                    )
                                 }
-                                else
-                                -> model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
                             }
-                            model * Cmd.none()
+                            else ->
+                                model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
                         }
 
                         is PlaylistsResult.Ok -> {
@@ -286,7 +281,6 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
         data class SetAccount(val account: Account) : Msg()
         data class OnAccount(val account: Account?) : Msg()
         data class OnTargetPlaylist(val playlist: Playlist?) : Msg()
-        object RemoveAccount : Msg()
         object OnAccountPermissionGranted : Msg()
         object ChangePlaylist : Msg()
         data class OnPlaylistResult(
@@ -326,10 +320,6 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
 
     fun setAccount(account: Account) {
         tea.ui(SetAccount(account))
-    }
-
-    fun removeAccount() {
-        tea.ui(RemoveAccount)
     }
 
     fun setVideoUri(uri: Uri) {

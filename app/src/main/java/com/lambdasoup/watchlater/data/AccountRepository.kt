@@ -26,52 +26,53 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import java.io.IOException
 
-class AccountRepository(context: Context?) : OnSharedPreferenceChangeListener {
+class AccountRepository(context: Context) : OnSharedPreferenceChangeListener {
 
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-    private val account = MutableLiveData<Account>()
+    private val liveData = MutableLiveData<Account?>()
     private val manager: AccountManager
-    private fun load() {
-        val name = prefs.getString(PREF_KEY_DEFAULT_ACCOUNT_NAME, null)
-        if (name != null) {
-            account.setValue(Account(name, ACCOUNT_TYPE_GOOGLE))
-        } else {
-            account.setValue(null)
-        }
+    
+    private fun getAccount(): Account? {
+        val name = prefs.getString(PREF_KEY_DEFAULT_ACCOUNT_NAME, null) ?: return null
+        return Account(name, ACCOUNT_TYPE_GOOGLE) 
+    } 
+
+    @MainThread
+    private fun updateLiveData() {
+        val account = getAccount()
+        liveData.value = account
     }
 
     fun put(account: Account) {
         val prefEditor = prefs.edit()
         prefEditor.putString(PREF_KEY_DEFAULT_ACCOUNT_NAME, account.name)
         prefEditor.apply()
-        load()
     }
 
-    fun clear() {
-        val prefEditor = prefs.edit()
-        prefEditor.remove(PREF_KEY_DEFAULT_ACCOUNT_NAME)
-        prefEditor.apply()
-        load()
-    }
-
-    fun get(): LiveData<Account> {
-        return account
+    fun get(): LiveData<Account?> {
+        return liveData
     }
 
     @WorkerThread
     fun getAuthToken(): AuthTokenResult {
+        val account = getAccount()
+        val accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE)
+        val isAccountOk = listOf(*accounts).contains(account)
         if (!isAccountOk) {
-            clear()
+            val prefEditor = prefs.edit()
+            prefEditor.remove(PREF_KEY_DEFAULT_ACCOUNT_NAME)
+            prefEditor.apply()
             return AuthTokenResult.Error
         }
 
-        val future = manager.getAuthToken(account.value, SCOPE_YOUTUBE, null, false, null, null)
+        val future = manager.getAuthToken(account, SCOPE_YOUTUBE, null, false, null, null)
 
         try {
             val result = future.result
@@ -93,20 +94,14 @@ class AccountRepository(context: Context?) : OnSharedPreferenceChangeListener {
         manager.invalidateAuthToken(ACCOUNT_TYPE_GOOGLE, token)
     }
 
-    private val isAccountOk: Boolean
-        get() {
-            val accounts = manager.getAccountsByType(ACCOUNT_TYPE_GOOGLE)
-            return listOf(*accounts).contains(account.value)
-        }
-
     override fun onSharedPreferenceChanged(prefs: SharedPreferences, key: String) {
-        load()
+        updateLiveData()
     }
 
     sealed class AuthTokenResult {
-        object Error: AuthTokenResult()
-        data class AuthToken(val token: String): AuthTokenResult()
-        data class HasIntent(val intent: Intent): AuthTokenResult()
+        object Error : AuthTokenResult()
+        data class AuthToken(val token: String) : AuthTokenResult()
+        data class HasIntent(val intent: Intent) : AuthTokenResult()
     }
 
     companion object {
@@ -118,6 +113,6 @@ class AccountRepository(context: Context?) : OnSharedPreferenceChangeListener {
     init {
         prefs.registerOnSharedPreferenceChangeListener(this)
         manager = AccountManager.get(context)
-        load()
+        updateLiveData()
     }
 }

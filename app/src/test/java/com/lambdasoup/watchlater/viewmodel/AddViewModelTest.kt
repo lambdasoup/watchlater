@@ -119,13 +119,6 @@ class AddViewModelTest {
     }
 
     @Test
-    fun `should remove account`() {
-        vm.removeAccount()
-
-        verify(accountRepository).clear()
-    }
-
-    @Test
     fun `should set permission needed`() {
         vm.setPermissionNeeded(true)
 

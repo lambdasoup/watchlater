@@ -22,7 +22,7 @@
 
 
 buildscript {
-    ext.kotlin_version = '1.4.21'
+    ext.kotlin_version = '1.5.32'
     repositories {
         google()
         mavenCentral()

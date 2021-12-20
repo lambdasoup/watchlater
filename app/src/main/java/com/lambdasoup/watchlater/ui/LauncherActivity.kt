@@ -69,6 +69,8 @@ class LauncherActivity : AppCompatActivity() {
         when (model.resolverState) {
             IntentResolverRepository.ResolverState.OK -> view.visibility = View.GONE
             IntentResolverRepository.ResolverState.YOUTUBE_ONLY -> view.visibility = View.VISIBLE
+            null -> {/* do nothing */
+            }
         }
     }
 

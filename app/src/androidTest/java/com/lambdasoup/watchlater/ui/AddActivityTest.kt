@@ -55,7 +55,7 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import org.hamcrest.Matchers
+import org.hamcrest.CoreMatchers.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -128,7 +128,7 @@ class AddActivityTest : WatchLaterActivityTest() {
         model.postValue(model.value?.copy(
                 permissionNeeded = false,
         ))
-        onView(withId(R.id.add_permissions)).check(matches(Matchers.not(isDisplayed())))
+        onView(withId(R.id.add_permissions)).check(matches(not(isDisplayed())))
     }
 
     @Test
@@ -222,7 +222,7 @@ class AddActivityTest : WatchLaterActivityTest() {
         
         onView(withId(R.id.action_watchnow)).perform(ViewActions.click())
         
-        intended(Matchers.allOf(
+        intended(allOf(
                 hasData(intent.data),
                 toPackage("com.google.android.youtube")))
     }
@@ -284,7 +284,7 @@ class AddActivityTest : WatchLaterActivityTest() {
     @Test
     fun should_retry_video_add_after_youtube_permissions_ok() {
         val intent = Intent("android.content.pm.action.REQUEST_PERMISSIONS")
-        intending(Matchers.equalTo(intent))
+        intending(equalTo(intent))
                 .respondWith(ActivityResult(
                         Activity.RESULT_OK,
                         null))

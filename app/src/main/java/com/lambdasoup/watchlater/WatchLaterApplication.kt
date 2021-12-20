@@ -53,7 +53,7 @@ class WatchLaterApplication : Application() {
     }
 
     private class WatchLaterFactory(private val application: WatchLaterApplication) : AndroidViewModelFactory(application) {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return if (WatchLaterViewModel::class.java.isAssignableFrom(modelClass)) {
                 try {
                     modelClass.getConstructor(WatchLaterApplication::class.java).newInstance(application)

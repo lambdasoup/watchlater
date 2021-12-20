@@ -41,7 +41,7 @@ steps:
 #
 # Build the project
 #
-- name: 'gcr.io/$PROJECT_ID/android:29'
+- name: 'gcr.io/$PROJECT_ID/android:31'
   id: build
   args: ["./gradlew", "assembleDebug", "lint", "test"]
   env:

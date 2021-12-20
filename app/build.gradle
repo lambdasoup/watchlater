@@ -119,6 +119,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.3.0'
 }
 repositories {
-    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
     mavenCentral()
 }

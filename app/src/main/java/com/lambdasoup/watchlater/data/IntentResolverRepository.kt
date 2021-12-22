@@ -24,43 +24,87 @@ package com.lambdasoup.watchlater.data
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.verify.domain.DomainVerificationManager
+import android.content.pm.verify.domain.DomainVerificationUserState
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
-class IntentResolverRepository(context: Context) {
+class IntentResolverRepository(private val context: Context) {
 
     private val packageManager: PackageManager = context.packageManager
 
-    private val _resolverState = MutableLiveData<ResolverState>()
+    private val _resolverState = MutableLiveData<ResolverProblems>()
 
-    fun getResolverState(): LiveData<ResolverState> {
+    fun getResolverState(): LiveData<ResolverProblems> {
         return _resolverState
     }
 
     fun update() {
+        _resolverState.value = ResolverProblems(
+            youtubeIsDefault = youtubeIsDefault(),
+            watchLaterIsDefault = watchLaterIsDefault(),
+            verifiedDomainsMissing = if (Build.VERSION.SDK_INT >= 31) {
+                domainVerificationMissing()
+            } else {
+                0
+            }
+        )
+    }
+
+    @RequiresApi(31)
+    private fun domainVerificationMissing(): Int {
+        val domainVerificationManager =
+            context.getSystemService(DomainVerificationManager::class.java)
+        val wlState = domainVerificationManager.getDomainVerificationUserState(context.packageName)
+            ?: throw RuntimeException("app does not declare any domains")
+        val watchlater = wlState.hostToStateMap.count { entry ->
+            entry.value == DomainVerificationUserState.DOMAIN_STATE_NONE
+        }
+        return watchlater
+    }
+
+    private fun youtubeIsDefault(): Boolean {
         val resolveIntent = Intent(Intent.ACTION_VIEW, Uri.parse(EXAMPLE_URI))
-        val resolveInfo = packageManager.resolveActivity(resolveIntent, PackageManager.MATCH_DEFAULT_ONLY)
-        when (resolveInfo?.activityInfo?.name) {
-            ACTIVITY_YOUTUBE -> {
+        val resolveInfo =
+            packageManager.resolveActivity(resolveIntent, PackageManager.MATCH_DEFAULT_ONLY)
+        return when (resolveInfo?.activityInfo?.name) {
 
-                // youtube is set as default app to launch with, no chooser
-                _resolverState.setValue(ResolverState.YOUTUBE_ONLY)
-            }
-            else -> {
+            // youtube is set as default app to launch with, no chooser
+            ACTIVITY_YOUTUBE -> true
 
-                // some unknown app is set as the default app to launch with, without chooser.
-                _resolverState.setValue(ResolverState.OK)
-            }
+            // some unknown app is set as the default app to launch with, without chooser.
+            else -> false
+
         }
     }
 
-    enum class ResolverState {
-        OK, YOUTUBE_ONLY
+    private fun watchLaterIsDefault(): Boolean {
+        val resolveIntent = Intent(Intent.ACTION_VIEW, Uri.parse(EXAMPLE_URI))
+        val resolveInfo =
+            packageManager.resolveActivity(resolveIntent, PackageManager.MATCH_DEFAULT_ONLY)
+        return when (resolveInfo?.activityInfo?.name) {
+
+            // youtube is set as default app to launch with, no chooser
+            ACTIVITY_WATCHLATER -> true
+
+            // some unknown app is set as the default app to launch with, without chooser.
+            else -> false
+
+        }
     }
+
+    data class ResolverProblems(
+        val youtubeIsDefault: Boolean,
+        val watchLaterIsDefault: Boolean,
+        val verifiedDomainsMissing: Int,
+    )
 
     companion object {
         private const val ACTIVITY_YOUTUBE = "com.google.android.youtube.UrlActivity"
+        private const val ACTIVITY_WATCHLATER = "com.lambdasoup.watchlater.ui.AddActivity"
         private const val EXAMPLE_URI = "https://www.youtube.com/watch?v=tntOCGkgt98"
     }
 }

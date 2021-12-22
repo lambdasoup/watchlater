@@ -27,7 +27,7 @@ import com.google.common.truth.Truth.assertThat
 import com.lambdasoup.tea.TeaTestEngineRule
 import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.data.IntentResolverRepository
-import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverState
+import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverProblems
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Model
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -51,7 +51,7 @@ class LauncherViewModelTest {
 
     private val application: WatchLaterApplication = mock()
     private val intentResolverRepository: IntentResolverRepository = mock()
-    private val liveData = MutableLiveData<ResolverState>()
+    private val liveData = MutableLiveData<ResolverProblems>()
 
     private lateinit var viewModel: LauncherViewModel
 
@@ -71,10 +71,10 @@ class LauncherViewModelTest {
 
     @Test
     fun `should return intentresolverstate`() {
-        val resolverState: ResolverState = mock()
-        liveData.postValue(resolverState)
+        val resolverProblem: ResolverProblems = mock()
+        liveData.postValue(resolverProblem)
 
         assertThat(viewModel.model.value)
-                .isEqualTo(Model(resolverState = resolverState))
+                .isEqualTo(Model(resolverProblems = resolverProblem))
     }
 }

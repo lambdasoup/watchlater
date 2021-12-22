@@ -28,7 +28,7 @@ import com.lambdasoup.tea.Sub
 import com.lambdasoup.tea.Tea
 import com.lambdasoup.tea.times
 import com.lambdasoup.watchlater.WatchLaterApplication
-import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverState
+import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverProblems
 import com.lambdasoup.watchlater.util.EventSource
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Msg.*
 
@@ -40,14 +40,15 @@ class LauncherViewModel(application: WatchLaterApplication) : WatchLaterViewMode
     val model = MutableLiveData<Model>()
 
     private val onResume = Sub.create<Unit, Msg>()
-    private val resolverStateSubscription = Sub.create<ResolverState, Msg>()
+    private val resolverStateSubscription = Sub.create<ResolverProblems, Msg>()
 
     private val updateRepository = Cmd.event<Msg> { repository.update() }
     private val openYouTubeSettings = Cmd.event<Msg> { events.submit(Event.OpenYouTubeSettings) }
+    private val openWatchLaterSettings = Cmd.event<Msg> { events.submit(Event.OpenWatchLaterSettings) }
     private val openExample = Cmd.event<Msg> { events.submit(Event.OpenExample) }
 
     private val tea = Tea(
-            init = Model(resolverState = null) * Cmd.none(),
+            init = Model(resolverProblems = null) * Cmd.none(),
             view = model::setValue,
             update = ::update,
             subscriptions = ::subscriptions,
@@ -56,10 +57,11 @@ class LauncherViewModel(application: WatchLaterApplication) : WatchLaterViewMode
     private fun update(model: Model, msg: Msg): Pair<Model, Cmd<Msg>> {
         return when (msg) {
             is OnResume -> model * updateRepository
-            is YouTubeSettings -> model * openYouTubeSettings
+            is OnYouTubeSettings -> model * openYouTubeSettings
+            is OnWatchLaterSettings -> model * openWatchLaterSettings
             is TryExample -> model * openExample
             is OnResolverState ->
-                    model.copy(resolverState = msg.resolverState) * Cmd.none()
+                    model.copy(resolverProblems = msg.resolverProblems) * Cmd.none()
         }
     }
 
@@ -71,27 +73,29 @@ class LauncherViewModel(application: WatchLaterApplication) : WatchLaterViewMode
             )
 
     private val observer =
-            Observer<ResolverState> { resolverStateSubscription.submit(it) }
+            Observer<ResolverProblems> { resolverStateSubscription.submit(it) }
 
     init {
         repository.getResolverState().observeForever(observer)
     }
 
     data class Model(
-            val resolverState: ResolverState?
+            val resolverProblems: ResolverProblems?
     )
 
     sealed class Msg {
         object OnResume : Msg()
-        object YouTubeSettings : Msg()
+        object OnYouTubeSettings : Msg()
+        object OnWatchLaterSettings : Msg()
         object TryExample : Msg()
         data class OnResolverState(
-                val resolverState: ResolverState
+                val resolverProblems: ResolverProblems
         ) : Msg()
     }
 
     sealed class Event {
         object OpenYouTubeSettings : Event()
+        object OpenWatchLaterSettings : Event()
         object OpenExample : Event()
     }
 
@@ -100,9 +104,13 @@ class LauncherViewModel(application: WatchLaterApplication) : WatchLaterViewMode
     }
     
     fun onYoutubeSettings() {
-        tea.ui(YouTubeSettings)
+        tea.ui(OnYouTubeSettings)
     }
-    
+
+    fun onWatchLaterSettings() {
+        tea.ui(OnWatchLaterSettings)
+    }
+
     fun onTryExample() {
         tea.ui(TryExample)
     }

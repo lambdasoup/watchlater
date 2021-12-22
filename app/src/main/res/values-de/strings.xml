@@ -21,7 +21,7 @@
   -->
 
 <resources>
-    <string name="app_name">Später ansehen</string>
+    <string name="app_name">Watch Later</string>
     <string name="asset_prefix">de</string>
     <string name="title_activity_about">Über</string>
     <string name="menu_about">Über</string>
@@ -49,11 +49,14 @@
     <string name="playlist_empty">Keine Liste ausgewählt</string>
     <string name="account_set">ändern</string>
     <string name="add_permissions_rationale">Die App wird nicht auf Deine Kontakte zugreifen. Die Berechtigung ist notwending, um mit Deinem YouTube-Konto zu kommunizieren.</string>
-    <string name="launcher_youtube_action_title">Bitte einstellen</string>
-    <string name="launcher_youtube_action_text">Dein Gerät ist konfiguriert, YouTube-Links immer mit der YouTube-App zu öffnen. Öffne die YouTube-Einstellungen und stelle sicher, dass \'Unterstützte Links öffnen\' auf \'Jedes Mal fragen\' steht.</string>
-    <string name="launcher_youtube_action_button">YouTube-Einstellungen Öffnen</string>
+    <string name="launcher_youtube_action_title">YouTube-Einstellungen anpassen</string>
+    <string name="launcher_youtube_action_text">Dein Gerät ist eingestellt, YouTube-Links standardmäßig mit der YouTube app zu öffnen. Gehe in die YouTube-Einstellungen und stelle sicher, daß \"Standardmäßig öffnen\" auf "In dieser App nicht öffnen" eingestellt ist.</string>
+    <string name="launcher_youtube_action_button">YouTube-Einstellungen öffnen</string>
+    <string name="launcher_watchlater_action_title">Watch Later-Einstellungen anpassen</string>
+    <string name="launcher_watchlater_action_text">Watch Later muss so eingestellt sein, daß YouTube-Links standardmäßig darin geöffnet werden. Gehe in die Watch Later-Einstellungen und stelle sicher, daß \"Standardmäßig öffnen\" auf \"In dieser App öffnen\" eingestellt ist.</string>
+    <string name="launcher_watchlater_action_button">Watch Later-Einstellungen öffnen</string>
     <string name="launcher_example_button">Beispielvideo testen</string>
-    <string name="launcher_example_text">Hier kannst Du \'Später Ansehen\' mit einem Beispielvideo testen. Keine Sorge, es ist nur ein harmloses Video mit lustigen Katzen.</string>
+    <string name="launcher_example_text">Hier kannst Du \'Watch Later\' mit einem Beispielvideo testen. Keine Sorge, es ist nur ein harmloses Video mit lustigen Katzen.</string>
     <string name="launcher_example_title">Ausprobieren</string>
     <string name="action_watchnow">Jetzt ansehen</string>
     <string name="action_watchlater">Später ansehen</string>

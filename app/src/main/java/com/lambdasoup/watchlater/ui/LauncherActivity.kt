@@ -24,6 +24,7 @@ package com.lambdasoup.watchlater.ui
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
@@ -36,7 +37,6 @@ import androidx.appcompat.widget.Toolbar
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.WatchLaterApplication
-import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Event
 
@@ -57,20 +57,29 @@ class LauncherActivity : AppCompatActivity() {
             when (event) {
                 Event.OpenYouTubeSettings -> openYoutubeSettings()
                 Event.OpenExample -> openExampleVideo()
+                Event.OpenWatchLaterSettings -> openWatchLaterSettings()
             }
         })
     }
 
     private fun render(model: LauncherViewModel.Model) {
         findViewById<View>(R.id.launcher_youtube_button).setOnClickListener { vm.onYoutubeSettings() }
+        findViewById<View>(R.id.launcher_watchlater_button).setOnClickListener { vm.onWatchLaterSettings() }
         findViewById<View>(R.id.launcher_example_button).setOnClickListener { vm.onTryExample() }
 
-        val view = findViewById<View>(R.id.launcher_youtube_action)
-        when (model.resolverState) {
-            IntentResolverRepository.ResolverState.OK -> view.visibility = View.GONE
-            IntentResolverRepository.ResolverState.YOUTUBE_ONLY -> view.visibility = View.VISIBLE
-            null -> {/* do nothing */
-            }
+        val youtubeView = findViewById<View>(R.id.launcher_youtube_action)
+        youtubeView.visibility = if (model.resolverProblems != null && model.resolverProblems.youtubeIsDefault) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
+
+        val watchLaterView = findViewById<View>(R.id.launcher_watchlater_action)
+        watchLaterView.visibility = if (model.resolverProblems != null &&
+            ((model.resolverProblems.verifiedDomainsMissing > 0) || !model.resolverProblems.watchLaterIsDefault)) {
+            View.VISIBLE
+        } else {
+            View.GONE
         }
     }
 
@@ -117,17 +126,30 @@ class LauncherActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.no_youtube_installed, Toast.LENGTH_SHORT).show()
             return
         }
-        if (packageManager.resolveActivity(INTENT_YOUTUBE_SETTINGS, PackageManager.MATCH_DEFAULT_ONLY) == null) {
+        val action = when {
+            Build.VERSION.SDK_INT >= 31 -> Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
+            else -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        }
+        val intent = Intent(action, Uri.parse("package:com.google.android.youtube"))
+        if (packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY ) == null) {
             Toast.makeText(this, R.string.no_youtube_settings_activity, Toast.LENGTH_SHORT).show()
             return
         }
-        startActivity(INTENT_YOUTUBE_SETTINGS)
+        startActivity(intent)
+    }
+
+    private fun openWatchLaterSettings() {
+        val action = when {
+            Build.VERSION.SDK_INT >= 31 -> Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
+            else -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        }
+        val intent = Intent(action, Uri.parse("package:${packageName}"))
+        startActivity(intent)
     }
 
     companion object {
         private val EXAMPLE_URI = Uri.parse("https://www.youtube.com/watch?v=dGFSjKuJfrI")
-        val EXAMPLE_INTENT = Intent(Intent.ACTION_VIEW, EXAMPLE_URI)
+        private val EXAMPLE_INTENT = Intent(Intent.ACTION_VIEW, EXAMPLE_URI)
         private val INTENT_YOUTUBE_APP = Intent().setData(EXAMPLE_URI).setPackage("com.google.android.youtube")
-        private val INTENT_YOUTUBE_SETTINGS = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:com.google.android.youtube"))
     }
 }

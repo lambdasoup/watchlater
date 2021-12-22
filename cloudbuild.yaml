@@ -6,13 +6,13 @@ steps:
   args: ['-q', 'cp', 'gs://watchlater-build-config/apikey.xml', 'app/src/main/res/values/']
 
 # build the project
-- name: 'gcr.io/$PROJECT_ID/android:31'
+- name: 'mreichelt/android:31'
   id: build
-  args: ["./gradlew", "assembleDebug", "lint", "test"]
+  args: ["./gradlew", "assembleDebug", "lintDebug", "testDebugUnitTest"]
   env:
     - 'TERM=dumb'
     - 'JAVA_TOOL_OPTIONS="-Xmx3g"'
-    - 'GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=8 -Dkotlin.incremental=false"'
+    - 'GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dkotlin.incremental=false"'
     - 'BRANCH_NAME=$BRANCH_NAME'
   waitFor:
     - copy_api_key

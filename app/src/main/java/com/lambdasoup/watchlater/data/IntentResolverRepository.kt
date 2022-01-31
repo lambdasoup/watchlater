@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -44,7 +44,6 @@ class IntentResolverRepository(private val context: Context) {
 
     fun update() {
         _resolverState.value = ResolverProblems(
-            youtubeIsDefault = youtubeIsDefault(),
             watchLaterIsDefault = watchLaterIsDefault(),
             verifiedDomainsMissing = if (Build.VERSION.SDK_INT >= 31) {
                 domainVerificationMissing()
@@ -66,21 +65,6 @@ class IntentResolverRepository(private val context: Context) {
         return watchlater
     }
 
-    private fun youtubeIsDefault(): Boolean {
-        val resolveIntent = Intent(Intent.ACTION_VIEW, Uri.parse(EXAMPLE_URI))
-        val resolveInfo =
-            packageManager.resolveActivity(resolveIntent, PackageManager.MATCH_DEFAULT_ONLY)
-        return when (resolveInfo?.activityInfo?.name) {
-
-            // youtube is set as default app to launch with, no chooser
-            ACTIVITY_YOUTUBE -> true
-
-            // some unknown app is set as the default app to launch with, without chooser.
-            else -> false
-
-        }
-    }
-
     private fun watchLaterIsDefault(): Boolean {
         val resolveIntent = Intent(Intent.ACTION_VIEW, Uri.parse(EXAMPLE_URI))
         val resolveInfo =
@@ -97,13 +81,11 @@ class IntentResolverRepository(private val context: Context) {
     }
 
     data class ResolverProblems(
-        val youtubeIsDefault: Boolean,
         val watchLaterIsDefault: Boolean,
         val verifiedDomainsMissing: Int,
     )
 
     companion object {
-        private const val ACTIVITY_YOUTUBE = "com.google.android.youtube.UrlActivity"
         private const val ACTIVITY_WATCHLATER = "com.lambdasoup.watchlater.ui.AddActivity"
         private const val EXAMPLE_URI = "https://www.youtube.com/watch?v=tntOCGkgt98"
     }

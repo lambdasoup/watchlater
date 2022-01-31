@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2015 - 2021
+  ~ Copyright (c) 2015 - 2022
   ~
   ~ Maximilian Hille <mh@lambdasoup.com>
   ~ Juliane Lehmann <jl@lambdasoup.com>
@@ -51,82 +51,96 @@
             android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/launcher_youtube_action"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_vertical_margin"
-                android:visibility="gone"
-                app:cardElevation="4dp"
-                app:contentPadding="8dp"
-                tools:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/launcher_youtube_action_action_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:text="@string/launcher_youtube_action_title"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
-
-                    <TextView
-                        android:id="@+id/launcher_youtube_action_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
-                        android:text="@string/launcher_youtube_action_text" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/launcher_youtube_button"
-                        style="?attr/borderlessButtonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/launcher_youtube_action_button" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/launcher_watchlater_action"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/activity_vertical_margin"
                 android:visibility="gone"
                 app:cardElevation="4dp"
-                app:contentPadding="8dp"
                 tools:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:divider="@drawable/divider_vertical"
+                    android:orientation="vertical"
+                    android:showDividers="middle">
 
-                    <TextView
-                        android:id="@+id/launcher_watchlater_action_action_title"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="@string/launcher_watchlater_action_title"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/launcher_watchlater_action_text"
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:text="@string/launcher_action_title"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:text="@string/launcher_action_text" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"
-                        android:text="@string/launcher_watchlater_action_text" />
+                        android:orientation="vertical">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/launcher_watchlater_button"
-                        style="?attr/borderlessButtonStyle"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:text="@string/launcher_youtube_action_title"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:text="@string/launcher_youtube_action_text" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/launcher_youtube_button"
+                            style="?attr/borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/launcher_youtube_action_button" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/launcher_watchlater_action_button" />
+                        android:layout_margin="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:text="@string/launcher_watchlater_action_title"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:text="@string/launcher_watchlater_action_text" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/launcher_watchlater_button"
+                            style="?attr/borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/launcher_watchlater_action_button" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -153,7 +167,6 @@
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 
                     <TextView
-                        android:id="@+id/launcher_example_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="8dp"

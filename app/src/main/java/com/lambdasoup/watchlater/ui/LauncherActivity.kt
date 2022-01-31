@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -67,13 +67,6 @@ class LauncherActivity : AppCompatActivity() {
         findViewById<View>(R.id.launcher_watchlater_button).setOnClickListener { vm.onWatchLaterSettings() }
         findViewById<View>(R.id.launcher_example_button).setOnClickListener { vm.onTryExample() }
 
-        val youtubeView = findViewById<View>(R.id.launcher_youtube_action)
-        youtubeView.visibility = if (model.resolverProblems != null && model.resolverProblems.youtubeIsDefault) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-
         val watchLaterView = findViewById<View>(R.id.launcher_watchlater_action)
         watchLaterView.visibility = if (model.resolverProblems != null &&
             ((model.resolverProblems.verifiedDomainsMissing > 0) || !model.resolverProblems.watchLaterIsDefault)) {
@@ -121,11 +114,6 @@ class LauncherActivity : AppCompatActivity() {
     }
 
     private fun openYoutubeSettings() {
-        // check if youtube is installed
-        if (packageManager.resolveActivity(INTENT_YOUTUBE_APP, PackageManager.MATCH_DEFAULT_ONLY) == null) {
-            Toast.makeText(this, R.string.no_youtube_installed, Toast.LENGTH_SHORT).show()
-            return
-        }
         val action = when {
             Build.VERSION.SDK_INT >= 31 -> Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
             else -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -150,6 +138,5 @@ class LauncherActivity : AppCompatActivity() {
     companion object {
         private val EXAMPLE_URI = Uri.parse("https://www.youtube.com/watch?v=dGFSjKuJfrI")
         private val EXAMPLE_INTENT = Intent(Intent.ACTION_VIEW, EXAMPLE_URI)
-        private val INTENT_YOUTUBE_APP = Intent().setData(EXAMPLE_URI).setPackage("com.google.android.youtube")
     }
 }

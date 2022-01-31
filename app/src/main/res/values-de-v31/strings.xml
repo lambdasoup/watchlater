@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2015 - 2021
+  ~ Copyright (c) 2015 - 2022
   ~
   ~ Maximilian Hille <mh@lambdasoup.com>
   ~ Juliane Lehmann <jl@lambdasoup.com>
@@ -21,6 +21,6 @@
   -->
 
 <resources>
-    <string name="launcher_youtube_action_text">Dein Gerät ist eingestellt, YouTube-Links standardmäßig mit der YouTube app zu öffnen. Gehe in die YouTube-Einstellungen und deaktiviere "Unterstützte Links öffnen".</string>
+    <string name="launcher_youtube_action_text">Dein Gerät ist eingestellt, YouTube-Links standardmäßig mit der YouTube app zu öffnen. Gehe in die YouTube-Einstellungen und deaktiviere \"Unterstützte Links öffnen\".</string>
     <string name="launcher_watchlater_action_text">Watch Later muss so eingestellt sein, daß YouTube-Links standardmäßig darin geöffnet werden. Gehe in die Watch Later-Einstellungen und aktiviere \"Unterstützte Links öffnen\". Füge dann alle verfügbaren Links hinzu.</string>
 </resources>

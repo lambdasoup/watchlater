@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2015 - 2021
+  ~ Copyright (c) 2015 - 2022
   ~
   ~ Maximilian Hille <mh@lambdasoup.com>
   ~ Juliane Lehmann <jl@lambdasoup.com>
@@ -34,7 +34,6 @@
     <string name="menu_store">Bewerten &amp; Teilen</string>
     <string name="title_activity_help">Hilfe</string>
     <string name="no_youtube_settings_activity">Kann YouTube-Einstellungen nicht starten. Ist die App installiert?</string>
-    <string name="no_youtube_installed">YouTube App ist nicht installiert.</string>
     <string name="menu_privacypolicy">Datenschutzerklärung</string>
     <string name="thumbnail_cd">Video-Vorschau-Bild</string>
     <string name="video_error_title">Konnte Video-Vorschau nicht laden</string>
@@ -49,10 +48,12 @@
     <string name="playlist_empty">Keine Liste ausgewählt</string>
     <string name="account_set">ändern</string>
     <string name="add_permissions_rationale">Die App wird nicht auf Deine Kontakte zugreifen. Die Berechtigung ist notwending, um mit Deinem YouTube-Konto zu kommunizieren.</string>
-    <string name="launcher_youtube_action_title">YouTube-Einstellungen anpassen</string>
+    <string name="launcher_action_title">App benötigt Setup</string>
+    <string name="launcher_action_text">Dein Gerät muss so eingestellt werden, dass YouTube-Links in Watch Later statt in der offiziellen YouTube-App geöffnet werden. Folge den beschriebenen Schritten.</string>
+    <string name="launcher_youtube_action_title">1. YouTube-Einstellungen anpassen</string>
     <string name="launcher_youtube_action_text">Dein Gerät ist eingestellt, YouTube-Links standardmäßig mit der YouTube app zu öffnen. Gehe in die YouTube-Einstellungen und stelle sicher, daß \"Standardmäßig öffnen\" auf "In dieser App nicht öffnen" eingestellt ist.</string>
     <string name="launcher_youtube_action_button">YouTube-Einstellungen öffnen</string>
-    <string name="launcher_watchlater_action_title">Watch Later-Einstellungen anpassen</string>
+    <string name="launcher_watchlater_action_title">1. Watch Later-Einstellungen anpassen</string>
     <string name="launcher_watchlater_action_text">Watch Later muss so eingestellt sein, daß YouTube-Links standardmäßig darin geöffnet werden. Gehe in die Watch Later-Einstellungen und stelle sicher, daß \"Standardmäßig öffnen\" auf \"In dieser App öffnen\" eingestellt ist.</string>
     <string name="launcher_watchlater_action_button">Watch Later-Einstellungen öffnen</string>
     <string name="launcher_example_button">Beispielvideo testen</string>

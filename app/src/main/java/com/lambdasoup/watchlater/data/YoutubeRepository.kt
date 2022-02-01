@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -21,10 +21,8 @@
  */
 package com.lambdasoup.watchlater.data
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
-import androidx.preference.PreferenceManager
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.data.YoutubeRepository.PlaylistItem.Snippet.ResourceId
 import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.Playlist
@@ -40,38 +38,45 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
 import java.io.IOException
 
-class YoutubeRepository(context: Context) {
-
-    private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+class YoutubeRepository(
+    private val sharedPreferences: SharedPreferences,
+    baseUrl: String,
+) {
 
     private val retrofit: Retrofit
     private val api: YoutubeApi
 
-    private val _targetPlaylist = object : LiveData<Playlist?>(), SharedPreferences.OnSharedPreferenceChangeListener {
-        
-        init {
-            update()
-        }
-        
-        private fun update() {
-            val playlistId = prefs.getString(PREF_PLAYLIST_ID, null)
-            val playlistTitle = prefs.getString(PREF_PLAYLIST_TITLE, null)
+    private val _targetPlaylist =
+        object : LiveData<Playlist?>(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-            if (playlistId == null || playlistTitle == null) {
-                postValue(null)
-                return
+            init {
+                update()
             }
 
-            postValue(Playlist(id = playlistId, snippet = Playlist.Snippet(title = playlistTitle)))
-        }
+            private fun update() {
+                val playlistId = sharedPreferences.getString(PREF_PLAYLIST_ID, null)
+                val playlistTitle = sharedPreferences.getString(PREF_PLAYLIST_TITLE, null)
+
+                if (playlistId == null || playlistTitle == null) {
+                    postValue(null)
+                    return
+                }
+
+                postValue(
+                    Playlist(
+                        id = playlistId,
+                        snippet = Playlist.Snippet(title = playlistTitle)
+                    )
+                )
+            }
         
         override fun onActive() {
             super.onActive()
-            prefs.registerOnSharedPreferenceChangeListener(this)
+            sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         }
 
         override fun onInactive() {
-            prefs.unregisterOnSharedPreferenceChangeListener(this)
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
             super.onInactive()
         }
 
@@ -96,7 +101,7 @@ class YoutubeRepository(context: Context) {
         }
 
         val retrofitBuilder = Retrofit.Builder()
-                .baseUrl(YOUTUBE_ENDPOINT)
+            .baseUrl(baseUrl)
                 .addConverterFactory(MoshiConverterFactory.create())
                 .client(httpClient.build())
         retrofit = retrofitBuilder.build()
@@ -107,7 +112,7 @@ class YoutubeRepository(context: Context) {
             retrofit.responseBodyConverter(YouTubeError::class.java, arrayOfNulls(0))
 
     fun setPlaylist(playlist: Playlist?) {
-        prefs.edit()
+        sharedPreferences.edit()
                 .putString(PREF_PLAYLIST_TITLE, playlist?.snippet?.title)
                 .putString(PREF_PLAYLIST_ID, playlist?.id)
                 .apply()
@@ -349,8 +354,6 @@ class YoutubeRepository(context: Context) {
     }
 
     companion object {
-        private const val YOUTUBE_ENDPOINT = "https://www.googleapis.com/youtube/v3/"
-
         private const val DAILY_LIMIT_EXCEEDED_UNREG = "dailyLimitExceededUnreg"
         private const val PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos"
         private const val VIDEO_NOT_FOUND = "videoNotFound"

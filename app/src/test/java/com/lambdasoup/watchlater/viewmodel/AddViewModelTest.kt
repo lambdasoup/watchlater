@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -28,16 +28,15 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.lambdasoup.tea.TeaTestEngineRule
-import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.data.AccountRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository
-import com.lambdasoup.watchlater.data.YoutubeRepository.AddVideoResult
+import com.lambdasoup.watchlater.data.YoutubeRepository.*
 import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.Playlist
-import com.lambdasoup.watchlater.data.YoutubeRepository.VideoInfoResult
-import com.lambdasoup.watchlater.data.YoutubeRepository.Videos
 import com.lambdasoup.watchlater.util.VideoIdParser
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.*
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -56,7 +55,6 @@ class AddViewModelTest {
     @get:Rule
     var teaRule: TestRule = TeaTestEngineRule()
 
-    private val application: WatchLaterApplication = mock()
     private val accountRepository: AccountRepository = mock()
     private val videoIdParser: VideoIdParser = mock()
     private val youtubeRepository: YoutubeRepository = mock()
@@ -200,9 +198,9 @@ class AddViewModelTest {
         val token2 = "token2"
 
         whenever(youtubeRepository.addVideo(videoId, playlist, token))
-                .thenReturn(AddVideoResult.Error(YoutubeRepository.ErrorType.InvalidToken, token))
+            .thenReturn(AddVideoResult.Error(ErrorType.InvalidToken, token))
         whenever(youtubeRepository.addVideo(videoId, playlist, token2))
-                .thenReturn(AddVideoResult.Success)
+            .thenReturn(AddVideoResult.Success)
 
         whenever(accountRepository.getAuthToken())
                 .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
@@ -221,9 +219,9 @@ class AddViewModelTest {
         val token2 = "token2"
 
         whenever(youtubeRepository.addVideo(videoId, playlist, token))
-                .thenReturn(AddVideoResult.Error(YoutubeRepository.ErrorType.InvalidToken, token))
+            .thenReturn(AddVideoResult.Error(ErrorType.InvalidToken, token))
         whenever(youtubeRepository.addVideo(videoId, playlist, token2))
-                .thenReturn(AddVideoResult.Error(YoutubeRepository.ErrorType.InvalidToken, token2))
+            .thenReturn(AddVideoResult.Error(ErrorType.InvalidToken, token2))
 
         whenever(accountRepository.getAuthToken())
                 .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
@@ -240,7 +238,7 @@ class AddViewModelTest {
     @Test
     fun `should handle generic error`() {
         whenever(youtubeRepository.addVideo(videoId, playlist, token))
-                .thenReturn(AddVideoResult.Error(YoutubeRepository.ErrorType.Other, token))
+            .thenReturn(AddVideoResult.Error(ErrorType.Other, token))
 
         vm.watchLater(videoId)
 
@@ -269,13 +267,13 @@ class AddViewModelTest {
         val videoId = "video-id"
         whenever(videoIdParser.parseVideoId(uri)).thenReturn(videoId)
         whenever(youtubeRepository.getVideoInfo(videoId, token))
-                .thenReturn(VideoInfoResult.Error(YoutubeRepository.ErrorType.VideoNotFound))
+            .thenReturn(VideoInfoResult.Error(ErrorType.VideoNotFound))
 
         vm.setVideoUri(uri)
 
         assertThat(vm.model.value!!.videoId).isEqualTo(videoId)
         assertThat(vm.model.value!!.videoInfo)
-            .isEqualTo(VideoInfo.Error(VideoInfo.ErrorType.Youtube(YoutubeRepository.ErrorType.VideoNotFound)))
+            .isEqualTo(VideoInfo.Error(VideoInfo.ErrorType.Youtube(ErrorType.VideoNotFound)))
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -291,7 +291,8 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
     private fun openWithYoutube(playVideo: Boolean = true) {
         try {
             val youtubeIntent = Intent()
-                    .setPackage("com.google.android.youtube")
+                .setPackage("com.google.android.youtube")
+                .setAction(Intent.ACTION_VIEW)
 
             if (playVideo) {
                 youtubeIntent.data = intent.data

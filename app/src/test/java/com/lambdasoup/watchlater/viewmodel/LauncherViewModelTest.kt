@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -25,7 +25,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.lambdasoup.tea.TeaTestEngineRule
-import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverProblems
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Model

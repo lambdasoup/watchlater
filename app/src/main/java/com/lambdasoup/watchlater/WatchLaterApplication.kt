@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -21,7 +21,9 @@
  */
 package com.lambdasoup.watchlater
 
+import android.accounts.AccountManager
 import android.app.Application
+import androidx.preference.PreferenceManager
 import com.lambdasoup.watchlater.data.AccountRepository
 import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository
@@ -42,17 +44,20 @@ class WatchLaterApplication : Application() {
             // TODO https://github.com/InsertKoinIO/koin/issues/1242
             // androidLogger()
             androidContext(this@WatchLaterApplication)
-            modules(appModule)
+            modules(appModule, appModuleExtra)
         }
     }
 }
 
 val appModule = module {
 
-    single { YoutubeRepository(get()) }
-    single { IntentResolverRepository(get()) }
-    single { AccountRepository(get()) }
+    single { YoutubeRepository(get(), androidContext().getString(R.string.youtube_endpoint)) }
+    single { IntentResolverRepository(get(), get()) }
+    single { AccountRepository(get(), get()) }
     single { VideoIdParser() }
+    single { androidContext().packageManager }
+    single { PreferenceManager.getDefaultSharedPreferences(get()) }
+    single { AccountManager.get(get()) }
 
     viewModel { AddViewModel(get(), get(), get()) }
     viewModel { LauncherViewModel(get()) }

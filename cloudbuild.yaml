@@ -11,7 +11,6 @@ steps:
   args: ["./gradlew", "assembleDebug", "lintDebug", "testDebugUnitTest"]
   env:
     - 'TERM=dumb'
-    - 'JAVA_TOOL_OPTIONS="-Xmx3g"'
     - 'GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dkotlin.incremental=false"'
     - 'BRANCH_NAME=$BRANCH_NAME'
   waitFor:

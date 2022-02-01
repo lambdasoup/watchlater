@@ -32,9 +32,10 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
-class IntentResolverRepository(private val context: Context) {
-
-    private val packageManager: PackageManager = context.packageManager
+class IntentResolverRepository(
+    private val context: Context,
+    private val packageManager: PackageManager,
+) {
 
     private val _resolverState = MutableLiveData<ResolverProblems>()
 

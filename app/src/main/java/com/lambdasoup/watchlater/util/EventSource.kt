@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -24,8 +24,10 @@ package com.lambdasoup.watchlater.util
 
 import androidx.annotation.MainThread
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.*
-import java.lang.RuntimeException
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
 
 class EventSource<T> {
     
@@ -76,7 +78,4 @@ class EventSource<T> {
     
     @VisibleForTesting
     internal fun contains(t: T) = events.contains(t)
-
-    @VisibleForTesting
-    internal fun clear() = events.clear()
 }

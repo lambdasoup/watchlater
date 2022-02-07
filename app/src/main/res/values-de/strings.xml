@@ -67,4 +67,6 @@
     <string name="playlist_selection_title">Liste auswählen</string>
     <string name="playlist_selection_edit">Listen editieren</string>
     <string name="playlist_selection_create">Liste erstellen</string>
+    <string name="error_invalid_video_id">Link enthält ungültige Video ID</string>
+    <string name="error_video_info_no_account">Video Info kann nur mit ausgewähltem Konto angezeigt werden</string>
 </resources>

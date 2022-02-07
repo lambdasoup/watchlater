@@ -67,4 +67,6 @@
     <string name="playlist_selection_title">Select Playlist</string>
     <string name="playlist_selection_edit">Edit playlists</string>
     <string name="playlist_selection_create">Create playlist</string>
+    <string name="error_invalid_video_id">Link has invalid video ID</string>
+    <string name="error_video_info_no_account">Video info can not be displayed without account</string>
 </resources>

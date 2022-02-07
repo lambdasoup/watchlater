@@ -176,7 +176,7 @@ class AddActivityTest : WatchLaterActivityTest() {
     @Test
     fun should_show_network_error() {
         model.postValue(model.value!!.copy(
-                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.Network),
+                videoInfo = VideoInfo.Error(VideoInfo.ErrorType.Youtube(YoutubeRepository.ErrorType.Network)),
         ))
 
         onView(withId(R.id.reason_title)).check(matches(withText(R.string.video_error_title)))
@@ -186,7 +186,7 @@ class AddActivityTest : WatchLaterActivityTest() {
     @Test
     fun should_show_video_not_found_error() {
         model.postValue(model.value!!.copy(
-                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.VideoNotFound),
+                videoInfo = VideoInfo.Error(VideoInfo.ErrorType.Youtube(YoutubeRepository.ErrorType.VideoNotFound)),
         ))
 
         onView(withId(R.id.reason_title)).check(matches(withText(R.string.video_error_title)))
@@ -196,7 +196,7 @@ class AddActivityTest : WatchLaterActivityTest() {
     @Test
     fun should_show_watch_buttons_on_default_error() {
         model.postValue(model.value!!.copy(
-                videoInfo = VideoInfo.Error(YoutubeRepository.ErrorType.Other),
+                videoInfo = VideoInfo.Error(VideoInfo.ErrorType.Youtube(YoutubeRepository.ErrorType.Other)),
         ))
 
         onView(withId(R.id.action_watchnow)).check(matches(isDisplayed()))

@@ -90,7 +90,7 @@ class AddViewModelTest {
                 .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
         accountLiveData.value = mock()
         whenever(videoIdParser.parseVideoId(uri)).thenReturn(videoId)
-        whenever(youtubeRepository.getVideoInfo(videoId))
+        whenever(youtubeRepository.getVideoInfo(videoId, token))
                 .thenReturn(VideoInfoResult.VideoInfo(item))
         whenever(youtubeRepository.addVideo(videoId, playlist, token))
                 .thenReturn(AddVideoResult.Success)
@@ -257,7 +257,8 @@ class AddViewModelTest {
         val item: Videos.Item = mock()
         val videoId = "video-id"
         whenever(videoIdParser.parseVideoId(uri)).thenReturn(videoId)
-        whenever(youtubeRepository.getVideoInfo(videoId)).thenReturn(VideoInfoResult.VideoInfo(item))
+        whenever(youtubeRepository.getVideoInfo(videoId, token))
+            .thenReturn(VideoInfoResult.VideoInfo(item))
 
         vm.setVideoUri(uri)
 
@@ -270,12 +271,29 @@ class AddViewModelTest {
         val uri: Uri = mock()
         val videoId = "video-id"
         whenever(videoIdParser.parseVideoId(uri)).thenReturn(videoId)
-        whenever(youtubeRepository.getVideoInfo(videoId))
+        whenever(youtubeRepository.getVideoInfo(videoId, token))
                 .thenReturn(VideoInfoResult.Error(YoutubeRepository.ErrorType.VideoNotFound))
 
         vm.setVideoUri(uri)
 
         assertThat(vm.model.value!!.videoId).isEqualTo(videoId)
-        assertThat(vm.model.value!!.videoInfo).isEqualTo(VideoInfo.Error(YoutubeRepository.ErrorType.VideoNotFound))
+        assertThat(vm.model.value!!.videoInfo)
+            .isEqualTo(VideoInfo.Error(VideoInfo.ErrorType.Youtube(YoutubeRepository.ErrorType.VideoNotFound)))
+    }
+
+    @Test
+    fun `should reload videoinfo after error when new account is added`() {
+        accountLiveData.value = null
+        whenever(accountRepository.getAuthToken())
+            .thenReturn(AccountRepository.AuthTokenResult.Error)
+
+        vm.setVideoUri(uri)
+
+        whenever(accountRepository.getAuthToken())
+            .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
+        accountLiveData.value = mock()
+
+        assertThat(vm.model.value!!.videoInfo)
+            .isInstanceOf(VideoInfo.Loaded::class.java)
     }
 }

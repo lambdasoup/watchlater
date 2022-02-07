@@ -26,7 +26,6 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.preference.PreferenceManager
 import com.lambdasoup.watchlater.BuildConfig
-import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository.PlaylistItem.Snippet.ResourceId
 import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.Playlist
 import com.squareup.moshi.JsonClass
@@ -46,7 +45,6 @@ class YoutubeRepository(context: Context) {
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     private val retrofit: Retrofit
-    private val apiKey: String
     private val api: YoutubeApi
 
     private val _targetPlaylist = object : LiveData<Playlist?>(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -96,7 +94,6 @@ class YoutubeRepository(context: Context) {
             loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
             httpClient.networkInterceptors().add(loggingInterceptor)
         }
-        apiKey = context.getString(R.string.youtube_api_key)
 
         val retrofitBuilder = Retrofit.Builder()
                 .baseUrl(YOUTUBE_ENDPOINT)
@@ -116,10 +113,11 @@ class YoutubeRepository(context: Context) {
                 .apply()
     }
 
-    fun getVideoInfo(videoId: String): VideoInfoResult {
+    fun getVideoInfo(videoId: String, token: String): VideoInfoResult {
+        val auth = "Bearer $token"
         val response: Response<Videos>
         try {
-            response = api.listVideos(videoId, apiKey).execute()
+            response = api.listVideos(videoId, auth).execute()
         } catch (e: IOException) {
             return VideoInfoResult.Error(ErrorType.Network)
         }
@@ -211,7 +209,8 @@ class YoutubeRepository(context: Context) {
 
         @GET("videos?part=snippet,contentDetails&maxResults=1")
         fun listVideos(
-                @Query("id") id: String, @Query("key") apiKey: String,
+                @Query("id") id: String,
+                @Header("Authorization") auth: String,
         ): Call<Videos>
 
         @GET("playlists?part=snippet&mine=true")

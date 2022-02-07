@@ -33,7 +33,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.lambdasoup.watchlater.R
-import com.lambdasoup.watchlater.data.YoutubeRepository.ErrorType
+import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository.Videos
 import com.lambdasoup.watchlater.util.formatDuration
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
@@ -86,9 +86,13 @@ class VideoView @JvmOverloads constructor(
         show(error)
         val reason: TextView = error.findViewById(R.id.reason)
         when (errorType) {
-            ErrorType.Network -> reason.setText(R.string.error_network)
-            ErrorType.VideoNotFound -> reason.setText(R.string.error_video_not_found)
-            else -> reason.text = resources.getString(R.string.could_not_load, errorType.toString())
+            is ErrorType.Youtube -> when (errorType.error) {
+                YoutubeRepository.ErrorType.Network -> reason.setText(R.string.error_network)
+                YoutubeRepository.ErrorType.VideoNotFound -> reason.setText(R.string.error_video_not_found)
+                else -> reason.text = resources.getString(R.string.could_not_load, errorType.toString())
+            }
+            is ErrorType.InvalidVideoId -> reason.setText(R.string.error_invalid_video_id)
+            is ErrorType.NoAccount -> reason.setText(R.string.error_video_info_no_account)
         }
     }
 

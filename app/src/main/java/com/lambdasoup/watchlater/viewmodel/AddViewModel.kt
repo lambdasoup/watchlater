@@ -40,6 +40,7 @@ import com.lambdasoup.watchlater.data.YoutubeRepository.Videos.Item
 import com.lambdasoup.watchlater.util.EventSource
 import com.lambdasoup.watchlater.util.VideoIdParser
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.Msg.*
+import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoInfo.ErrorType.*
 
 class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(application) {
 
@@ -47,8 +48,8 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
     private val youtubeRepository: YoutubeRepository = application.youtubeRepository
     private val videoIdParser: VideoIdParser = application.videoIdParser
 
-    private val getVideoInfo = Cmd.task<Msg, String, VideoInfoResult> {
-        youtubeRepository.getVideoInfo(it)
+    private val getVideoInfo = Cmd.task<Msg, String, String, VideoInfoResult> { videoId, token ->
+        youtubeRepository.getVideoInfo(videoId, token)
     }
 
     private val getAuthToken = Cmd.task<Msg, AuthTokenResult> {
@@ -156,20 +157,30 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                     val videoId = videoIdParser.parseVideoId(msg.uri)
                     if (videoId != null) {
                         model.copy(videoId = videoId) *
-                                getVideoInfo(videoId) { OnVideoInfoResult(it) }
+                                getAuthToken { token -> OnVideoInfoTokenResult(token, videoId) }
                     } else {
                         model.copy(
                                 videoId = null,
-                                videoInfo = VideoInfo.Error(ErrorType.Other),
+                                videoInfo = VideoInfo.Error(InvalidVideoId),
                         ) * Cmd.none()
                     }
+                }
+
+                is OnVideoInfoTokenResult -> when (msg.result) {
+                    is AuthTokenResult.Error ->
+                        model.copy(videoInfo = VideoInfo.Error(NoAccount)) * Cmd.none()
+                    is AuthTokenResult.AuthToken ->
+                        model * getVideoInfo(msg.videoId, msg.result.token) { OnVideoInfoResult(it) }
+                    is AuthTokenResult.HasIntent ->
+                        model.copy(videoAdd = VideoAdd.HasIntent(msg.result.intent)) *
+                                Cmd.event<Msg> { events.submit(Event.OpenAuthIntent(msg.result.intent)) }
                 }
 
                 is OnVideoInfoResult -> when (msg.result) {
                     is VideoInfoResult.VideoInfo ->
                         model.copy(videoInfo = VideoInfo.Loaded(msg.result.item)) * Cmd.none()
                     is VideoInfoResult.Error ->
-                        model.copy(videoInfo = VideoInfo.Error(msg.result.type)) * Cmd.none()
+                        model.copy(videoInfo = VideoInfo.Error(Youtube(msg.result.type))) * Cmd.none()
                 }
 
                 is SetPermissionNeeded -> {
@@ -186,7 +197,13 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                     ) * Cmd.none()
                 }
 
-                is OnAccount -> model.copy(account = msg.account) * Cmd.none()
+                is OnAccount -> model.copy(account = msg.account) *
+                        // in case we did not have an account yet, trigger video info load
+                        if (model.videoInfo is VideoInfo.Error && msg.account != null && model.videoId != null) {
+                            getAuthToken { OnVideoInfoTokenResult(it, model.videoId) }
+                        } else {
+                            Cmd.none()
+                        }
 
                 is OnInsertTokenResult -> when (msg.result) {
                     is AuthTokenResult.Error ->
@@ -303,6 +320,11 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
                 val result: AuthTokenResult,
         ) : Msg()
 
+        data class OnVideoInfoTokenResult(
+            val result: AuthTokenResult,
+            val videoId: String,
+        ) : Msg()
+
         data class OnAddVideoResult(
                 val result: AddVideoResult,
                 val videoId: String,
@@ -362,5 +384,11 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
         object Progress : VideoInfo()
         data class Loaded(val data: Item) : VideoInfo()
         data class Error(val error: ErrorType) : VideoInfo()
+
+        sealed interface ErrorType {
+            data class Youtube(val error: YoutubeRepository.ErrorType) : ErrorType
+            object NoAccount : ErrorType
+            object InvalidVideoId : ErrorType
+        }
     }
 }

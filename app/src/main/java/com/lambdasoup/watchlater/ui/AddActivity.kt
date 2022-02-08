@@ -37,22 +37,19 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
-import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AddActivity : AppCompatActivity(), ActionView.ActionListener {
 
-    private val vm: AddViewModel by viewModels {
-        (applicationContext as WatchLaterApplication).viewModelProviderFactory
-    }
+    private val vm: AddViewModel by viewModel()
 
     private lateinit var actionView: ActionView
     private lateinit var permissionsView: PermissionsView
@@ -175,7 +172,8 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
             val titles = requireArguments().getStringArray(ARG_TITLES)
             val ids = requireArguments().getStringArray(ARG_IDS)
 
-            (context as AddActivity).vm.selectPlaylist(YoutubeRepository.Playlists.Playlist(
+            (context as AddActivity).vm.selectPlaylist(
+                YoutubeRepository.Playlists.Playlist(
                     id = ids!![which],
                     snippet = YoutubeRepository.Playlists.Playlist.Snippet(
                             title = titles!![which]

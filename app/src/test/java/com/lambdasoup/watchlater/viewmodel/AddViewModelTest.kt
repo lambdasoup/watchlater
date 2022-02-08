@@ -76,15 +76,12 @@ class AddViewModelTest {
     fun setup() {
         initMocks(this)
 
-        whenever(application.accountRepository).thenReturn(accountRepository)
-        whenever(application.videoIdParser).thenReturn(videoIdParser)
-        whenever(application.youtubeRepository).thenReturn(youtubeRepository)
         accountLiveData = MutableLiveData()
         whenever(accountRepository.get()).thenReturn(accountLiveData)
         whenever(youtubeRepository.targetPlaylist).thenReturn(playlistLiveData)
         playlistLiveData.value = playlist
 
-        vm = AddViewModel(application)
+        vm = AddViewModel(accountRepository, youtubeRepository, videoIdParser)
 
         whenever(accountRepository.getAuthToken())
                 .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))

@@ -23,18 +23,17 @@ package com.lambdasoup.watchlater.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import com.lambdasoup.tea.Cmd
 import com.lambdasoup.tea.Sub
 import com.lambdasoup.tea.Tea
 import com.lambdasoup.tea.times
-import com.lambdasoup.watchlater.WatchLaterApplication
+import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverProblems
 import com.lambdasoup.watchlater.util.EventSource
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Msg.*
 
-class LauncherViewModel(application: WatchLaterApplication) : WatchLaterViewModel(application) {
-
-    private val repository = application.intentResolverRepository
+class LauncherViewModel(private val repository: IntentResolverRepository) : ViewModel() {
 
     val events = EventSource<Event>()
     val model = MutableLiveData<Model>()

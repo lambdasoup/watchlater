@@ -95,6 +95,7 @@ dependencies {
     implementation 'androidx.activity:activity-ktx:1.4.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.preference:preference-ktx:1.2.0"
+    implementation "io.insert-koin:koin-android:3.1.5"
 
     testImplementation project(':tea')
     testImplementation 'junit:junit:4.13.2'

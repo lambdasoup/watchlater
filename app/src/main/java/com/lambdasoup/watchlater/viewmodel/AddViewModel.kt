@@ -26,27 +26,25 @@ import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import com.lambdasoup.tea.Cmd
 import com.lambdasoup.tea.Sub
 import com.lambdasoup.tea.Tea
 import com.lambdasoup.tea.times
-import com.lambdasoup.watchlater.WatchLaterApplication
-import com.lambdasoup.watchlater.data.AccountRepository
+import com.lambdasoup.watchlater.data.*
 import com.lambdasoup.watchlater.data.AccountRepository.AuthTokenResult
-import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository.*
-import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.Playlist
-import com.lambdasoup.watchlater.data.YoutubeRepository.Videos.Item
+import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.*
 import com.lambdasoup.watchlater.util.EventSource
 import com.lambdasoup.watchlater.util.VideoIdParser
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.Msg.*
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoInfo.ErrorType.*
 
-class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(application) {
-
-    private val accountRepository: AccountRepository = application.accountRepository
-    private val youtubeRepository: YoutubeRepository = application.youtubeRepository
-    private val videoIdParser: VideoIdParser = application.videoIdParser
+class AddViewModel(
+    private val accountRepository: AccountRepository,
+    private val youtubeRepository: YoutubeRepository,
+    private val videoIdParser: VideoIdParser,
+) : ViewModel() {
 
     private val getVideoInfo = Cmd.task<Msg, String, String, VideoInfoResult> { videoId, token ->
         youtubeRepository.getVideoInfo(videoId, token)
@@ -326,9 +324,9 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
         ) : Msg()
 
         data class OnAddVideoResult(
-                val result: AddVideoResult,
-                val videoId: String,
-                val targetPlaylist: Playlist,
+            val result: AddVideoResult,
+            val videoId: String,
+            val targetPlaylist: Playlist,
         ) : Msg()
     }
 
@@ -382,7 +380,7 @@ class AddViewModel(application: WatchLaterApplication) : WatchLaterViewModel(app
 
     sealed class VideoInfo {
         object Progress : VideoInfo()
-        data class Loaded(val data: Item) : VideoInfo()
+        data class Loaded(val data: Videos.Item) : VideoInfo()
         data class Error(val error: ErrorType) : VideoInfo()
 
         sealed interface ErrorType {

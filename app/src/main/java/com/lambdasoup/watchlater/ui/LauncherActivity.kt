@@ -31,20 +31,17 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
-import com.lambdasoup.watchlater.WatchLaterApplication
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Event
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LauncherActivity : AppCompatActivity() {
 
-    private val vm: LauncherViewModel by viewModels {
-        (applicationContext as WatchLaterApplication).viewModelProviderFactory
-    }
+    private val vm: LauncherViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

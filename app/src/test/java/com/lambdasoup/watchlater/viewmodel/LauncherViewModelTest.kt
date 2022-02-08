@@ -49,7 +49,6 @@ class LauncherViewModelTest {
     @get:Rule
     var teaRule: TestRule = TeaTestEngineRule()
 
-    private val application: WatchLaterApplication = mock()
     private val intentResolverRepository: IntentResolverRepository = mock()
     private val liveData = MutableLiveData<ResolverProblems>()
 
@@ -59,8 +58,7 @@ class LauncherViewModelTest {
     fun setup() {
         initMocks(this)
         whenever(intentResolverRepository.getResolverState()).thenReturn(liveData)
-        whenever(application.intentResolverRepository).thenReturn(intentResolverRepository)
-        viewModel = LauncherViewModel(application)
+        viewModel = LauncherViewModel(intentResolverRepository)
     }
 
     @Test

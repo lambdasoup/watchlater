@@ -22,52 +22,38 @@
 package com.lambdasoup.watchlater
 
 import android.app.Application
-import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import com.lambdasoup.watchlater.data.AccountRepository
 import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.util.VideoIdParser
-import com.lambdasoup.watchlater.viewmodel.WatchLaterViewModel
-import java.lang.reflect.InvocationTargetException
+import com.lambdasoup.watchlater.viewmodel.AddViewModel
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.context.GlobalContext.startKoin
+import org.koin.dsl.module
 
 class WatchLaterApplication : Application() {
 
-    lateinit var accountRepository: AccountRepository
-    lateinit var youtubeRepository: YoutubeRepository
-    lateinit var intentResolverRepository: IntentResolverRepository
-    lateinit var videoIdParser: VideoIdParser
-
-    @VisibleForTesting
-    lateinit var viewModelProviderFactory: ViewModelProvider.Factory
-
     override fun onCreate() {
         super.onCreate()
-        accountRepository = AccountRepository(this)
-        youtubeRepository = YoutubeRepository(this)
-        intentResolverRepository = IntentResolverRepository(this)
-        videoIdParser = VideoIdParser()
-        viewModelProviderFactory = WatchLaterFactory(this)
-    }
 
-    private class WatchLaterFactory(private val application: WatchLaterApplication) : AndroidViewModelFactory(application) {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return if (WatchLaterViewModel::class.java.isAssignableFrom(modelClass)) {
-                try {
-                    modelClass.getConstructor(WatchLaterApplication::class.java).newInstance(application)
-                } catch (e: NoSuchMethodException) {
-                    throw RuntimeException("Cannot create an instance of $modelClass", e)
-                } catch (e: IllegalAccessException) {
-                    throw RuntimeException("Cannot create an instance of $modelClass", e)
-                } catch (e: InstantiationException) {
-                    throw RuntimeException("Cannot create an instance of $modelClass", e)
-                } catch (e: InvocationTargetException) {
-                    throw RuntimeException("Cannot create an instance of $modelClass", e)
-                }
-            } else super.create(modelClass)
+        startKoin{
+            // TODO https://github.com/InsertKoinIO/koin/issues/1242
+            // androidLogger()
+            androidContext(this@WatchLaterApplication)
+            modules(appModule)
         }
     }
+}
 
+val appModule = module {
+
+    single { YoutubeRepository(get()) }
+    single { IntentResolverRepository(get()) }
+    single { AccountRepository(get()) }
+    single { VideoIdParser() }
+
+    viewModel { AddViewModel(get(), get(), get()) }
+    viewModel { LauncherViewModel(get()) }
 }

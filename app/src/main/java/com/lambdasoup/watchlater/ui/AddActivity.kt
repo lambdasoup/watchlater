@@ -188,6 +188,7 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         }
     }
 
+    @Deprecated("Deprecated on platform")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             REQUEST_ACCOUNT -> {

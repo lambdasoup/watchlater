@@ -83,7 +83,7 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
             }
         }
         vm.setVideoUri(intent.data!!)
-        vm.model.observe(this, {
+        vm.model.observe(this) {
             videoView.setVideoInfo(it.videoInfo)
 
             if (it.permissionNeeded != null) {
@@ -98,7 +98,7 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
             playlistView.onChanged(it.targetPlaylist)
 
             setPlaylistSelection(it.playlistSelection)
-        })
+        }
 
         vm.events.observe(this) { event ->
             when (event) {

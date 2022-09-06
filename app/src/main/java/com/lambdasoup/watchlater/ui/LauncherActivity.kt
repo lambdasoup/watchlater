@@ -49,14 +49,14 @@ class LauncherActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        vm.model.observe(this, { render(it) })
-        vm.events.observe(this, { event ->
+        vm.model.observe(this) { render(it) }
+        vm.events.observe(this) { event ->
             when (event) {
                 Event.OpenYouTubeSettings -> openYoutubeSettings()
                 Event.OpenExample -> openExampleVideo()
                 Event.OpenWatchLaterSettings -> openWatchLaterSettings()
             }
-        })
+        }
     }
 
     private fun render(model: LauncherViewModel.Model) {

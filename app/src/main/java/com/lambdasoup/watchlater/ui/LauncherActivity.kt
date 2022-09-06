@@ -27,12 +27,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
@@ -45,11 +42,12 @@ class LauncherActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_launcher)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        setContent {
+            LauncherScreen(
+                onOverflowAction = this::onOverflowActionSelected
+            )
+        }
 
-        vm.model.observe(this) { render(it) }
         vm.events.observe(this) { event ->
             when (event) {
                 Event.OpenYouTubeSettings -> openYoutubeSettings()
@@ -59,50 +57,25 @@ class LauncherActivity : AppCompatActivity() {
         }
     }
 
-    private fun render(model: LauncherViewModel.Model) {
-        findViewById<View>(R.id.launcher_youtube_button).setOnClickListener { vm.onYoutubeSettings() }
-        findViewById<View>(R.id.launcher_watchlater_button).setOnClickListener { vm.onWatchLaterSettings() }
-        findViewById<View>(R.id.launcher_example_button).setOnClickListener { vm.onTryExample() }
-
-        val watchLaterView = findViewById<View>(R.id.launcher_watchlater_action)
-        watchLaterView.visibility = if (model.resolverProblems != null &&
-            ((model.resolverProblems.verifiedDomainsMissing > 0) || !model.resolverProblems.watchLaterIsDefault)) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         vm.onResume()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_add, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_about -> {
+    private fun onOverflowActionSelected(menuAction: MenuAction) {
+        when (menuAction) {
+            MenuAction.About -> {
                 startActivity(Intent(this, AboutActivity::class.java))
-                true
             }
-            R.id.menu_help -> {
+            MenuAction.Help -> {
                 startActivity(Intent(this, HelpActivity::class.java))
-                true
             }
-            R.id.menu_privacy -> {
+            MenuAction.PrivacyPolicy -> {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://lambdasoup.com/privacypolicy-watchlater/")))
-                true
             }
-            R.id.menu_store -> {
+            MenuAction.Store -> {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)))
-                true
             }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 

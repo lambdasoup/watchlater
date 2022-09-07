@@ -23,22 +23,28 @@
 package com.lambdasoup.watchlater.ui
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun LauncherScreen(
@@ -47,36 +53,65 @@ fun LauncherScreen(
 ) {
     WatchLaterTheme {
         val viewState = viewModel.model.observeAsState()
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = stringResource(id = R.string.app_name)) },
-                    actions = {
-                        OverflowMenu(onActionSelected = onOverflowAction)
-                    },
-                )
-            },
-            content = { systemBarPadding ->
-                val scrollState = rememberScrollState()
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(scrollState)
-                        .padding(systemBarPadding)
-                ) {
-                    viewState.value!!.resolverProblems.let { resolverProblems ->
-                        if (resolverProblems != null &&
-                            ((resolverProblems.verifiedDomainsMissing > 0) || !resolverProblems.watchLaterIsDefault)
-                        ) {
-                            SetupGuideCard(
-                                onYoutubeSettingsClick = viewModel::onYoutubeSettings,
-                                onWatchLaterSettingsClick = viewModel::onWatchLaterSettings,
-                            )
-                        }
-                    }
-                    ExampleCard(onOpenExampleVideoClick = viewModel::onTryExample)
+
+        // Sadly, AppBarHeight is private in androidx.compose.material.AppBar
+        val topBarHeight = 56.dp
+        val topBarHeightPx = with(LocalDensity.current) { topBarHeight.roundToPx().toFloat() }
+
+        val topBarOffsetHeightPx = remember { mutableStateOf(0f) }
+        val nestedScrollConnection = remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    // try to consume before LazyColumn to collapse toolbar if needed, hence pre-scroll
+                    val delta = available.y
+                    val newOffset = topBarOffsetHeightPx.value + delta
+                    topBarOffsetHeightPx.value = newOffset.coerceIn(-topBarHeightPx, 0f)
+                    // here's the catch: let's pretend we consumed 0 in any case, since we want
+                    // Column to scroll anyway for good UX
+                    // We're basically watching scroll without taking it
+                    return Offset.Zero
                 }
             }
-        )
+        }
+
+        // Not using Scaffold here, because it has opinions on where the topBar is that aren't interested in the
+        // offset due to scrolling.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(nestedScrollConnection),
+        ) {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .verticalScroll(scrollState)
+            ) {
+                Spacer(modifier = Modifier.height(topBarHeight))
+
+                viewState.value!!.resolverProblems.let { resolverProblems ->
+                    if (resolverProblems != null &&
+                        ((resolverProblems.verifiedDomainsMissing > 0) || !resolverProblems.watchLaterIsDefault)
+                    ) {
+                        SetupGuideCard(
+                            onYoutubeSettingsClick = viewModel::onYoutubeSettings,
+                            onWatchLaterSettingsClick = viewModel::onWatchLaterSettings,
+                        )
+                    }
+                }
+                ExampleCard(onOpenExampleVideoClick = viewModel::onTryExample)
+            }
+
+            // placed last because of drawing order
+            TopAppBar(
+                modifier = Modifier
+                    .height(topBarHeight)
+                    .offset { IntOffset(x = 0, y = topBarOffsetHeightPx.value.roundToInt()) },
+                title = { Text(text = stringResource(id = R.string.app_name)) },
+                actions = {
+                    OverflowMenu(onActionSelected = onOverflowAction)
+                },
+            )
+        }
     }
 }
 

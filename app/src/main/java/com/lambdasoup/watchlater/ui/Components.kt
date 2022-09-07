@@ -53,7 +53,6 @@ fun OverflowMenu(
     DropdownMenu(
         expanded = showMenu,
         onDismissRequest = { showMenu = false },
-
     ) {
         actions.forEach { action ->
             DropdownMenuItem(

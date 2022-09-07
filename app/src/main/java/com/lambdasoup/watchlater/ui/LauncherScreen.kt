@@ -23,53 +23,61 @@
 package com.lambdasoup.watchlater.ui
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
 
-// TODO: all the theming
 @Composable
 fun LauncherScreen(
     onOverflowAction: (MenuAction) -> Unit,
     viewModel: LauncherViewModel = viewModel(),
 ) {
-    val viewState = viewModel.model.observeAsState()
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(id = R.string.app_name)) },
-                actions = {
-                    OverflowMenu(onActionSelected = onOverflowAction)
-                }
-            )
-        },
-        content = { appBarPadding ->
-            Column(
-                modifier = Modifier.padding(appBarPadding),
-                verticalArrangement = Arrangement.Top
-            ) {
-                viewState.value!!.resolverProblems.let { resolverProblems ->
-                    if (resolverProblems != null &&
-                        ((resolverProblems.verifiedDomainsMissing > 0) || !resolverProblems.watchLaterIsDefault)
-                    ) {
-                        SetupGuideCard(
-                            onYoutubeSettingsClick = viewModel::onYoutubeSettings,
-                            onWatchLaterSettingsClick = viewModel::onWatchLaterSettings,
-                        )
+    WatchLaterTheme {
+        val viewState = viewModel.model.observeAsState()
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(text = stringResource(id = R.string.app_name)) },
+                    actions = {
+                        OverflowMenu(onActionSelected = onOverflowAction)
+                    },
+                )
+            },
+            content = { systemBarPadding ->
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(scrollState)
+                        .padding(systemBarPadding)
+                ) {
+                    viewState.value!!.resolverProblems.let { resolverProblems ->
+                        if (resolverProblems != null &&
+                            ((resolverProblems.verifiedDomainsMissing > 0) || !resolverProblems.watchLaterIsDefault)
+                        ) {
+                            SetupGuideCard(
+                                onYoutubeSettingsClick = viewModel::onYoutubeSettings,
+                                onWatchLaterSettingsClick = viewModel::onWatchLaterSettings,
+                            )
+                        }
                     }
+                    ExampleCard(onOpenExampleVideoClick = viewModel::onTryExample)
                 }
-                ExampleCard(onOpenExampleVideoClick = viewModel::onTryExample)
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -77,21 +85,44 @@ fun SetupGuideCard(
     onYoutubeSettingsClick: () -> Unit,
     onWatchLaterSettingsClick: () -> Unit,
 ) {
-    Column(
-        verticalArrangement = Arrangement.Top
+    Card(
+        modifier = Modifier.padding(
+            horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
+            vertical = dimensionResource(id = R.dimen.activity_vertical_margin)
+        )
     ) {
-        SetupHeader()
-        Divider()
-        SetupYoutube(onYoutubeSettingsClick = onYoutubeSettingsClick)
-        Divider()
-        SetupWatchLater(onWatchLaterSettingsClick = onWatchLaterSettingsClick)
+        Column {
+            VerticalSpace()
+
+            SetupHeader()
+
+            VerticalSpace()
+            Divider()
+            VerticalSpace()
+
+            SetupYoutube(onYoutubeSettingsClick = onYoutubeSettingsClick)
+
+            VerticalSpace()
+            Divider()
+            VerticalSpace()
+
+            SetupWatchLater(onWatchLaterSettingsClick = onWatchLaterSettingsClick)
+
+            VerticalSpace()
+        }
     }
 }
 
 @Composable
 fun SetupHeader() {
-    Text(text = stringResource(id = R.string.launcher_action_title))
-    Text(text = stringResource(id = R.string.launcher_action_text))
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = stringResource(id = R.string.launcher_action_title),
+            style = MaterialTheme.typography.h6,
+        )
+        VerticalSpace()
+        Text(text = stringResource(id = R.string.launcher_action_text))
+    }
 }
 
 @Composable
@@ -101,10 +132,15 @@ fun SetupStep(
     @StringRes buttonText: Int,
     onButtonClick: () -> Unit,
 ) {
-    Text(text = stringResource(id = title))
-    Text(text = stringResource(id = text))
-    Button(onClick = onButtonClick) {
-        Text(text = stringResource(id = buttonText))
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = stringResource(id = title),
+            style = MaterialTheme.typography.subtitle2,
+        )
+        VerticalSpace()
+        Text(text = stringResource(id = text))
+        VerticalSpace()
+        WatchLaterTextButton(onClick = onButtonClick, label = buttonText)
     }
 }
 
@@ -130,13 +166,31 @@ fun SetupWatchLater(onWatchLaterSettingsClick: () -> Unit) =
 fun ExampleCard(
     onOpenExampleVideoClick: () -> Unit
 ) {
-    Column() {
-        Text(text = stringResource(id = R.string.launcher_example_title))
-        Text(text = stringResource(id = R.string.launcher_example_text))
-        Button(
-            onClick = onOpenExampleVideoClick
+    Card(
+        modifier = Modifier.padding(
+            all = dimensionResource(id = R.dimen.activity_horizontal_margin),
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(all = 16.dp)
         ) {
-            Text(text = stringResource(id = R.string.launcher_example_button))
+            Text(
+                text = stringResource(id = R.string.launcher_example_title),
+                style = MaterialTheme.typography.h6,
+            )
+            VerticalSpace()
+            Text(
+                text = stringResource(id = R.string.launcher_example_text),
+                style = MaterialTheme.typography.body1,
+            )
+            VerticalSpace()
+            WatchLaterTextButton(
+                onClick = onOpenExampleVideoClick,
+                label = R.string.launcher_example_button,
+            )
         }
     }
 }
+
+@Composable
+private fun VerticalSpace() = Spacer(modifier = Modifier.height(16.dp))

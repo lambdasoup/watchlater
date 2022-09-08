@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lambdasoup.watchlater.ui
+package com.lambdasoup.watchlater.ui.launcher
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -32,6 +32,9 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
+import com.lambdasoup.watchlater.ui.AboutActivity
+import com.lambdasoup.watchlater.ui.HelpActivity
+import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Event
 import org.koin.androidx.viewmodel.ext.android.viewModel

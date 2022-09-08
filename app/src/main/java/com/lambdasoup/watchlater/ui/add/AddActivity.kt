@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lambdasoup.watchlater.ui
+package com.lambdasoup.watchlater.ui.add
 
 import android.Manifest
 import android.accounts.Account
@@ -44,6 +44,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository
+import com.lambdasoup.watchlater.ui.*
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -135,7 +136,8 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
             bundle.putStringArray(PlaylistSelectionDialogFragment.ARG_TITLES, titles.toTypedArray())
             newFragment.arguments = bundle
             newFragment.show(supportFragmentManager,
-                    PlaylistSelectionDialogFragment.TAG)
+                PlaylistSelectionDialogFragment.TAG
+            )
         }
     }
 

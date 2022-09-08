@@ -115,7 +115,7 @@ class LauncherActivityEnvironmentRule(
         val resolveInfo = if (isWatchLaterDefault) {
             ResolveInfo().apply {
                 activityInfo = ActivityInfo().apply {
-                    name = "com.lambdasoup.watchlater.ui.AddActivity"
+                    name = "com.lambdasoup.watchlater.ui.add.AddActivity"
                 }
             }
         } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -19,7 +19,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lambdasoup.watchlater.ui
+package com.lambdasoup.watchlater.ui.add
 
 import android.content.Context
 import android.util.AttributeSet

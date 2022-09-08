@@ -25,7 +25,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    tools:context="com.lambdasoup.watchlater.ui.AddActivity">
+    tools:context="com.lambdasoup.watchlater.ui.add.AddActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -47,21 +47,21 @@
         android:orientation="vertical"
         android:showDividers="middle">
 
-        <com.lambdasoup.watchlater.ui.AccountView
+        <com.lambdasoup.watchlater.ui.add.AccountView
             android:id="@+id/add_account"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
             android:layout_marginStart="@dimen/activity_horizontal_margin" />
 
-        <com.lambdasoup.watchlater.ui.PlaylistView
+        <com.lambdasoup.watchlater.ui.add.PlaylistView
             android:id="@+id/add_playlist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin" />
 
-        <com.lambdasoup.watchlater.ui.PermissionsView
+        <com.lambdasoup.watchlater.ui.add.PermissionsView
             android:id="@+id/add_permissions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,7 +72,7 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <com.lambdasoup.watchlater.ui.VideoView
+        <com.lambdasoup.watchlater.ui.add.VideoView
             android:id="@+id/add_video"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
             android:layout_marginTop="@dimen/activity_vertical_margin"
             tools:title="test" />
 
-        <com.lambdasoup.watchlater.ui.ActionView
+        <com.lambdasoup.watchlater.ui.add.ActionView
             android:id="@+id/add_action"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp" />
 
-        <com.lambdasoup.watchlater.ui.ResultView
+        <com.lambdasoup.watchlater.ui.add.ResultView
             android:id="@+id/add_result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

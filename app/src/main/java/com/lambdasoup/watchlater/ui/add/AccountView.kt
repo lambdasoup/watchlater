@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -19,33 +19,47 @@
  * You should have received a copy of the GNU General Public License
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.lambdasoup.watchlater.ui
+package com.lambdasoup.watchlater.ui.add
 
+import android.accounts.Account
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.lifecycle.Observer
 import com.lambdasoup.watchlater.R
 
-class PermissionsView @JvmOverloads constructor(
+class AccountView @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr), View.OnClickListener {
+) : LinearLayout(context, attrs, defStyleAttr), View.OnClickListener, Observer<Account?> {
 
     var listener: Listener? = null
 
+    private val label: TextView
+
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_permissions, this)
-        findViewById<View>(R.id.view_permissions_grant).setOnClickListener(this)
+        LayoutInflater.from(context).inflate(R.layout.view_account, this)
+        findViewById<View>(R.id.view_account_set).setOnClickListener(this)
+        label = findViewById(R.id.view_account_label)
     }
 
     override fun onClick(view: View) {
-        listener?.onGrantPermissionsClicked()
+        listener?.onSetAccount()
+    }
+
+    override fun onChanged(account: Account?) {
+        if (account == null) {
+            label.setText(R.string.account_empty)
+            return
+        }
+        label.text = account.name
     }
 
     interface Listener {
-        fun onGrantPermissionsClicked()
+        fun onSetAccount()
     }
 }

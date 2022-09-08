@@ -82,6 +82,8 @@ class CucumberTest {
 
     private val server = MockWebServer()
 
+    private val idlingResource = TeaIdlingResource()
+
     @Before
     fun before() {
         server.start(port = 8080)
@@ -106,7 +108,7 @@ class CucumberTest {
             mock()
         )
 
-        IdlingRegistry.getInstance().register(TeaIdlingResource())
+        IdlingRegistry.getInstance().register(idlingResource.espressoIdlingResource)
     }
 
     @After

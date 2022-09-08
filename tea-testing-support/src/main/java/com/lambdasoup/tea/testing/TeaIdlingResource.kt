@@ -25,15 +25,26 @@ package com.lambdasoup.tea.testing
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.IdlingResource as EspressoIdlingResource
+import androidx.compose.ui.test.IdlingResource as ComposeIdlingResource
 import com.lambdasoup.tea.BuildConfig
 import com.lambdasoup.tea.Tea
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
-class TeaIdlingResource : IdlingResource {
-
+class TeaIdlingResource {
     private var scheduler = ScheduledThreadPoolExecutor(1)
-    private var callback: IdlingResource.ResourceCallback? = null
+
+    private val _espressoIdlingResource = EspressoIdlingResourceImpl()
+    val espressoIdlingResource: EspressoIdlingResource = _espressoIdlingResource
+
+    val composeIdlingResource = object : ComposeIdlingResource {
+        override val isIdleNow: Boolean
+            get() = this@TeaIdlingResource.isIdleNow
+
+        override fun getDiagnosticMessageIfBusy(): String? {
+            return if (isIdleNow) null else "${scheduler.queue.size} tasks in queue"
+        }
+    }
 
     init {
         Tea.createEngine = {
@@ -52,17 +63,24 @@ class TeaIdlingResource : IdlingResource {
 
     private fun updateListener() {
         if (isIdleNow) {
-            callback?.onTransitionToIdle()
+            _espressoIdlingResource.callback?.onTransitionToIdle()
         }
     }
 
-    override fun getName() = "Android TEA idling resource"
+    private val isIdleNow: Boolean
+        get() = scheduler.activeCount == 0
 
-    override fun isIdleNow(): Boolean {
-        return scheduler.activeCount == 0
-    }
+    private inner class EspressoIdlingResourceImpl : EspressoIdlingResource {
+        var callback: EspressoIdlingResource.ResourceCallback? = null
 
-    override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback?) {
-        this.callback = callback
+        override fun getName() = "Android TEA idling resource"
+
+        override fun isIdleNow(): Boolean {
+            return this@TeaIdlingResource.isIdleNow
+        }
+
+        override fun registerIdleTransitionCallback(callback: EspressoIdlingResource.ResourceCallback?) {
+            this.callback = callback
+        }
     }
 }

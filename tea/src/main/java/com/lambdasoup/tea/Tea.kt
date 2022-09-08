@@ -113,7 +113,7 @@ class Tea<Model, Msg>(
     companion object {
         /**
          * Overwrite before instantiating Tea to set a different engine. Only meant and useful for testing purposes
-         * (see tea-junit4).
+         * (see tea-testing-support).
          */
         var createEngine: () -> Engine = {
             DefaultEngine()

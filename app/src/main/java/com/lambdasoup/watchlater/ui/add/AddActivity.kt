@@ -39,6 +39,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lambdasoup.watchlater.BuildConfig
@@ -71,12 +73,9 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         actionView.listener = this
         videoView = findViewById(R.id.add_video)
         val resultView = findViewById<ResultView>(R.id.add_result)
-        val accountView = findViewById<AccountView>(R.id.add_account)
-        accountView!!.listener = object : AccountView.Listener {
-            override fun onSetAccount() {
-                askForAccount()
-            }
-        }
+
+        val accountView = findViewById<ComposeView>(R.id.add_account)
+
         val playlistView: PlaylistView = findViewById(R.id.add_playlist)
         playlistView.listener = object : PlaylistView.Listener {
             override fun onChangePlaylist() {
@@ -91,7 +90,11 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
                 onPermissionNeededChanged(it.permissionNeeded)
             }
 
-            accountView.onChanged(it.account)
+            accountView!!.setContent {
+                WatchLaterTheme {
+                    Account(account = it.account, onSetAccount = this::askForAccount)
+                }
+            }
 
             resultView.onChanged(it.videoAdd)
             actionView.setState(it.videoAdd, it.videoId)

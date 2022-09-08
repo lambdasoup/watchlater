@@ -27,7 +27,7 @@ import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.lambdasoup.tea.TeaTestEngineRule
+import com.lambdasoup.tea.testing.TeaTestEngineRule
 import com.lambdasoup.watchlater.data.AccountRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository.*

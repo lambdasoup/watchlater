@@ -44,7 +44,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.lambdasoup.tea.TeaIdlingResource
+import com.lambdasoup.tea.testing.TeaIdlingResource
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.ui.AddActivity
 import com.lambdasoup.watchlater.ui.LauncherActivity

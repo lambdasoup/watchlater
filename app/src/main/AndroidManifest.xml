@@ -36,7 +36,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.WatchLater">
-        <activity android:name=".ui.LauncherActivity"
+        <activity android:name=".ui.launcher.LauncherActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +45,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.AddActivity"
+            android:name=".ui.add.AddActivity"
             android:excludeFromRecents="true"
             android:theme="@style/Theme.WatchLater.Add"
             android:exported="true">

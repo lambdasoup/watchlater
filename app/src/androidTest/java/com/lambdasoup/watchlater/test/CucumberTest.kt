@@ -46,8 +46,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.lambdasoup.tea.testing.TeaIdlingResource
 import com.lambdasoup.watchlater.R
-import com.lambdasoup.watchlater.ui.AddActivity
-import com.lambdasoup.watchlater.ui.LauncherActivity
+import com.lambdasoup.watchlater.ui.add.AddActivity
+import com.lambdasoup.watchlater.ui.launcher.LauncherActivity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -142,7 +142,7 @@ class CucumberTest {
     fun watchLaterIsDefault() {
         val resolveInfo: ResolveInfo = ResolveInfo().apply {
             activityInfo = ActivityInfo().apply {
-                name = "com.lambdasoup.watchlater.ui.AddActivity"
+                name = "com.lambdasoup.watchlater.ui.add.AddActivity"
             }
         }
         whenever(packageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY)))

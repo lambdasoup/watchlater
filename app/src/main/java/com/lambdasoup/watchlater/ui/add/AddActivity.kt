@@ -73,15 +73,9 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         actionView.listener = this
         videoView = findViewById(R.id.add_video)
         val resultView = findViewById<ResultView>(R.id.add_result)
-
         val accountView = findViewById<ComposeView>(R.id.add_account)
+        val playlistView = findViewById<ComposeView>(R.id.add_playlist)
 
-        val playlistView: PlaylistView = findViewById(R.id.add_playlist)
-        playlistView.listener = object : PlaylistView.Listener {
-            override fun onChangePlaylist() {
-                vm.changePlaylist()
-            }
-        }
         vm.setVideoUri(intent.data!!)
         vm.model.observe(this) {
             videoView.setVideoInfo(it.videoInfo)
@@ -90,7 +84,7 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
                 onPermissionNeededChanged(it.permissionNeeded)
             }
 
-            accountView!!.setContent {
+            accountView.setContent {
                 WatchLaterTheme {
                     Account(account = it.account, onSetAccount = this::askForAccount)
                 }
@@ -99,7 +93,11 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
             resultView.onChanged(it.videoAdd)
             actionView.setState(it.videoAdd, it.videoId)
 
-            playlistView.onChanged(it.targetPlaylist)
+            playlistView.setContent {
+                WatchLaterTheme {
+                    Playlist(playlist = it.targetPlaylist, onSetPlaylist = vm::changePlaylist)
+                }
+            }
 
             setPlaylistSelection(it.playlistSelection)
         }

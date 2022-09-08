@@ -24,7 +24,7 @@ package com.lambdasoup.watchlater.viewmodel
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.lambdasoup.tea.TeaTestEngineRule
+import com.lambdasoup.tea.testing.TeaTestEngineRule
 import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverProblems
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Model

@@ -23,6 +23,7 @@
 package com.lambdasoup.tea
 
 import com.lambdasoup.tea.TeaTest.Msg.*
+import com.lambdasoup.tea.testing.TeaTestEngineRule
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Rule
 import org.junit.Test

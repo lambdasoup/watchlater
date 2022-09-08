@@ -111,23 +111,29 @@ class Tea<Model, Msg>(
     }
 
     companion object {
-        internal var createEngine: () -> Engine = {
-            object : Engine {
-                private var scheduler = ScheduledThreadPoolExecutor(1)
-                private var handler = Handler(Looper.getMainLooper())
-                override fun log(s: String) {
-                    if (!BuildConfig.DEBUG) return
-                    Log.d("TEA", s)
-                }
-                override fun execute(r: () -> Unit) = scheduler.execute(r)
-                override fun post(r: () -> Unit): Unit = run { handler.post(r) }
-            }
+        /**
+         * Overwrite before instantiating Tea to set a different engine. Only meant and useful for testing purposes
+         * (see tea-junit4).
+         */
+        var createEngine: () -> Engine = {
+            DefaultEngine()
         }
     }
 
-    internal interface Engine {
+    interface Engine {
         fun execute(r: () -> Unit)
         fun post(r: () -> Unit)
         fun log(s: String)
+    }
+
+    class DefaultEngine : Engine {
+        private var scheduler = ScheduledThreadPoolExecutor(1)
+        private var handler = Handler(Looper.getMainLooper())
+        override fun log(s: String) {
+            if (!BuildConfig.DEBUG) return
+            Log.d("TEA", s)
+        }
+        override fun execute(r: () -> Unit) = scheduler.execute(r)
+        override fun post(r: () -> Unit): Unit = run { handler.post(r) }
     }
 }

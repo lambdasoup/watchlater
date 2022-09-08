@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -20,8 +20,9 @@
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lambdasoup.tea
+package com.lambdasoup.tea.testing
 
+import com.lambdasoup.tea.Tea
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 

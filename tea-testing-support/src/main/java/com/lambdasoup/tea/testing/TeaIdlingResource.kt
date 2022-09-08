@@ -20,12 +20,14 @@
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lambdasoup.tea
+package com.lambdasoup.tea.testing
 
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.test.espresso.IdlingResource
+import com.lambdasoup.tea.BuildConfig
+import com.lambdasoup.tea.Tea
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
 class TeaIdlingResource : IdlingResource {

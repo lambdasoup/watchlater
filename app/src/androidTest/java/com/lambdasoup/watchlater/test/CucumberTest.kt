@@ -113,6 +113,7 @@ class CucumberTest {
 
     @After
     fun after() {
+        IdlingRegistry.getInstance().unregister(idlingResource.espressoIdlingResource)
         Intents.release()
         server.shutdown()
     }

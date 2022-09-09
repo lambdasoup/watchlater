@@ -99,7 +99,16 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
                 }
             }
 
-            setPlaylistSelection(it.playlistSelection)
+            findViewById<ComposeView>(R.id.playlist_selection_dialog).setContent {
+                WatchLaterTheme {
+                    PlaylistSelection(
+                        onDialogDismiss = vm::clearPlaylists,
+                        openPlaylistsOnYoutube = { openWithYoutube(playVideo = false) },
+                        onPlaylistSelected = vm::selectPlaylist,
+                        playlists = it.playlistSelection
+                    )
+                }
+            }
         }
 
         vm.events.observe(this) { event ->
@@ -116,78 +125,6 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
             permissionsView.visibility = View.GONE
         } else {
             permissionsView.visibility = View.VISIBLE
-        }
-    }
-
-    private fun setPlaylistSelection(playlists: YoutubeRepository.Playlists?) {
-        val fragment = supportFragmentManager
-                .findFragmentByTag(PlaylistSelectionDialogFragment.TAG) as PlaylistSelectionDialogFragment?
-
-        if (playlists == null) {
-            fragment?.dismissAllowingStateLoss()
-            return
-        }
-
-        if (fragment == null) {
-            val newFragment = PlaylistSelectionDialogFragment()
-            val ids: List<String> = playlists.items.map { it.id }
-            val titles: List<String> = playlists.items.map { it.snippet.title }
-            val bundle = Bundle()
-            bundle.putStringArray(PlaylistSelectionDialogFragment.ARG_IDS, ids.toTypedArray())
-            bundle.putStringArray(PlaylistSelectionDialogFragment.ARG_TITLES, titles.toTypedArray())
-            newFragment.arguments = bundle
-            newFragment.show(supportFragmentManager,
-                PlaylistSelectionDialogFragment.TAG
-            )
-        }
-    }
-
-    class PlaylistSelectionDialogFragment : DialogFragment(), DialogInterface.OnClickListener {
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            val titles = requireArguments().getStringArray(ARG_TITLES)
-
-            val builder = MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.playlist_selection_title)
-
-            if (titles == null || titles.isNotEmpty()) {
-                builder.setItems(titles, this)
-                builder.setNeutralButton(R.string.playlist_selection_edit) { _, _ ->
-                    (context as AddActivity).openWithYoutube(playVideo = false)
-                }
-
-            } else {
-                builder.setMessage(R.string.playlist_selection_message)
-                builder.setNeutralButton(R.string.playlist_selection_create) { _, _ ->
-                    (context as AddActivity).openWithYoutube(playVideo = false)
-                }
-            }
-
-            return builder.create()
-        }
-
-        companion object {
-            const val TAG = "PlaylistSelectionDialog"
-            const val ARG_IDS = "ids"
-            const val ARG_TITLES = "titles"
-        }
-
-        override fun onClick(dialog: DialogInterface, which: Int) {
-            val titles = requireArguments().getStringArray(ARG_TITLES)
-            val ids = requireArguments().getStringArray(ARG_IDS)
-
-            (context as AddActivity).vm.selectPlaylist(
-                YoutubeRepository.Playlists.Playlist(
-                    id = ids!![which],
-                    snippet = YoutubeRepository.Playlists.Playlist.Snippet(
-                            title = titles!![which]
-                    )
-            ))
-        }
-
-        override fun onDismiss(dialog: DialogInterface) {
-            super.onDismiss(dialog)
-
-            (context as AddActivity).vm.clearPlaylists()
         }
     }
 
@@ -247,7 +184,8 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
                 true
             }
             R.id.menu_store -> {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)))
+                startActivity(Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)))
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -285,11 +223,11 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         val title = getString(R.string.choose_account)
         return if (Build.VERSION.SDK_INT < 26) {
             AccountManager.newChooseAccountIntent(null, null,
-                    types, false, title, null,
-                    null, null)
+                types, false, title, null,
+                null, null)
         } else AccountManager.newChooseAccountIntent(null, null,
-                types, title, null, null,
-                null)
+            types, title, null, null,
+            null)
     }
 
     private fun openWithYoutube(playVideo: Boolean = true) {

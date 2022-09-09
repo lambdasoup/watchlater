@@ -103,6 +103,10 @@
             tools:text="Could not add video. Please check your network connection and try again."
             tools:visibility="visible" />
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/playlist_selection_dialog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -97,7 +97,9 @@ fun Modifier.padAlignTextButtonContentEnd() = padding(
 fun WatchLaterTextButton(
     onClick: () -> Unit,
     @StringRes label: Int,
+    modifier: Modifier = Modifier
 ) = TextButton(
+    modifier = modifier,
     onClick = onClick,
     colors = ButtonDefaults.textButtonColors(
         contentColor = MaterialTheme.colors.secondary

@@ -110,4 +110,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="touch_target_min_size">48dp</dimen>
+
+    <dimen name="resultview_padding">4dp</dimen>
 </resources>

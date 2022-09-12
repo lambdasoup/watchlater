@@ -45,7 +45,7 @@ class PermissionsView @JvmOverloads constructor(
         listener?.onGrantPermissionsClicked()
     }
 
-    interface Listener {
+    fun interface Listener {
         fun onGrantPermissionsClicked()
     }
 }

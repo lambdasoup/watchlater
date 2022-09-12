@@ -25,28 +25,20 @@ import android.Manifest
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.annotation.TargetApi
-import android.app.Dialog
 import android.content.ActivityNotFoundException
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.platform.ComposeView
-import androidx.fragment.app.DialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
-import com.lambdasoup.watchlater.data.YoutubeRepository
-import com.lambdasoup.watchlater.ui.*
+import com.lambdasoup.watchlater.ui.AboutActivity
+import com.lambdasoup.watchlater.ui.HelpActivity
+import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -54,62 +46,19 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
 
     private val vm: AddViewModel by viewModel()
 
-    private lateinit var actionView: ActionView
-    private lateinit var permissionsView: PermissionsView
-    private lateinit var videoView: VideoView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        permissionsView = findViewById(R.id.add_permissions)
-        permissionsView.listener = object : PermissionsView.Listener {
-            override fun onGrantPermissionsClicked() {
-                tryAcquireAccountsPermission()
-            }
+        setContent {
+            AddScreen(
+                onOverflowAction = this::onOverflowActionSelected,
+                onSetAccount = this::askForAccount,
+                openPlaylistsOnYoutube = { openWithYoutube(playVideo = false) },
+                onGrantPermissionsClicked = this::tryAcquireAccountsPermission,
+                actionListener = this,
+            )
         }
-        actionView = findViewById(R.id.add_action)
-        actionView.listener = this
-        videoView = findViewById(R.id.add_video)
-        val resultView = findViewById<ResultView>(R.id.add_result)
-        val accountView = findViewById<ComposeView>(R.id.add_account)
-        val playlistView = findViewById<ComposeView>(R.id.add_playlist)
 
         vm.setVideoUri(intent.data!!)
-        vm.model.observe(this) {
-            videoView.setVideoInfo(it.videoInfo)
-
-            if (it.permissionNeeded != null) {
-                onPermissionNeededChanged(it.permissionNeeded)
-            }
-
-            accountView.setContent {
-                WatchLaterTheme {
-                    Account(account = it.account, onSetAccount = this::askForAccount)
-                }
-            }
-
-            resultView.onChanged(it.videoAdd)
-            actionView.setState(it.videoAdd, it.videoId)
-
-            playlistView.setContent {
-                WatchLaterTheme {
-                    Playlist(playlist = it.targetPlaylist, onSetPlaylist = vm::changePlaylist)
-                }
-            }
-
-            findViewById<ComposeView>(R.id.playlist_selection_dialog).setContent {
-                WatchLaterTheme {
-                    PlaylistSelection(
-                        onDialogDismiss = vm::clearPlaylists,
-                        openPlaylistsOnYoutube = { openWithYoutube(playVideo = false) },
-                        onPlaylistSelected = vm::selectPlaylist,
-                        playlists = it.playlistSelection
-                    )
-                }
-            }
-        }
 
         vm.events.observe(this) { event ->
             when (event) {
@@ -117,14 +66,6 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
                     startActivityForResult(event.intent, REQUEST_ACCOUNT_INTENT)
                 }
             }
-        }
-    }
-
-    private fun onPermissionNeededChanged(permissionNeeded: Boolean) {
-        if (!permissionNeeded) {
-            permissionsView.visibility = View.GONE
-        } else {
-            permissionsView.visibility = View.VISIBLE
         }
     }
 
@@ -163,32 +104,20 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         vm.setPermissionNeeded(needsPermission)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.menu_add, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_about -> {
+    private fun onOverflowActionSelected(menuAction: MenuAction) {
+        when (menuAction) {
+            MenuAction.About -> {
                 startActivity(Intent(this, AboutActivity::class.java))
-                true
             }
-            R.id.menu_help -> {
+            MenuAction.Help -> {
                 startActivity(Intent(this, HelpActivity::class.java))
-                true
             }
-            R.id.menu_privacy -> {
+            MenuAction.PrivacyPolicy -> {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://lambdasoup.com/privacypolicy-watchlater/")))
-                true
             }
-            R.id.menu_store -> {
-                startActivity(Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)))
-                true
+            MenuAction.Store -> {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)))
             }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 

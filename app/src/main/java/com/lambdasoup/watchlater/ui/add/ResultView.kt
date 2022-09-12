@@ -23,7 +23,9 @@ package com.lambdasoup.watchlater.ui.add
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.setPadding
 import androidx.lifecycle.Observer
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoAdd
@@ -33,6 +35,13 @@ class ResultView @JvmOverloads constructor(
         attrs: AttributeSet? = null,
         defStyleAttr: Int = 0
 ) : AppCompatTextView(context, attrs, defStyleAttr), Observer<VideoAdd> {
+
+    init {
+        gravity = Gravity.CENTER
+        setTextAppearance(R.style.TextAppearance_WatchLater_Result)
+        setPadding(context.resources.getDimensionPixelSize(R.dimen.resultview_padding))
+        clearResult()
+    }
 
     override fun onChanged(videoAdd: VideoAdd) {
         when (videoAdd) {

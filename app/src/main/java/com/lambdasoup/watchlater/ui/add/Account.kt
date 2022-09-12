@@ -35,10 +35,14 @@ import com.lambdasoup.watchlater.ui.WatchLaterTextButton
 
 @Composable
 fun Account(
+    modifier: Modifier = Modifier,
     account: Account?,
     onSetAccount: () -> Unit,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             modifier = Modifier.weight(1f, fill = true),
             text = if (account == null) stringResource(id = R.string.account_empty) else account.name,

@@ -35,10 +35,14 @@ import com.lambdasoup.watchlater.ui.WatchLaterTextButton
 
 @Composable
 fun Playlist(
+    modifier: Modifier = Modifier,
     playlist: Playlist?,
     onSetPlaylist: () -> Unit,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             modifier = Modifier.weight(1f, fill = true),
             text = playlist?.snippet?.title ?: stringResource(id = R.string.playlist_empty),

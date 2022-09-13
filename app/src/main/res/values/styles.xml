@@ -58,10 +58,6 @@
         <item name="rippleColor">?attr/colorSecondary</item>
     </style>
 
-    <style name="TextAppearance.WatchLater.Result" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-    
     <color name="statusBar">@color/mat_red_600</color>
 
     <color name="mat_lightblue_600">#039BE5</color>
@@ -110,6 +106,4 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="touch_target_min_size">48dp</dimen>
-
-    <dimen name="resultview_padding">4dp</dimen>
 </resources>

@@ -127,15 +127,9 @@ fun AddScreen(
                 }
             )
 
-            AndroidView(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                factory = { context ->
-                    ResultView(context)
-                },
-                update = { view ->
-                    viewState.value.let { view.onChanged(it.videoAdd) }
-                }
+            Result(
+                modifier = Modifier.fillMaxWidth(),
+                videoAdd = viewState.value.videoAdd,
             )
         }
 

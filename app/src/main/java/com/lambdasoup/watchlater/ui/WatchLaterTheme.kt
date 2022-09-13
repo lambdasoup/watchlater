@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Shapes
 import androidx.compose.material.Text
@@ -48,6 +49,8 @@ private val Lightblue600Dark = Color(0xFF006DB3)
 private val Red600 = Color(0xFFE53935)
 private val Red600Dark = Color(0xFFAB000D)
 private val LightGrey = Color(0xFFF0F0F0)
+private val Green600 = Color(0xFF43A047)
+private val Green600Dark = Color(0xFF00701a)
 
 private val DarkColors = darkColors(
     // using default Material palette
@@ -59,7 +62,11 @@ private val LightColors = lightColors(
     secondary = Lightblue600,
     secondaryVariant = Lightblue600Dark,
     background = LightGrey,
+    error = Red600,
 )
+
+val Colors.success: Color
+    get() = if (isLight) Green600 else Green600Dark
 
 @Composable
 fun WatchLaterTheme(

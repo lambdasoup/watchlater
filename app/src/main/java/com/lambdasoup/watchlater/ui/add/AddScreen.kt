@@ -82,16 +82,13 @@ fun AddScreen(
             )
 
             AnimatedVisibility(visible = viewState.value.permissionNeeded == true) {
-                AndroidView(
+                AccountPermission(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin))
+                        .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
+                        .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin))
                         .padding(top = 8.dp),
-                    factory = { context ->
-                        PermissionsView(context).apply {
-                            listener = PermissionsView.Listener(onGrantPermissionsClicked)
-                        }
-                    }
+                    onGrantPermissionsClicked = onGrantPermissionsClicked,
                 )
             }
 

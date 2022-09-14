@@ -36,13 +36,13 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.lambdasoup.watchlater.ui.MenuAction
-import com.lambdasoup.watchlater.viewmodel.AddViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lambdasoup.watchlater.R
+import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.ui.OverflowMenu
 import com.lambdasoup.watchlater.ui.WatchLaterTheme
 import com.lambdasoup.watchlater.ui.padWithRoomForTextButtonContent
+import com.lambdasoup.watchlater.viewmodel.AddViewModel
 
 @Composable
 fun AddScreen(
@@ -50,7 +50,8 @@ fun AddScreen(
     onSetAccount: () -> Unit,
     openPlaylistsOnYoutube: () -> Unit,
     onGrantPermissionsClicked: () -> Unit,
-    actionListener: ActionView.ActionListener,
+    onWatchNowClicked: () -> Unit,
+    onWatchLaterClicked: (String) -> Unit,
     viewModel: AddViewModel = viewModel(),
 ) {
     WatchLaterTheme {
@@ -103,25 +104,21 @@ fun AddScreen(
                     VideoView(context)
                 },
                 update = { view ->
-                    viewState.value.let { view.setVideoInfo(it.videoInfo) }
+                    view.setVideoInfo(viewState.value.videoInfo)
                 }
             )
 
-            AndroidView(
+            Actions(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = 12.dp,
-                        vertical = 8.dp,
+                        horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
+                        vertical = dimensionResource(id = R.dimen.activity_vertical_margin),
                     ),
-                factory = { context ->
-                    ActionView(context).apply {
-                        listener = actionListener
-                    }
-                },
-                update = { view ->
-                    viewState.value.let { view.setState(it.videoAdd, it.videoId) }
-                }
+                state = viewState.value.videoAdd,
+                videoId = viewState.value.videoId,
+                onWatchNowClicked = onWatchNowClicked,
+                onWatchLaterClicked = onWatchLaterClicked,
             )
 
             Result(

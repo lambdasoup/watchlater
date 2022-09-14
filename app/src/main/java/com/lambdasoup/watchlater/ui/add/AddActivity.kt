@@ -42,7 +42,7 @@ import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AddActivity : AppCompatActivity(), ActionView.ActionListener {
+class AddActivity : AppCompatActivity() {
 
     private val vm: AddViewModel by viewModel()
 
@@ -54,7 +54,8 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
                 onSetAccount = this::askForAccount,
                 openPlaylistsOnYoutube = { openWithYoutube(playVideo = false) },
                 onGrantPermissionsClicked = this::tryAcquireAccountsPermission,
-                actionListener = this,
+                onWatchNowClicked = this::openWithYoutube,
+                onWatchLaterClicked = { videoId -> vm.watchLater(videoId) },
             )
         }
 
@@ -176,14 +177,6 @@ class AddActivity : AppCompatActivity(), ActionView.ActionListener {
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(this, R.string.error_youtube_player_missing, Toast.LENGTH_SHORT).show()
         }
-    }
-
-    override fun onWatchNowClicked() {
-        openWithYoutube()
-    }
-
-    override fun onWatchLaterClicked(videoId: String) {
-        vm.watchLater(videoId)
     }
 
     companion object {

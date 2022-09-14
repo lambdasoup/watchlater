@@ -27,6 +27,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
@@ -61,6 +62,7 @@ private val LightColors = lightColors(
     primaryVariant = Red600Dark,
     secondary = Lightblue600,
     secondaryVariant = Lightblue600Dark,
+    onSecondary = Color.White,
     background = LightGrey,
     error = Red600,
 )
@@ -70,7 +72,7 @@ val Colors.success: Color
 
 @Composable
 fun WatchLaterTheme(
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val isDark = isSystemInDarkTheme()
     MaterialTheme(
@@ -104,7 +106,7 @@ fun Modifier.padAlignTextButtonContentEnd() = padding(
 fun WatchLaterTextButton(
     onClick: () -> Unit,
     @StringRes label: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) = TextButton(
     modifier = modifier,
     onClick = onClick,
@@ -113,4 +115,24 @@ fun WatchLaterTextButton(
     ),
 ) {
     Text(text = stringResource(id = label).uppercase())
+}
+
+@Composable
+fun WatchLaterButton(
+    onClick: () -> Unit,
+    @StringRes label: Int,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) = Button(
+    modifier = modifier,
+    enabled = enabled,
+    onClick = onClick,
+    colors = ButtonDefaults.buttonColors(
+        backgroundColor = MaterialTheme.colors.secondary,
+        contentColor = MaterialTheme.colors.onSecondary,
+    )
+) {
+    Text(
+        text = stringResource(id = label).uppercase(),
+    )
 }

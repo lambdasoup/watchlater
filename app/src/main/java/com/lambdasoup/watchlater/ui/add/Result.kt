@@ -39,11 +39,11 @@ import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoAdd
 
 @Composable
 fun Result(
-    videoAdd: VideoAdd?,
+    videoAdd: VideoAdd,
     modifier: Modifier = Modifier
 ) {
     when (videoAdd) {
-        is VideoAdd.Idle, VideoAdd.Progress, null -> {
+        is VideoAdd.Idle, VideoAdd.Progress -> {
             // nothing to show
         }
         is VideoAdd.Success -> ShowSuccess(modifier = modifier)

@@ -37,10 +37,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
-import com.lambdasoup.tea_junit4.TeaIdlingResource
+import com.lambdasoup.tea.testing.TeaIdlingResource
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.onNodeWithTextRes
-import com.lambdasoup.watchlater.ui.LauncherActivity
+import com.lambdasoup.watchlater.ui.launcher.LauncherActivity
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock

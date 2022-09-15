@@ -23,10 +23,20 @@
 package com.lambdasoup.watchlater.ui.launcher
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +57,8 @@ import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.ui.OverflowMenu
 import com.lambdasoup.watchlater.ui.WatchLaterTextButton
 import com.lambdasoup.watchlater.ui.WatchLaterTheme
+import com.lambdasoup.watchlater.ui.padAlignTextButtonContentStart
+import com.lambdasoup.watchlater.ui.padWithRoomForTextButtonContent
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
 import kotlin.math.roundToInt
 
@@ -109,7 +121,9 @@ fun LauncherScreen(
             TopAppBar(
                 modifier = Modifier
                     .height(topBarHeight)
-                    .offset { IntOffset(x = 0, y = topBarOffsetHeightPx.value.roundToInt()) },
+                    .offset {
+                        IntOffset(x = 0, y = topBarOffsetHeightPx.value.roundToInt())
+                    },
                 title = { Text(text = stringResource(id = R.string.app_name)) },
                 actions = {
                     OverflowMenu(onActionSelected = onOverflowAction)
@@ -171,15 +185,28 @@ fun SetupStep(
     @StringRes buttonText: Int,
     onButtonClick: () -> Unit,
 ) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column(
+        modifier = Modifier
+            .padWithRoomForTextButtonContent(
+                start = dimensionResource(id = R.dimen.activity_horizontal_margin)
+            )
+            .padding(
+                end = dimensionResource(id = R.dimen.activity_horizontal_margin),
+            )
+    ) {
         Text(
+            modifier = Modifier.padAlignTextButtonContentStart(),
             text = stringResource(id = title),
             style = MaterialTheme.typography.subtitle2,
         )
         VerticalSpace()
-        Text(text = stringResource(id = text))
+        Text(
+            modifier = Modifier.padAlignTextButtonContentStart(),
+            text = stringResource(id = text),
+        )
         VerticalSpace()
-        WatchLaterTextButton(onClick = onButtonClick, label = buttonText)
+        WatchLaterTextButton(onClick = onButtonClick,
+                             label = buttonText)
     }
 }
 
@@ -203,7 +230,7 @@ fun SetupWatchLater(onWatchLaterSettingsClick: () -> Unit) =
 
 @Composable
 fun ExampleCard(
-    onOpenExampleVideoClick: () -> Unit
+    onOpenExampleVideoClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier.padding(
@@ -211,14 +238,19 @@ fun ExampleCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(all = 16.dp)
+            modifier = Modifier
+                .padding(vertical = 16.dp)
+                .padding(end = 16.dp)
+                .padWithRoomForTextButtonContent(start = 16.dp)
         ) {
             Text(
+                modifier = Modifier.padAlignTextButtonContentStart(),
                 text = stringResource(id = R.string.launcher_example_title),
                 style = MaterialTheme.typography.h6,
             )
             VerticalSpace()
             Text(
+                modifier = Modifier.padAlignTextButtonContentStart(),
                 text = stringResource(id = R.string.launcher_example_text),
                 style = MaterialTheme.typography.body1,
             )

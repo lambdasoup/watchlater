@@ -92,20 +92,22 @@ class AddViewModel(
         tea.clear()
     }
 
+    private val initialModel = Model(
+        videoId = null,
+        videoAdd = VideoAdd.Idle,
+        videoInfo = VideoInfo.Progress,
+        account = null,
+        permissionNeeded = null,
+        tokenRetried = false,
+        targetPlaylist = null,
+        playlistSelection = null,
+    )
+
     val events = EventSource<Event>()
-    val model = MutableLiveData<Model>()
+    val model = MutableLiveData<Model>(initialModel)
 
     private val tea = Tea(
-            init = Model(
-                    videoId = null,
-                    videoAdd = VideoAdd.Idle,
-                    videoInfo = VideoInfo.Progress,
-                    account = null,
-                    permissionNeeded = null,
-                    tokenRetried = false,
-                    targetPlaylist = null,
-                    playlistSelection = null,
-            ) * Cmd.none(),
+            init = initialModel * Cmd.none(),
             view = model::postValue,
             update = ::update,
             subscriptions = ::subscriptions,

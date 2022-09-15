@@ -24,11 +24,23 @@ package com.lambdasoup.watchlater.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Shapes
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.Typography
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 private val Lightblue600 = Color(0xFF039BE5)
@@ -63,6 +75,25 @@ fun WatchLaterTheme(
 }
 
 @Composable
+fun Modifier.padWithRoomForTextButtonContent(
+    start: Dp = 0.dp,
+    end: Dp = 0.dp,
+) = padding(
+    start = (start - ButtonDefaults.TextButtonContentPadding.calculateStartPadding(LocalLayoutDirection.current)).coerceAtLeast(0.dp),
+    end = (end - ButtonDefaults.TextButtonContentPadding.calculateEndPadding(LocalLayoutDirection.current)).coerceAtLeast(0.dp),
+)
+
+@Composable
+fun Modifier.padAlignTextButtonContentStart() = padding(
+    start = ButtonDefaults.TextButtonContentPadding.calculateStartPadding(LocalLayoutDirection.current)
+)
+
+@Composable
+fun Modifier.padAlignTextButtonContentEnd() = padding(
+    end = ButtonDefaults.TextButtonContentPadding.calculateEndPadding(LocalLayoutDirection.current)
+)
+
+@Composable
 fun WatchLaterTextButton(
     onClick: () -> Unit,
     @StringRes label: Int,
@@ -71,12 +102,6 @@ fun WatchLaterTextButton(
     colors = ButtonDefaults.textButtonColors(
         contentColor = MaterialTheme.colors.secondary
     ),
-    // No default text button padding in this project. Makes it so much easier to align the buttons with everything
-    // else.
-    contentPadding = PaddingValues(all = 0.dp),
 ) {
-    Text(
-        text = stringResource(id = label).uppercase(),
-        style = MaterialTheme.typography.button
-    )
+    Text(text = stringResource(id = label).uppercase())
 }

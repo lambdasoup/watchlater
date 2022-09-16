@@ -25,11 +25,12 @@ package com.lambdasoup.watchlater
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.core.app.ApplicationProvider
 
-fun AndroidComposeTestRule<*, *>.onNodeWithTextRes(
+fun SemanticsNodeInteractionsProvider.onNodeWithTextRes(
     @StringRes textResId: Int, substring: Boolean = false,
     ignoreCase: Boolean = false, useUnmergedTree: Boolean = false
 ): SemanticsNodeInteraction {
@@ -41,3 +42,10 @@ fun AndroidComposeTestRule<*, *>.onNodeWithTextRes(
         useUnmergedTree = useUnmergedTree
     )
 }
+
+fun AndroidComposeTestRule<*, *>.onNodeWithTextRes(
+    @StringRes textResId: Int, substring: Boolean = false,
+    ignoreCase: Boolean = false, useUnmergedTree: Boolean = false
+) = (this as SemanticsNodeInteractionsProvider).onNodeWithTextRes(
+    textResId, substring, ignoreCase, useUnmergedTree
+)

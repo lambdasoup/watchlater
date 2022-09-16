@@ -33,11 +33,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -122,7 +125,8 @@ fun LauncherScreen(
                 modifier = Modifier
                     .height(topBarHeight)
                     .offset {
-                        IntOffset(x = 0, y = topBarOffsetHeightPx.value.roundToInt())
+                        IntOffset(x = 0,
+                                  y = topBarOffsetHeightPx.value.roundToInt())
                     },
                 title = { Text(text = stringResource(id = R.string.app_name)) },
                 actions = {
@@ -174,7 +178,12 @@ fun SetupHeader() {
             style = MaterialTheme.typography.h6,
         )
         VerticalSpace()
-        Text(text = stringResource(id = R.string.launcher_action_text))
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium ) {
+            Text(
+                text = stringResource(id = R.string.launcher_action_text),
+                style = MaterialTheme.typography.body2
+            )
+        }
     }
 }
 
@@ -200,10 +209,13 @@ fun SetupStep(
             style = MaterialTheme.typography.subtitle2,
         )
         VerticalSpace()
-        Text(
-            modifier = Modifier.padAlignTextButtonContentStart(),
-            text = stringResource(id = text),
-        )
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium ) {
+            Text(
+                modifier = Modifier.padAlignTextButtonContentStart(),
+                text = stringResource(id = text),
+                style = MaterialTheme.typography.body2
+            )
+        }
         VerticalSpace()
         WatchLaterTextButton(onClick = onButtonClick,
                              label = buttonText)
@@ -249,11 +261,13 @@ fun ExampleCard(
                 style = MaterialTheme.typography.h6,
             )
             VerticalSpace()
-            Text(
-                modifier = Modifier.padAlignTextButtonContentStart(),
-                text = stringResource(id = R.string.launcher_example_text),
-                style = MaterialTheme.typography.body1,
-            )
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium ) {
+                Text(
+                    modifier = Modifier.padAlignTextButtonContentStart(),
+                    text = stringResource(id = R.string.launcher_example_text),
+                    style = MaterialTheme.typography.body2,
+                )
+            }
             VerticalSpace()
             WatchLaterTextButton(
                 onClick = onOpenExampleVideoClick,

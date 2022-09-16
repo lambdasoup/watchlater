@@ -24,10 +24,9 @@ package com.lambdasoup.watchlater.util
 
 import androidx.annotation.MainThread
 import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 
 class EventSource<T> {
     
@@ -45,9 +44,8 @@ class EventSource<T> {
         this.owner = owner
         this.callback = callback
 
-        owner.lifecycle.addObserver(object: LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            fun clear() {
+        owner.lifecycle.addObserver(object: DefaultLifecycleObserver {
+            override fun onDestroy(owner: LifecycleOwner) {
                 this@EventSource.owner = null
                 this@EventSource.callback = null
             }

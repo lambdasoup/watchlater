@@ -26,6 +26,7 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.annotation.TargetApi
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -33,6 +34,8 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import com.lambdasoup.watchlater.BuildConfig
 import com.lambdasoup.watchlater.R
@@ -41,8 +44,18 @@ import com.lambdasoup.watchlater.ui.HelpActivity
 import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.lang.ref.WeakReference
 
 class AddActivity : AppCompatActivity() {
+    private val authIntentLauncher = registerForActivityResult(StartActivityForResult()) {
+        if (it.resultCode == RESULT_OK) {
+            vm.onAccountPermissionGranted()
+        }
+    }
+
+    private val accountChooserLauncher = registerForActivityResult(ChooseAccountContract(this)) {
+        it?.let { vm.setAccount(it) }
+    }
 
     private val vm: AddViewModel by viewModel()
 
@@ -64,38 +77,9 @@ class AddActivity : AppCompatActivity() {
         vm.events.observe(this) { event ->
             when (event) {
                 is AddViewModel.Event.OpenAuthIntent -> {
-                    startActivityForResult(event.intent, REQUEST_ACCOUNT_INTENT)
+                    authIntentLauncher.launch(event.intent)
                 }
             }
-        }
-    }
-
-    @Deprecated("Deprecated on platform")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            REQUEST_ACCOUNT -> {
-                onRequestAccountResult(resultCode, data)
-                return
-            }
-            REQUEST_ACCOUNT_INTENT -> {
-                onRequestAccountIntentResult(resultCode)
-                return
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    private fun onRequestAccountResult(resultCode: Int, data: Intent?) {
-        if (resultCode == RESULT_OK) {
-            val name = data!!.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
-            val type = data.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
-            vm.setAccount(Account(name, type))
-        }
-    }
-
-    private fun onRequestAccountIntentResult(resultCode: Int) {
-        if (resultCode == RESULT_OK) {
-            vm.onAccountPermissionGranted()
         }
     }
 
@@ -108,27 +92,43 @@ class AddActivity : AppCompatActivity() {
     private fun onOverflowActionSelected(menuAction: MenuAction) {
         when (menuAction) {
             MenuAction.About -> {
-                startActivity(Intent(this, AboutActivity::class.java))
+                startActivity(
+                    Intent(this, AboutActivity::class.java)
+                )
             }
             MenuAction.Help -> {
-                startActivity(Intent(this, HelpActivity::class.java))
+                startActivity(
+                    Intent(this, HelpActivity::class.java)
+                )
             }
             MenuAction.PrivacyPolicy -> {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://lambdasoup.com/privacypolicy-watchlater/")))
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://lambdasoup.com/privacypolicy-watchlater/")
+                    )
+                )
             }
             MenuAction.Store -> {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)))
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)
+                    )
+                )
             }
         }
     }
 
     private fun askForAccount() {
-        val intent = newChooseAccountIntent()
-        startActivityForResult(intent, REQUEST_ACCOUNT)
+        accountChooserLauncher.launch(Unit)
     }
 
     private fun tryAcquireAccountsPermission() {
-        requestPermissions(arrayOf(Manifest.permission.GET_ACCOUNTS), PERMISSIONS_REQUEST_GET_ACCOUNTS)
+        requestPermissions(
+            arrayOf(Manifest.permission.GET_ACCOUNTS),
+            PERMISSIONS_REQUEST_GET_ACCOUNTS
+        )
     }
 
     private fun needsPermission(): Boolean {
@@ -147,19 +147,6 @@ class AddActivity : AppCompatActivity() {
                 == PackageManager.PERMISSION_GRANTED)
     }
 
-    @Suppress("DEPRECATION")
-    private fun newChooseAccountIntent(): Intent {
-        val types = arrayOf(ACCOUNT_TYPE_GOOGLE)
-        val title = getString(R.string.choose_account)
-        return if (Build.VERSION.SDK_INT < 26) {
-            AccountManager.newChooseAccountIntent(null, null,
-                types, false, title, null,
-                null, null)
-        } else AccountManager.newChooseAccountIntent(null, null,
-            types, title, null, null,
-            null)
-    }
-
     private fun openWithYoutube(playVideo: Boolean = true) {
         try {
             val youtubeIntent = Intent()
@@ -175,14 +162,60 @@ class AddActivity : AppCompatActivity() {
             startActivity(youtubeIntent)
             finish()
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, R.string.error_youtube_player_missing, Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                R.string.error_youtube_player_missing,
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
     companion object {
         private const val PERMISSIONS_REQUEST_GET_ACCOUNTS = 100
-        private const val REQUEST_ACCOUNT = 1
-        private const val REQUEST_ACCOUNT_INTENT = 2
-        private const val ACCOUNT_TYPE_GOOGLE = "com.google"
+
+    }
+
+    private class ChooseAccountContract(context: Context) : ActivityResultContract<Unit, Account?>() {
+        private val contextRef = WeakReference(context)
+
+        override fun createIntent(context: Context, input: Unit): Intent {
+            val types = arrayOf(ACCOUNT_TYPE_GOOGLE)
+            val title = contextRef.get()!!.getString(R.string.choose_account)
+            return if (Build.VERSION.SDK_INT < 26) {
+                @Suppress("DEPRECATION")
+                AccountManager.newChooseAccountIntent(
+                    null,
+                    null,
+                    types,
+                    false,
+                    title,
+                    null,
+                    null,
+                    null
+                )
+            } else AccountManager.newChooseAccountIntent(
+                null,
+                null,
+                types,
+                title,
+                null,
+                null,
+                null
+            )
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Account? {
+            return if (resultCode == RESULT_OK && intent != null) {
+                val name = intent.getStringExtra(AccountManager.KEY_ACCOUNT_NAME)
+                val type = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE)
+                Account(name, type)
+            } else {
+                null
+            }
+        }
+
+        companion object {
+            private const val ACCOUNT_TYPE_GOOGLE = "com.google"
+        }
     }
 }

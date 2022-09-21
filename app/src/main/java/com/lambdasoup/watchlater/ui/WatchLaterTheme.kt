@@ -54,7 +54,9 @@ private val Green600 = Color(0xFF43A047)
 private val Green600Dark = Color(0xFF00701a)
 
 private val DarkColors = darkColors(
-    // using default Material palette
+    secondary = Red600Dark,
+    secondaryVariant = Red600,
+    onSecondary = LightGrey,
 )
 
 private val LightColors = lightColors(

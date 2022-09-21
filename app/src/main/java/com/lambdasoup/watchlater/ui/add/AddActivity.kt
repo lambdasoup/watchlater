@@ -63,6 +63,7 @@ class AddActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AddScreen(
+                onClickOutside = this::finish,
                 onOverflowAction = this::onOverflowActionSelected,
                 onSetAccount = this::askForAccount,
                 openPlaylistsOnYoutube = { openWithYoutube(playVideo = false) },

@@ -72,7 +72,7 @@
 
     <!-- theme is a customized version of Theme.AppCompat.Dialog.MinWidth -->
     <style name="Theme.WatchLater.Add">
-        <item name="android:colorBackground">?attr/colorBackgroundFloating</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
 
         <item name="android:windowFrame">@null</item>
@@ -87,13 +87,8 @@
         <item name="windowActionBar">false</item>
         <item name="windowActionModeOverlay">true</item>
 
-        <item name="listPreferredItemPaddingLeft">24dip</item>
-        <item name="listPreferredItemPaddingRight">24dip</item>
-
-        <item name="android:listDivider">@null</item>
-
-        <item name="android:windowMinWidthMajor">65%</item>
-        <item name="android:windowMinWidthMinor">95%</item>
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
     </style>
 
     <!--

@@ -23,15 +23,27 @@
 package com.lambdasoup.watchlater.ui.add
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.IndicationInstance
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -45,6 +57,7 @@ import com.lambdasoup.watchlater.viewmodel.AddViewModel
 
 @Composable
 fun AddScreen(
+    onClickOutside: () -> Unit,
     onOverflowAction: (MenuAction) -> Unit,
     onSetAccount: () -> Unit,
     openPlaylistsOnYoutube: () -> Unit,
@@ -57,75 +70,121 @@ fun AddScreen(
         @Suppress("UNCHECKED_CAST")
         val viewState = viewModel.model.observeAsState() as State<AddViewModel.Model>
 
-        Column {
-            TopAppBar(
-                title = { Text(text = stringResource(id = R.string.app_name)) },
-                actions = {
-                    OverflowMenu(onActionSelected = onOverflowAction)
-                },
-            )
-
-            Account(
+        // no ripple when dismissing activity by clicking "outside"
+        // fill fully to avoid janky layout from the window resizing itself to wrap its compose content -
+        // so we emulate the "dialog style" by hand
+        val interactionsClickOutside = remember { MutableInteractionSource() }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = interactionsClickOutside,
+                    indication = NoIndication,
+                    onClick = onClickOutside
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Surface(
                 modifier = Modifier
-                    .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
-                    .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin)),
-                account = viewState.value.account,
-                onSetAccount = onSetAccount,
-            )
+                    .widthIn(max = 480.dp)
+                    .fillMaxWidth()
+                    // padding _seems_ unbalanced, but what with the automatically added status bar padding - have a
+                    // look in landscape orientation.
+                    .padding(horizontal = 32.dp)
+                    .padding(top = 8.dp, bottom = 32.dp)
+                    .clickable(
+                        enabled = false,
+                        onClick = {}
+                    ),
+            ) {
 
-            Playlist(
-                modifier = Modifier
-                    .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
-                    .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin)),
-                playlist = viewState.value.targetPlaylist,
-                onSetPlaylist = viewModel::changePlaylist,
-            )
+                Column {
+                    TopAppBar(
+                        modifier = Modifier.fillMaxWidth(),
+                        title = { Text(text = stringResource(id = R.string.app_name)) },
+                        actions = {
+                            OverflowMenu(onActionSelected = onOverflowAction)
+                        },
+                    )
 
-            AnimatedVisibility(visible = viewState.value.permissionNeeded == true) {
-                AccountPermission(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
-                        .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin))
-                        .padding(top = 8.dp),
-                    onGrantPermissionsClicked = onGrantPermissionsClicked,
+                    Account(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
+                            .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin)),
+                        account = viewState.value.account,
+                        onSetAccount = onSetAccount,
+                    )
+
+                    Playlist(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
+                            .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin)),
+                        playlist = viewState.value.targetPlaylist,
+                        onSetPlaylist = viewModel::changePlaylist,
+                    )
+
+                    AnimatedVisibility(visible = viewState.value.permissionNeeded == true) {
+                        AccountPermission(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
+                                .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin))
+                                .padding(top = 8.dp),
+                            onGrantPermissionsClicked = onGrantPermissionsClicked,
+                        )
+                    }
+
+                    VideoSnippet(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
+                                vertical = dimensionResource(id = R.dimen.activity_vertical_margin)
+                            ),
+                        videoInfo = viewState.value.videoInfo,
+                    )
+
+                    Actions(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
+                                vertical = dimensionResource(id = R.dimen.activity_vertical_margin),
+                            ),
+                        state = viewState.value.videoAdd,
+                        videoId = viewState.value.videoId,
+                        onWatchNowClicked = onWatchNowClicked,
+                        onWatchLaterClicked = onWatchLaterClicked,
+                    )
+
+                    Result(
+                        modifier = Modifier.fillMaxWidth(),
+                        videoAdd = viewState.value.videoAdd,
+                    )
+                }
+
+                PlaylistSelection(
+                    onDialogDismiss = viewModel::clearPlaylists,
+                    openPlaylistsOnYoutube = openPlaylistsOnYoutube,
+                    onPlaylistSelected = viewModel::selectPlaylist,
+                    playlists = viewState.value.playlistSelection
                 )
             }
-
-            VideoSnippet(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
-                        vertical = dimensionResource(id = R.dimen.activity_vertical_margin)
-                    ),
-                videoInfo = viewState.value.videoInfo,
-            )
-
-            Actions(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
-                        vertical = dimensionResource(id = R.dimen.activity_vertical_margin),
-                    ),
-                state = viewState.value.videoAdd,
-                videoId = viewState.value.videoId,
-                onWatchNowClicked = onWatchNowClicked,
-                onWatchLaterClicked = onWatchLaterClicked,
-            )
-
-            Result(
-                modifier = Modifier.fillMaxWidth(),
-                videoAdd = viewState.value.videoAdd,
-            )
         }
+    }
+}
 
-        PlaylistSelection(
-            onDialogDismiss = viewModel::clearPlaylists,
-            openPlaylistsOnYoutube = openPlaylistsOnYoutube,
-            onPlaylistSelected = viewModel::selectPlaylist,
-            playlists = viewState.value.playlistSelection
-        )
+private object NoIndication : Indication {
+    private object NoIndicationInstance : IndicationInstance {
+        override fun ContentDrawScope.drawIndication() {
+            drawContent()
+        }
+    }
+
+    @Composable
+    override fun rememberUpdatedInstance(interactionSource: InteractionSource): IndicationInstance {
+        return NoIndicationInstance
     }
 }

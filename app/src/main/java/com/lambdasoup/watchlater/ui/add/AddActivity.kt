@@ -70,6 +70,10 @@ class AddActivity : AppCompatActivity() {
                 onGrantPermissionsClicked = this::tryAcquireAccountsPermission,
                 onWatchNowClicked = this::openWithYoutube,
                 onWatchLaterClicked = { videoId -> vm.watchLater(videoId) },
+                onChangePlaylistClicked = vm::changePlaylist,
+                onAbortChangePlaylist = vm::clearPlaylists,
+                onSelectPlaylist = vm::selectPlaylist,
+                viewModel = vm.model,
             )
         }
 

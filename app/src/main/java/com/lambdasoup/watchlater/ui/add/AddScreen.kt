@@ -22,6 +22,7 @@
 
 package com.lambdasoup.watchlater.ui.add
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.IndicationInstance
@@ -46,8 +47,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.ui.MenuAction
@@ -192,3 +195,32 @@ private object NoIndication : Indication {
         return NoIndicationInstance
     }
 }
+
+@Preview(name = "deutsch", locale = "de")
+@Preview(name = "english", locale = "en")
+@Preview(name = "night", uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun AddScreenPreview() = AddScreen(
+    onClickOutside = {},
+    onOverflowAction = {},
+    onSetAccount = {},
+    openPlaylistsOnYoutube = {},
+    onGrantPermissionsClicked = {},
+    onWatchNowClicked = {},
+    onWatchLaterClicked = {},
+    onChangePlaylistClicked = {},
+    onSelectPlaylist = {},
+    onAbortChangePlaylist = {},
+    viewModel = MutableLiveData(
+        AddViewModel.Model(
+            videoId = "foo",
+            videoAdd = AddViewModel.VideoAdd.Success,
+            videoInfo = AddViewModel.VideoInfo.Progress,
+            account = null,
+            permissionNeeded = false,
+            tokenRetried = false,
+            targetPlaylist = null,
+            playlistSelection = null,
+        )
+    )
+)

@@ -47,8 +47,9 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.LiveData
 import com.lambdasoup.watchlater.R
+import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.ui.OverflowMenu
 import com.lambdasoup.watchlater.ui.WatchLaterTheme
@@ -64,11 +65,14 @@ fun AddScreen(
     onGrantPermissionsClicked: () -> Unit,
     onWatchNowClicked: () -> Unit,
     onWatchLaterClicked: (String) -> Unit,
-    viewModel: AddViewModel = viewModel(),
+    onChangePlaylistClicked: () -> Unit,
+    onAbortChangePlaylist: () -> Unit,
+    onSelectPlaylist: (YoutubeRepository.Playlists.Playlist) -> Unit,
+    viewModel: LiveData<AddViewModel.Model>,
 ) {
     WatchLaterTheme {
         @Suppress("UNCHECKED_CAST")
-        val viewState = viewModel.model.observeAsState() as State<AddViewModel.Model>
+        val viewState = viewModel.observeAsState() as State<AddViewModel.Model>
 
         // no ripple when dismissing activity by clicking "outside"
         // fill fully to avoid janky layout from the window resizing itself to wrap its compose content -
@@ -122,7 +126,7 @@ fun AddScreen(
                             .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
                             .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin)),
                         playlist = viewState.value.targetPlaylist,
-                        onSetPlaylist = viewModel::changePlaylist,
+                        onSetPlaylist = onChangePlaylistClicked,
                     )
 
                     AnimatedVisibility(visible = viewState.value.permissionNeeded == true) {
@@ -166,9 +170,9 @@ fun AddScreen(
                 }
 
                 PlaylistSelection(
-                    onDialogDismiss = viewModel::clearPlaylists,
+                    onDialogDismiss = onAbortChangePlaylist,
                     openPlaylistsOnYoutube = openPlaylistsOnYoutube,
-                    onPlaylistSelected = viewModel::selectPlaylist,
+                    onPlaylistSelected = onSelectPlaylist,
                     playlists = viewState.value.playlistSelection
                 )
             }

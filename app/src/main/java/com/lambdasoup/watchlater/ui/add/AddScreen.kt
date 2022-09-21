@@ -56,6 +56,7 @@ import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.ui.OverflowMenu
 import com.lambdasoup.watchlater.ui.WatchLaterTheme
+import com.lambdasoup.watchlater.ui.animateContentHeight
 import com.lambdasoup.watchlater.ui.padWithRoomForTextButtonContent
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 
@@ -146,6 +147,7 @@ fun AddScreen(
                     VideoSnippet(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .animateContentHeight()
                             .padding(
                                 horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
                                 vertical = dimensionResource(id = R.dimen.activity_vertical_margin)

@@ -94,10 +94,11 @@ private fun ShowError(
     modifier: Modifier,
 ) {
     val errorStr: String = when (errorType) {
-        VideoAdd.ErrorType.NoAccount -> stringResource(R.string.error_no_account)
-        VideoAdd.ErrorType.NoPermission -> stringResource(R.string.error_no_permission)
-        VideoAdd.ErrorType.NoPlaylistSelected -> stringResource(R.string.error_no_playlist)
-        else -> stringResource(R.string.error_general, errorType.name)
+        is VideoAdd.ErrorType.NoAccount -> stringResource(R.string.error_no_account)
+        is VideoAdd.ErrorType.NoPermission -> stringResource(R.string.error_no_permission)
+        is VideoAdd.ErrorType.NoPlaylistSelected -> stringResource(R.string.error_no_playlist)
+        is VideoAdd.ErrorType.Network -> stringResource(id = R.string.error_network)
+        is VideoAdd.ErrorType.Other -> stringResource(R.string.error_general, errorType.msg)
     }
     ShowResult(isError = true, msg = stringResource(id = R.string.could_not_add, errorStr), modifier = modifier)
 }

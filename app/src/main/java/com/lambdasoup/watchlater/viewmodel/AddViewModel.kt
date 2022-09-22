@@ -144,8 +144,7 @@ class AddViewModel(
 
                 is OnPlaylistsTokenResult -> when (msg.result) {
                     is AuthTokenResult.Error ->
-                        model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoAccount)) *
-                                Cmd.none()
+                        model.copy(videoAdd = VideoAdd.Error(msg.result.errorType.toVideoAddErrorType())) * Cmd.none()
                     is AuthTokenResult.AuthToken ->
                         model * getPlaylists(msg.result.token) { OnPlaylistResult(it, msg.result.token) }
                     is AuthTokenResult.HasIntent ->
@@ -168,7 +167,7 @@ class AddViewModel(
 
                 is OnVideoInfoTokenResult -> when (msg.result) {
                     is AuthTokenResult.Error ->
-                        model.copy(videoInfo = VideoInfo.Error(NoAccount)) * Cmd.none()
+                        model.copy(videoInfo = VideoInfo.Error(msg.result.errorType.toVideoInfoErrorType())) * Cmd.none()
                     is AuthTokenResult.AuthToken ->
                         model * getVideoInfo(msg.videoId, msg.result.token) { OnVideoInfoResult(it) }
                     is AuthTokenResult.HasIntent ->
@@ -207,8 +206,7 @@ class AddViewModel(
 
                 is OnInsertTokenResult -> when (msg.result) {
                     is AuthTokenResult.Error ->
-                        model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.NoAccount)) *
-                                Cmd.none()
+                        model.copy(videoAdd = VideoAdd.Error(msg.result.errorType.toVideoAddErrorType())) * Cmd.none()
                     is AuthTokenResult.AuthToken -> model *
                             addVideo(msg.videoId, msg.result.token, msg.targetPlaylist) {
                                 OnAddVideoResult(it, msg.videoId, msg.targetPlaylist)
@@ -225,7 +223,7 @@ class AddViewModel(
                             ErrorType.InvalidToken -> {
                                 if (model.tokenRetried) {
                                     model.copy(
-                                            videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)
+                                            videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other(msg.result.type.name))
                                     ) * Cmd.none()
                                 } else {
                                     model.copy(tokenRetried = true) * Cmd.batch(
@@ -234,8 +232,12 @@ class AddViewModel(
                                     )
                                 }
                             }
+                            ErrorType.Network ->
+                                model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Network)) * Cmd.none()
                             else ->
-                                model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
+                                model.copy(
+                                    videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other(msg.result.type.name))
+                                ) * Cmd.none()
                         }
                 }
 
@@ -245,7 +247,7 @@ class AddViewModel(
                             ErrorType.InvalidToken -> {
                                 if (model.tokenRetried) {
                                     model.copy(
-                                            videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)
+                                            videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other(msg.result.type.name))
                                     ) * Cmd.none()
                                 } else {
                                     model.copy(tokenRetried = true) * Cmd.batch(
@@ -254,8 +256,12 @@ class AddViewModel(
                                     )
                                 }
                             }
+                            ErrorType.Network ->
+                                model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Network)) * Cmd.none()
                             else ->
-                                model.copy(videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other)) * Cmd.none()
+                                model.copy(
+                                    videoAdd = VideoAdd.Error(VideoAdd.ErrorType.Other(msg.result.type.name))
+                                ) * Cmd.none()
                         }
 
                         is PlaylistsResult.Ok -> {
@@ -375,8 +381,12 @@ class AddViewModel(
         data class Error(val error: ErrorType) : VideoAdd()
         data class HasIntent(val intent: Intent) : VideoAdd()
 
-        enum class ErrorType {
-            Other, NoAccount, NoPermission, NoPlaylistSelected
+        sealed interface ErrorType {
+            data class Other(val msg: String) : ErrorType
+            object NoAccount : ErrorType
+            object NoPermission : ErrorType
+            object NoPlaylistSelected : ErrorType
+            object Network : ErrorType
         }
     }
 
@@ -389,6 +399,20 @@ class AddViewModel(
             data class Youtube(val error: YoutubeRepository.ErrorType) : ErrorType
             object NoAccount : ErrorType
             object InvalidVideoId : ErrorType
+            object Network : ErrorType
+            data class Other(val msg: String) : ErrorType
         }
+    }
+
+    private fun AccountRepository.ErrorType.toVideoAddErrorType() = when (this) {
+        is AccountRepository.ErrorType.Network -> VideoAdd.ErrorType.Network
+        is AccountRepository.ErrorType.AccountRemoved -> VideoAdd.ErrorType.NoAccount
+        is AccountRepository.ErrorType.Other -> VideoAdd.ErrorType.Other(msg)
+    }
+
+    private fun AccountRepository.ErrorType.toVideoInfoErrorType() = when(this) {
+        is AccountRepository.ErrorType.Network -> Network
+        is AccountRepository.ErrorType.AccountRemoved -> NoAccount
+        is AccountRepository.ErrorType.Other -> Other(msg)
     }
 }

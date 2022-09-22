@@ -132,7 +132,10 @@ class AddViewModel(
                 }
 
                 is SetAccount -> model.copy(videoAdd = VideoAdd.Idle) *
-                        Cmd.event<Msg> { accountRepository.put(msg.account) }
+                        Cmd.event<Msg> {
+                            accountRepository.put(msg.account)
+                            youtubeRepository.setPlaylist(null)
+                        }
 
                 is ChangePlaylist ->
                     if (model.account == null) {

@@ -314,4 +314,13 @@ class AddViewModelTest {
         assertThat(vm.model.value!!.videoAdd)
             .isInstanceOf(VideoAdd.Idle::class.java)
     }
+
+    @Test
+    fun `should unset playlist when account is changed`() {
+        val account: Account = mock()
+
+        vm.setAccount(account)
+
+        verify(youtubeRepository).setPlaylist(null)
+    }
 }

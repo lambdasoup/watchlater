@@ -75,7 +75,7 @@ fun AddScreen(
     viewModel: LiveData<AddViewModel.Model>,
 ) {
     WatchLaterTheme {
-        @Suppress("UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST") // This particular LiveData always has non-null values.
         val viewState = viewModel.observeAsState() as State<AddViewModel.Model>
 
         // no ripple when dismissing activity by clicking "outside"

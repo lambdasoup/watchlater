@@ -306,4 +306,12 @@ class AddViewModelTest {
         assertThat(vm.model.value!!.videoInfo)
             .isInstanceOf(VideoInfo.Loaded::class.java)
     }
+
+    @Test
+    fun `should remove videoAdd error when playlist gets changed`() {
+        vm.selectPlaylist(mock())
+
+        assertThat(vm.model.value!!.videoAdd)
+            .isInstanceOf(VideoAdd.Idle::class.java)
+    }
 }

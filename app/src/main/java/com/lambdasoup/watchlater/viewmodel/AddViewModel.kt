@@ -274,7 +274,7 @@ class AddViewModel(
 
                 is OnTargetPlaylist -> model.copy(targetPlaylist = msg.playlist) * Cmd.none()
 
-                is SelectPlaylist -> model.copy(playlistSelection = null) *
+                is SelectPlaylist -> model.copy(playlistSelection = null, videoAdd = VideoAdd.Idle) *
                         Cmd.event<Msg> { youtubeRepository.setPlaylist(msg.playlist) }
 
                 is ClearPlaylists -> model.copy(playlistSelection = null) * Cmd.none()

@@ -165,7 +165,8 @@ class AddViewModelTest {
 
     @Test
     fun `should error when token result has error`() {
-        whenever(accountRepository.getAuthToken()).thenReturn(AccountRepository.AuthTokenResult.Error)
+        whenever(accountRepository.getAuthToken())
+            .thenReturn(AccountRepository.AuthTokenResult.Error(AccountRepository.ErrorType.AccountRemoved))
         accountLiveData.value = mock()
 
         vm.watchLater(videoId)
@@ -174,6 +175,20 @@ class AddViewModelTest {
         assertThat(videoAdd).isNotNull()
         assertThat(videoAdd).isInstanceOf(VideoAdd.Error::class.java)
         assertThat((videoAdd as VideoAdd.Error).error).isEqualTo(VideoAdd.ErrorType.NoAccount)
+    }
+
+    @Test
+    fun `should network error when token result has network error`() {
+        whenever(accountRepository.getAuthToken())
+            .thenReturn(AccountRepository.AuthTokenResult.Error(AccountRepository.ErrorType.Network))
+        accountLiveData.value = mock()
+
+        vm.watchLater(videoId)
+
+        val videoAdd = vm.model.value!!.videoAdd
+        assertThat(videoAdd).isNotNull()
+        assertThat(videoAdd).isInstanceOf(VideoAdd.Error::class.java)
+        assertThat((videoAdd as VideoAdd.Error).error).isEqualTo(VideoAdd.ErrorType.Network)
     }
 
     @Test
@@ -232,7 +247,7 @@ class AddViewModelTest {
         verify(accountRepository).invalidateToken(token)
         val videoAdd = vm.model.value!!.videoAdd
         assertThat(videoAdd).isNotNull()
-        assertThat(videoAdd).isEqualTo(VideoAdd.Error(VideoAdd.ErrorType.Other))
+        assertThat(videoAdd).isEqualTo(VideoAdd.Error(VideoAdd.ErrorType.Other("InvalidToken")))
     }
 
     @Test
@@ -243,7 +258,7 @@ class AddViewModelTest {
         vm.watchLater(videoId)
 
         val videoAdd = vm.model.value!!.videoAdd
-        assertThat((videoAdd as VideoAdd.Error).error).isEqualTo(VideoAdd.ErrorType.Other)
+        assertThat((videoAdd as VideoAdd.Error).error).isEqualTo(VideoAdd.ErrorType.Other("Other"))
     }
 
     @Test
@@ -280,7 +295,7 @@ class AddViewModelTest {
     fun `should reload videoinfo after error when new account is added`() {
         accountLiveData.value = null
         whenever(accountRepository.getAuthToken())
-            .thenReturn(AccountRepository.AuthTokenResult.Error)
+            .thenReturn(AccountRepository.AuthTokenResult.Error(AccountRepository.ErrorType.Network))
 
         vm.setVideoUri(uri)
 

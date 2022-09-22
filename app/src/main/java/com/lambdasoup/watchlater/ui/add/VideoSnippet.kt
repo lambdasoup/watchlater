@@ -164,4 +164,6 @@ private fun errorText(
         }
         is VideoInfo.ErrorType.InvalidVideoId -> stringResource(id = R.string.error_invalid_video_id)
         is VideoInfo.ErrorType.NoAccount -> stringResource(id = R.string.error_video_info_no_account)
+        is VideoInfo.ErrorType.Network -> stringResource(id = R.string.error_network)
+        is VideoInfo.ErrorType.Other -> stringResource(id = R.string.error_general, errorType.msg)
     }

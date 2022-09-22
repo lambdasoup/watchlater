@@ -32,6 +32,7 @@ import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.lambdasoup.watchlater.data.AccountRepository.ErrorType.*
 import java.io.IOException
 
 class AccountRepository(
@@ -76,7 +77,7 @@ class AccountRepository(
             val prefEditor = sharedPreferences.edit()
             prefEditor.remove(PREF_KEY_DEFAULT_ACCOUNT_NAME)
             prefEditor.apply()
-            return AuthTokenResult.Error
+            return AuthTokenResult.Error(AccountRemoved)
         }
 
         val future = accountManager.getAuthToken(account, SCOPE_YOUTUBE, null, false, null, null)
@@ -89,11 +90,11 @@ class AccountRepository(
             }
             return AuthTokenResult.AuthToken(result.getString(AccountManager.KEY_AUTHTOKEN)!!)
         } catch (e: OperationCanceledException) {
-            throw RuntimeException("could not get token", e)
+            return AuthTokenResult.Error(Other(e.message.orEmpty()))
         } catch (e: IOException) {
-            throw RuntimeException("could not get token", e)
+            return AuthTokenResult.Error(Network)
         } catch (e: AuthenticatorException) {
-            throw RuntimeException("could not get token", e)
+            return AuthTokenResult.Error(Other(e.message.orEmpty()))
         }
     }
 
@@ -106,9 +107,15 @@ class AccountRepository(
     }
 
     sealed class AuthTokenResult {
-        object Error : AuthTokenResult()
+        data class Error(val errorType: ErrorType) : AuthTokenResult()
         data class AuthToken(val token: String) : AuthTokenResult()
         data class HasIntent(val intent: Intent) : AuthTokenResult()
+    }
+
+    sealed class ErrorType {
+        object AccountRemoved : ErrorType()
+        object Network : ErrorType()
+        data class Other(val msg: String) : ErrorType()
     }
 
     companion object {

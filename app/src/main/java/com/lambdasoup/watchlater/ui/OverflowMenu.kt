@@ -27,6 +27,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,14 +42,16 @@ fun OverflowMenu(
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
-    IconButton(
-        onClick = {
-            showMenu = !showMenu
-        }) {
-        Icon(
-            imageVector = Icons.Default.MoreVert,
-            contentDescription = stringResource(id = R.string.menu_overflow),
-        )
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+        IconButton(
+            onClick = {
+                showMenu = !showMenu
+            }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(id = R.string.menu_overflow),
+            )
+        }
     }
     DropdownMenu(
         expanded = showMenu,

@@ -21,14 +21,10 @@
  */
 package com.lambdasoup.watchlater.ui
 
-import android.os.Bundle
 import com.lambdasoup.watchlater.R
 
 class HelpActivity : WebviewActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        loadUrl("file:///android_asset/html/" + getString(R.string.asset_prefix) + "/youtube_channel_help.html")
-    }
-
+    override val initialUrl: String
+        get() = "file:///android_asset/html/" + getString(R.string.asset_prefix) + "/youtube_channel_help.html"
 }

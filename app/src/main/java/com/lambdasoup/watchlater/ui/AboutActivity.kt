@@ -21,13 +21,7 @@
  */
 package com.lambdasoup.watchlater.ui
 
-import android.os.Bundle
-
 class AboutActivity : WebviewActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        loadUrl("file:///android_asset/html/about.html")
-    }
-
+    override val initialUrl: String
+        get() = "file:///android_asset/html/about.html"
 }

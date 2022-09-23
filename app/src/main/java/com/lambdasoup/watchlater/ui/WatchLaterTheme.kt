@@ -37,13 +37,16 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
+import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val Lightblue600 = Color(0xFF039BE5)
 private val Lightblue600Dark = Color(0xFF006DB3)
@@ -77,8 +80,22 @@ fun WatchLaterTheme(
     content: @Composable () -> Unit,
 ) {
     val isDark = isSystemInDarkTheme()
+    val colors = if (isDark) DarkColors else LightColors
+
+    val systemUiController = rememberSystemUiController()
+    DisposableEffect(systemUiController, isDark) {
+        systemUiController.setStatusBarColor(
+            color = colors.primarySurface
+        )
+        systemUiController.setNavigationBarColor(
+            color = colors.background
+        )
+
+        onDispose {}
+    }
+
     MaterialTheme(
-        colors = if (isDark) DarkColors else LightColors,
+        colors = colors,
         typography = Typography(),
         shapes = Shapes(),
         content = content

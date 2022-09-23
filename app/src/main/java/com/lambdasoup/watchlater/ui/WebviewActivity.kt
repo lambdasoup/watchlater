@@ -22,38 +22,19 @@
 package com.lambdasoup.watchlater.ui
 
 import android.os.Bundle
-import android.view.MenuItem
-import android.webkit.WebView
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import com.lambdasoup.watchlater.R
 
 abstract class WebviewActivity : AppCompatActivity() {
+    abstract val initialUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_webview)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-                ?: throw IllegalStateException("this activity must have an action bar")
-        actionBar.setDisplayHomeAsUpEnabled(true)
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_close_24)
-    }
-
-    fun loadUrl(url: String?) {
-        val webView = findViewById<WebView>(R.id.webview_webview)
-        webView.loadUrl(url!!)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+        setContent {
+            WebviewScreen(
+                initialUrl = initialUrl,
+                onUpNavigation = this::finish,
+            )
         }
     }
-
 }

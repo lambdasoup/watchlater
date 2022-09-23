@@ -70,4 +70,5 @@
     <string name="error_invalid_video_id">Link enthält ungültige Video ID</string>
     <string name="error_video_info_no_account">Video Info kann nur mit ausgewähltem Konto angezeigt werden</string>
     <string name="menu_overflow">mehr</string>
+    <string name="navigation_close">schließen</string>
 </resources>

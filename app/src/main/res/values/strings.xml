@@ -70,4 +70,5 @@
     <string name="error_invalid_video_id">Link has invalid video ID</string>
     <string name="error_video_info_no_account">Video info can not be displayed without account</string>
     <string name="menu_overflow">more</string>
+    <string name="navigation_close">close</string>
 </resources>

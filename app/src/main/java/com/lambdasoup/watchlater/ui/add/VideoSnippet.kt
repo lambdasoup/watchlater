@@ -24,11 +24,7 @@ package com.lambdasoup.watchlater.ui.add
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -39,9 +35,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -60,13 +60,19 @@ fun VideoSnippet(
 ) {
     val loading = videoInfo is VideoInfo.Progress
 
-    val painter = when (videoInfo) {
-        is VideoInfo.Loaded -> rememberAsyncImagePainter(model = videoInfo.data.snippet.thumbnails.medium.url)
-        else -> remember { ColorPainter(Color.Transparent) }
+    val painter: Painter
+    val imageLoaded: Boolean
+    if (LocalInspectionMode.current) {
+        painter = painterResource(id = R.drawable.thumbnail)
+        imageLoaded = true
+    } else {
+        painter = when (videoInfo) {
+            is VideoInfo.Loaded -> rememberAsyncImagePainter(model = videoInfo.data.snippet.thumbnails.medium.url)
+            else -> remember { ColorPainter(Color.Transparent) }
+        }
+        imageLoaded = videoInfo is VideoInfo.Loaded &&
+                (painter as AsyncImagePainter).state is AsyncImagePainter.State.Success
     }
-
-    val imageLoaded = videoInfo is VideoInfo.Loaded &&
-            (painter as AsyncImagePainter).state is AsyncImagePainter.State.Success
 
     val headerText = when (videoInfo) {
         is VideoInfo.Loaded -> videoInfo.data.snippet.title
@@ -159,11 +165,43 @@ private fun errorText(
         is VideoInfo.ErrorType.Youtube -> when (errorType.error) {
             YoutubeRepository.ErrorType.Network -> stringResource(id = R.string.error_network)
             YoutubeRepository.ErrorType.VideoNotFound -> stringResource(id = R.string.error_video_not_found)
-            else -> stringResource(id = R.string.could_not_load,
-                                   errorType.toString())
+            else -> stringResource(
+                id = R.string.could_not_load,
+                errorType.toString()
+            )
         }
         is VideoInfo.ErrorType.InvalidVideoId -> stringResource(id = R.string.error_invalid_video_id)
         is VideoInfo.ErrorType.NoAccount -> stringResource(id = R.string.error_video_info_no_account)
         is VideoInfo.ErrorType.Network -> stringResource(id = R.string.error_network)
         is VideoInfo.ErrorType.Other -> stringResource(id = R.string.error_general, errorType.msg)
     }
+
+@Preview(name = "Progress")
+@Composable
+fun VideoSnippetPreviewProgress() = VideoSnippet(
+    videoInfo = VideoInfo.Progress
+)
+
+@Preview(name = "Error")
+@Composable
+fun VideoSnippetPreviewError() = VideoSnippet(
+    videoInfo = VideoInfo.Error(error = VideoInfo.ErrorType.NoAccount)
+)
+
+@Preview(name = "Loaded")
+@Composable
+fun VideoSnippetPreviewLoaded() = VideoSnippet(
+    videoInfo = VideoInfo.Loaded(
+        data = YoutubeRepository.Videos.Item(
+            id = "video-id",
+            snippet = YoutubeRepository.Videos.Item.Snippet(
+                title = "Video Title",
+                description = "Video description",
+                thumbnails = YoutubeRepository.Videos.Item.Snippet.Thumbnails(
+                    medium = YoutubeRepository.Videos.Item.Snippet.Thumbnails.Thumbnail("dummy-url ignore in preview"),
+                )
+            ),
+            contentDetails = YoutubeRepository.Videos.Item.ContentDetails(duration = "time string"),
+        )
+    )
+)

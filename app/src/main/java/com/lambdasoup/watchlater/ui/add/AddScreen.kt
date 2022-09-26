@@ -29,12 +29,7 @@ import androidx.compose.foundation.IndicationInstance
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -53,11 +48,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository
-import com.lambdasoup.watchlater.ui.MenuAction
-import com.lambdasoup.watchlater.ui.OverflowMenu
-import com.lambdasoup.watchlater.ui.WatchLaterTheme
-import com.lambdasoup.watchlater.ui.animateContentHeight
-import com.lambdasoup.watchlater.ui.padWithRoomForTextButtonContent
+import com.lambdasoup.watchlater.ui.*
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 
 @Composable
@@ -202,7 +193,7 @@ private object NoIndication : Indication {
 @Preview(name = "english", locale = "en")
 @Preview(name = "night", uiMode = UI_MODE_NIGHT_YES)
 @Composable
-fun AddScreenPreview() = AddScreen(
+fun AddScreenPreviewProgress() = AddScreen(
     onClickOutside = {},
     onOverflowAction = {},
     onSetAccount = {},
@@ -218,6 +209,47 @@ fun AddScreenPreview() = AddScreen(
             videoId = "foo",
             videoAdd = AddViewModel.VideoAdd.Success,
             videoInfo = AddViewModel.VideoInfo.Progress,
+            account = null,
+            permissionNeeded = false,
+            tokenRetried = false,
+            targetPlaylist = null,
+            playlistSelection = null,
+        )
+    )
+)
+
+@Preview(name = "deutsch", locale = "de")
+@Preview(name = "english", locale = "en")
+@Preview(name = "night", uiMode = UI_MODE_NIGHT_YES)
+@Composable
+fun AddScreenPreviewInfoLoaded() = AddScreen(
+    onClickOutside = {},
+    onOverflowAction = {},
+    onSetAccount = {},
+    openPlaylistsOnYoutube = {},
+    onGrantPermissionsClicked = {},
+    onWatchNowClicked = {},
+    onWatchLaterClicked = {},
+    onChangePlaylistClicked = {},
+    onSelectPlaylist = {},
+    onAbortChangePlaylist = {},
+    viewModel = MutableLiveData(
+        AddViewModel.Model(
+            videoId = "foo",
+            videoAdd = AddViewModel.VideoAdd.Success,
+            videoInfo = AddViewModel.VideoInfo.Loaded(
+                data = YoutubeRepository.Videos.Item(
+                    id = "video-id",
+                    snippet = YoutubeRepository.Videos.Item.Snippet(
+                        title = "Video Title",
+                        description = "Video description",
+                        thumbnails = YoutubeRepository.Videos.Item.Snippet.Thumbnails(
+                            medium = YoutubeRepository.Videos.Item.Snippet.Thumbnails.Thumbnail("dummy-url ignore in preview"),
+                        )
+                    ),
+                    contentDetails = YoutubeRepository.Videos.Item.ContentDetails(duration = "time string"),
+                )
+            ),
             account = null,
             permissionNeeded = false,
             tokenRetried = false,

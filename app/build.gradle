@@ -20,9 +20,12 @@
  * along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'org.jlleitschuh.gradle.ktlint'
+}
 
 def version_major = 2
 def version_minor = 3

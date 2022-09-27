@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -24,19 +24,19 @@ package com.lambdasoup.tea
 
 sealed class Cmd<Msg> {
     internal data class AppMsg<Msg>(
-            val msg: Msg,
+        val msg: Msg,
     ) : Cmd<Msg>()
 
     internal data class Event<Msg>(
-            val event: () -> Unit,
+        val event: () -> Unit,
     ) : Cmd<Msg>()
 
     internal data class Task<Msg>(
-            val task: () -> Msg,
+        val task: () -> Msg,
     ) : Cmd<Msg>()
 
     internal data class Batch<Msg>(
-            val cmds: Set<Cmd<Msg>>
+        val cmds: Set<Cmd<Msg>>
     ) : Cmd<Msg>()
 
     internal class None<Msg> : Cmd<Msg>()
@@ -59,8 +59,9 @@ sealed class Cmd<Msg> {
             Task { g(f(a, b)) }
         }
 
-        fun <Msg, A, B, C, T> task(f: (A, B, C) -> (T)): (A, B, C, (T) -> Msg) -> Cmd<Msg> = { a, b, c, g ->
-            Task { g(f(a, b, c)) }
-        }
+        fun <Msg, A, B, C, T> task(f: (A, B, C) -> (T)): (A, B, C, (T) -> Msg) -> Cmd<Msg> =
+            { a, b, c, g ->
+                Task { g(f(a, b, c)) }
+            }
     }
 }

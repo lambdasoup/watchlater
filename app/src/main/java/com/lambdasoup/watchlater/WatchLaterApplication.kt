@@ -40,7 +40,7 @@ class WatchLaterApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        startKoin{
+        startKoin {
             // TODO https://github.com/InsertKoinIO/koin/issues/1242
             // androidLogger()
             androidContext(this@WatchLaterApplication)

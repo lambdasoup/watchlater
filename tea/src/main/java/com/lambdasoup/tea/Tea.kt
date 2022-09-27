@@ -28,10 +28,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor
 import kotlin.RuntimeException
 
 class Tea<Model, Msg>(
-        val init: Pair<Model, Cmd<Msg>>,
-        val view: (Model) -> Unit,
-        val update: (model: Model, msg: Msg) -> Pair<Model, Cmd<Msg>>,
-        val subscriptions: (model: Model) -> Sub<Msg>,
+    val init: Pair<Model, Cmd<Msg>>,
+    val view: (Model) -> Unit,
+    val update: (model: Model, msg: Msg) -> Pair<Model, Cmd<Msg>>,
+    val subscriptions: (model: Model) -> Sub<Msg>,
 ) {
 
     private var model = init.first
@@ -52,7 +52,7 @@ class Tea<Model, Msg>(
 
         process(cmd)
     }
-    
+
     private fun process(cmd: Cmd<Msg>) {
         when (cmd) {
             is Cmd.AppMsg<Msg> -> process(cmd.msg)
@@ -133,6 +133,7 @@ class Tea<Model, Msg>(
             if (!BuildConfig.DEBUG) return
             Log.d("TEA", s)
         }
+
         override fun execute(r: () -> Unit) = scheduler.execute(r)
         override fun post(r: () -> Unit): Unit = run { handler.post(r) }
     }

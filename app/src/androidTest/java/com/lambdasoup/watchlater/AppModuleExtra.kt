@@ -40,13 +40,16 @@ val sharedPreferences: SharedPreferences = mock()
 val appModuleExtra = module {
     single { packageManager }
     single {
-        IntentResolverRepository(object : ContextWrapper(get()) {
-            override fun getSystemService(name: String) =
-                when (name) {
-                    "domain_verification" -> domainVerificationManager
-                    else -> super.getSystemService(name)
-                }
-        }, get())
+        IntentResolverRepository(
+            object : ContextWrapper(get()) {
+                override fun getSystemService(name: String) =
+                    when (name) {
+                        "domain_verification" -> domainVerificationManager
+                        else -> super.getSystemService(name)
+                    }
+            },
+            get(),
+        )
     }
     single { accountManager }
     single { sharedPreferences }

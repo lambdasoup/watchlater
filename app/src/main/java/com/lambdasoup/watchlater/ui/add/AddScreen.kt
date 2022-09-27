@@ -29,7 +29,12 @@ import androidx.compose.foundation.IndicationInstance
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -48,7 +53,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository
-import com.lambdasoup.watchlater.ui.*
+import com.lambdasoup.watchlater.ui.MenuAction
+import com.lambdasoup.watchlater.ui.OverflowMenu
+import com.lambdasoup.watchlater.ui.WatchLaterTheme
+import com.lambdasoup.watchlater.ui.animateContentHeight
+import com.lambdasoup.watchlater.ui.padWithRoomForTextButtonContent
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 
 @Composable

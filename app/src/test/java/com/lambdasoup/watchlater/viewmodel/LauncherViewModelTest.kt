@@ -44,7 +44,7 @@ class LauncherViewModelTest {
 
     @get:Rule
     val aacRule: TestRule = InstantTaskExecutorRule()
-    
+
     @get:Rule
     var teaRule: TestRule = TeaTestEngineRule()
 
@@ -72,6 +72,6 @@ class LauncherViewModelTest {
         liveData.postValue(resolverProblem)
 
         assertThat(viewModel.model.value)
-                .isEqualTo(Model(resolverProblems = resolverProblem))
+            .isEqualTo(Model(resolverProblems = resolverProblem))
     }
 }

@@ -22,9 +22,8 @@
 
 package com.lambdasoup.tea
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 
 class UtilTest {
 
@@ -39,7 +38,7 @@ class UtilTest {
 
     sealed class SealedClass {
         @Suppress("unused")
-        object Object: SealedClass()
+        object Object : SealedClass()
     }
 
     @Test
@@ -48,5 +47,4 @@ class UtilTest {
 
         assertEquals("Object", actual)
     }
-
 }

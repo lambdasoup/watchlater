@@ -108,7 +108,6 @@ class LauncherActivityEnvironmentRule(
         com.lambdasoup.watchlater.domainVerificationManager
     private val server = MockWebServer()
 
-
     private fun before() {
         setupMocking()
 
@@ -188,7 +187,6 @@ class LauncherActivityEnvironmentRule(
             }
         }
     }
-
 }
 
 abstract class LauncherActivityTest(

@@ -30,10 +30,15 @@ import com.google.common.truth.Truth.assertThat
 import com.lambdasoup.tea.testing.TeaTestEngineRule
 import com.lambdasoup.watchlater.data.AccountRepository
 import com.lambdasoup.watchlater.data.YoutubeRepository
-import com.lambdasoup.watchlater.data.YoutubeRepository.*
+import com.lambdasoup.watchlater.data.YoutubeRepository.AddVideoResult
+import com.lambdasoup.watchlater.data.YoutubeRepository.ErrorType
 import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.Playlist
+import com.lambdasoup.watchlater.data.YoutubeRepository.VideoInfoResult
+import com.lambdasoup.watchlater.data.YoutubeRepository.Videos
 import com.lambdasoup.watchlater.util.VideoIdParser
-import com.lambdasoup.watchlater.viewmodel.AddViewModel.*
+import com.lambdasoup.watchlater.viewmodel.AddViewModel.Event
+import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoAdd
+import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoInfo
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -82,13 +87,13 @@ class AddViewModelTest {
         vm = AddViewModel(accountRepository, youtubeRepository, videoIdParser)
 
         whenever(accountRepository.getAuthToken())
-                .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
+            .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
         accountLiveData.value = mock()
         whenever(videoIdParser.parseVideoId(uri)).thenReturn(videoId)
         whenever(youtubeRepository.getVideoInfo(videoId, token))
-                .thenReturn(VideoInfoResult.VideoInfo(item))
+            .thenReturn(VideoInfoResult.VideoInfo(item))
         whenever(youtubeRepository.addVideo(videoId, playlist, token))
-                .thenReturn(AddVideoResult.Success)
+            .thenReturn(AddVideoResult.Success)
 
         observedEvents.clear()
 
@@ -195,7 +200,7 @@ class AddViewModelTest {
     fun `should intent when token result has intent`() {
         val intent: Intent = mock()
         whenever(accountRepository.getAuthToken())
-                .thenReturn(AccountRepository.AuthTokenResult.HasIntent(intent))
+            .thenReturn(AccountRepository.AuthTokenResult.HasIntent(intent))
         accountLiveData.value = mock()
 
         vm.watchLater(videoId)
@@ -218,8 +223,8 @@ class AddViewModelTest {
             .thenReturn(AddVideoResult.Success)
 
         whenever(accountRepository.getAuthToken())
-                .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
-                .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token2))
+            .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
+            .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token2))
 
         vm.watchLater(videoId)
 
@@ -239,8 +244,8 @@ class AddViewModelTest {
             .thenReturn(AddVideoResult.Error(ErrorType.InvalidToken, token2))
 
         whenever(accountRepository.getAuthToken())
-                .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
-                .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token2))
+            .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token))
+            .thenReturn(AccountRepository.AuthTokenResult.AuthToken(token2))
 
         vm.watchLater(videoId)
 

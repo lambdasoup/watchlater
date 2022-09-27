@@ -24,7 +24,11 @@ package com.lambdasoup.watchlater.ui.add
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -71,7 +75,7 @@ fun VideoSnippet(
             else -> remember { ColorPainter(Color.Transparent) }
         }
         imageLoaded = videoInfo is VideoInfo.Loaded &&
-                (painter as AsyncImagePainter).state is AsyncImagePainter.State.Success
+            (painter as AsyncImagePainter).state is AsyncImagePainter.State.Success
     }
 
     val headerText = when (videoInfo) {

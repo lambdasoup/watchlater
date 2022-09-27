@@ -35,7 +35,11 @@ import retrofit2.Converter
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.Query
 import java.io.IOException
 
 class YoutubeRepository(
@@ -69,25 +73,28 @@ class YoutubeRepository(
                     )
                 )
             }
-        
-        override fun onActive() {
-            super.onActive()
-            sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-        }
 
-        override fun onInactive() {
-            sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-            super.onInactive()
-        }
-
-        override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-            if (key !in setOf(PREF_PLAYLIST_ID, PREF_PLAYLIST_TITLE)) {
-                return
+            override fun onActive() {
+                super.onActive()
+                sharedPreferences.registerOnSharedPreferenceChangeListener(this)
             }
 
-            update()
+            override fun onInactive() {
+                sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+                super.onInactive()
+            }
+
+            override fun onSharedPreferenceChanged(
+                sharedPreferences: SharedPreferences?,
+                key: String?,
+            ) {
+                if (key !in setOf(PREF_PLAYLIST_ID, PREF_PLAYLIST_TITLE)) {
+                    return
+                }
+
+                update()
+            }
         }
-    }
 
     val targetPlaylist: LiveData<Playlist?>
         get() = _targetPlaylist
@@ -102,20 +109,20 @@ class YoutubeRepository(
 
         val retrofitBuilder = Retrofit.Builder()
             .baseUrl(baseUrl)
-                .addConverterFactory(MoshiConverterFactory.create())
-                .client(httpClient.build())
+            .addConverterFactory(MoshiConverterFactory.create())
+            .client(httpClient.build())
         retrofit = retrofitBuilder.build()
         api = retrofit.create(YoutubeApi::class.java)
     }
 
     private val youtubeErrorConverter: Converter<ResponseBody?, YouTubeError> =
-            retrofit.responseBodyConverter(YouTubeError::class.java, arrayOfNulls(0))
+        retrofit.responseBodyConverter(YouTubeError::class.java, arrayOfNulls(0))
 
     fun setPlaylist(playlist: Playlist?) {
         sharedPreferences.edit()
-                .putString(PREF_PLAYLIST_TITLE, playlist?.snippet?.title)
-                .putString(PREF_PLAYLIST_ID, playlist?.id)
-                .apply()
+            .putString(PREF_PLAYLIST_TITLE, playlist?.snippet?.title)
+            .putString(PREF_PLAYLIST_ID, playlist?.id)
+            .apply()
     }
 
     fun getVideoInfo(videoId: String, token: String): VideoInfoResult {
@@ -186,139 +193,139 @@ class YoutubeRepository(
     sealed class AddVideoResult {
         object Success : AddVideoResult()
         data class Error(
-                val type: ErrorType,
-                val token: String,
+            val type: ErrorType,
+            val token: String,
         ) : AddVideoResult()
     }
 
     sealed class VideoInfoResult {
         data class VideoInfo(val item: Videos.Item) : VideoInfoResult()
         data class Error(
-                val type: ErrorType
+            val type: ErrorType,
         ) : VideoInfoResult()
     }
 
     sealed class PlaylistsResult {
         data class Ok(val playlists: Playlists) : PlaylistsResult()
         data class Error(
-                val type: ErrorType,
+            val type: ErrorType,
         ) : PlaylistsResult()
     }
 
     private interface YoutubeApi {
         @POST("playlistItems?part=snippet")
         fun insertPlaylistItem(
-                @Body playlistItem: PlaylistItem,
-                @Header("Authorization") auth: String,
+            @Body playlistItem: PlaylistItem,
+            @Header("Authorization") auth: String,
         ): Call<PlaylistItem?>
 
         @GET("videos?part=snippet,contentDetails&maxResults=1")
         fun listVideos(
-                @Query("id") id: String,
-                @Header("Authorization") auth: String,
+            @Query("id") id: String,
+            @Header("Authorization") auth: String,
         ): Call<Videos>
 
         @GET("playlists?part=snippet&mine=true")
         fun getPlaylists(
-                @Query("maxResults") maxResults: Int,
-                @Header("Authorization") auth: String,
+            @Query("maxResults") maxResults: Int,
+            @Header("Authorization") auth: String,
         ): Call<Playlists>
     }
 
     @JsonClass(generateAdapter = true)
     data class Videos(
-            val items: List<Item>,
+        val items: List<Item>,
     ) {
 
         @JsonClass(generateAdapter = true)
         data class Item(
-                val id: String,
-                val snippet: Snippet,
-                val contentDetails: ContentDetails,
+            val id: String,
+            val snippet: Snippet,
+            val contentDetails: ContentDetails,
         ) {
 
             @JsonClass(generateAdapter = true)
             data class Snippet(
-                    val title: String,
-                    val description: String,
-                    val thumbnails: Thumbnails,
+                val title: String,
+                val description: String,
+                val thumbnails: Thumbnails,
             ) {
 
                 @JsonClass(generateAdapter = true)
                 data class Thumbnails(
-                        val medium: Thumbnail,
+                    val medium: Thumbnail,
                 ) {
 
                     @JsonClass(generateAdapter = true)
                     data class Thumbnail(
-                            val url: String,
+                        val url: String,
                     )
                 }
             }
 
             @JsonClass(generateAdapter = true)
             data class ContentDetails(
-                    val duration: String,
+                val duration: String,
             )
         }
     }
 
     @JsonClass(generateAdapter = true)
     data class PlaylistItem(
-            val snippet: Snippet,
+        val snippet: Snippet,
     ) {
 
         @JsonClass(generateAdapter = true)
         data class Snippet(
-                val playlistId: String,
-                val resourceId: ResourceId,
-                val title: String?,
-                val description: String?,
+            val playlistId: String,
+            val resourceId: ResourceId,
+            val title: String?,
+            val description: String?,
         ) {
 
             @JsonClass(generateAdapter = true)
             data class ResourceId(
-                    val videoId: String?,
-                    val kind: String = "youtube#video",
+                val videoId: String?,
+                val kind: String = "youtube#video",
             )
         }
     }
 
     @JsonClass(generateAdapter = true)
     data class YouTubeError(
-            val error: RootError,
+        val error: RootError,
     ) {
 
         @JsonClass(generateAdapter = true)
         data class RootError(
-                val code: Int,
-                val message: String,
-                val errors: List<ErrorDetail>?,
+            val code: Int,
+            val message: String,
+            val errors: List<ErrorDetail>?,
         ) {
 
             @JsonClass(generateAdapter = true)
             data class ErrorDetail(
-                    val domain: String,
-                    val reason: String,
-                    val message: String,
+                val domain: String,
+                val reason: String,
+                val message: String,
             )
         }
     }
 
     @JsonClass(generateAdapter = true)
     data class Playlists(
-            val items: List<Playlist>,
+        val items: List<Playlist>,
     ) {
 
         @JsonClass(generateAdapter = true)
         data class Playlist(
-                val id: String,
-                val snippet: Snippet,
+            val id: String,
+            val snippet: Snippet,
         ) {
 
             @JsonClass(generateAdapter = true)
             data class Snippet(
-                    val title: String,
+                val title: String,
             )
         }
     }
@@ -330,8 +337,7 @@ class YoutubeRepository(
             return ErrorType.Other
         } ?: return ErrorType.Other
         var errorDetail = ""
-        if (youtubeError.error.errors != null
-                && youtubeError.error.errors.isNotEmpty()) {
+        if (youtubeError.error.errors != null && youtubeError.error.errors.isNotEmpty()) {
             errorDetail = youtubeError.error.errors[0].reason
         }
         return when (errorResponse.code()) {
@@ -355,7 +361,8 @@ class YoutubeRepository(
 
     companion object {
         private const val DAILY_LIMIT_EXCEEDED_UNREG = "dailyLimitExceededUnreg"
-        private const val PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS = "playlistContainsMaximumNumberOfVideos"
+        private const val PLAYLIST_CONTAINS_MAXIMUM_NUMBER_OF_VIDEOS =
+            "playlistContainsMaximumNumberOfVideos"
         private const val VIDEO_NOT_FOUND = "videoNotFound"
 
         private const val PREF_PLAYLIST_ID = "playlist-id"

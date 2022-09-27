@@ -148,8 +148,8 @@ class AddActivity : AppCompatActivity() {
 
     @TargetApi(23)
     private fun hasAccountsPermission(): Boolean {
-        return (application.checkSelfPermission(Manifest.permission.GET_ACCOUNTS)
-                == PackageManager.PERMISSION_GRANTED)
+        return application.checkSelfPermission(Manifest.permission.GET_ACCOUNTS) ==
+            PackageManager.PERMISSION_GRANTED
     }
 
     private fun openWithYoutube(playVideo: Boolean = true) {
@@ -177,10 +177,10 @@ class AddActivity : AppCompatActivity() {
 
     companion object {
         private const val PERMISSIONS_REQUEST_GET_ACCOUNTS = 100
-
     }
 
-    private class ChooseAccountContract(context: Context) : ActivityResultContract<Unit, Account?>() {
+    private class ChooseAccountContract(context: Context) :
+        ActivityResultContract<Unit, Account?>() {
         private val contextRef = WeakReference(context)
 
         override fun createIntent(context: Context, input: Unit): Intent {

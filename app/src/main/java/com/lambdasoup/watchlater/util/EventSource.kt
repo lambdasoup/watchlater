@@ -29,22 +29,22 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 
 class EventSource<T> {
-    
+
     private var events: MutableSet<T> = mutableSetOf()
-    
+
     private var owner: LifecycleOwner? = null
     private var callback: ((T) -> Unit)? = null
-    
+
     @MainThread
     fun observe(owner: LifecycleOwner, callback: (T) -> Unit) {
         if (this.owner !== null) {
             throw RuntimeException("EventSource can only have one owner at a time.")
         }
-        
+
         this.owner = owner
         this.callback = callback
 
-        owner.lifecycle.addObserver(object: DefaultLifecycleObserver {
+        owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onDestroy(owner: LifecycleOwner) {
                 this@EventSource.owner = null
                 this@EventSource.callback = null
@@ -53,27 +53,27 @@ class EventSource<T> {
 
         flush()
     }
-    
+
     @MainThread
     private fun flush() {
         val atLeast = owner?.lifecycle?.currentState?.isAtLeast(Lifecycle.State.CREATED)
         if (atLeast == null || atLeast == false) {
-           return
+            return
         }
-        
+
         for (event in events) {
             callback!!(event)
         }
 
         events.clear()
     }
-    
+
     @MainThread
     fun submit(t: T) {
         events.add(t)
         flush()
     }
-    
+
     @VisibleForTesting
     internal fun contains(t: T) = events.contains(t)
 }

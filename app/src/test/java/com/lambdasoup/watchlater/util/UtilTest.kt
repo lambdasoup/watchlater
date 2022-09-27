@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -31,5 +31,4 @@ class UtilTest {
         val actual = formatDuration("PT22H23M2S")
         assertThat(actual).isEqualTo("22h 23m 2s")
     }
-
 }

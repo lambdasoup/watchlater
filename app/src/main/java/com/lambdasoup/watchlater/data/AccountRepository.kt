@@ -32,7 +32,9 @@ import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.lambdasoup.watchlater.data.AccountRepository.ErrorType.*
+import com.lambdasoup.watchlater.data.AccountRepository.ErrorType.AccountRemoved
+import com.lambdasoup.watchlater.data.AccountRepository.ErrorType.Network
+import com.lambdasoup.watchlater.data.AccountRepository.ErrorType.Other
 import java.io.IOException
 
 class AccountRepository(

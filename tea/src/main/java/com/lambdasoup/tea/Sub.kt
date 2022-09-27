@@ -38,14 +38,14 @@ abstract class Sub<Msg> internal constructor() {
         fun <Msg> batch(vararg subs: Sub<Msg>): Sub<Msg> = BatchSub(setOf(*subs))
         fun <Msg> none(): Sub<Msg> = NoneSub()
         fun <T, Msg> create(
-                bind: (() -> Unit)? = null,
-                unbind: (() -> Unit)? = null,
+            bind: (() -> Unit)? = null,
+            unbind: (() -> Unit)? = null,
         ) = Base<T, Msg>(bind, unbind)
     }
 
     class Base<T, Msg> internal constructor(
-            val bind: (() -> Unit)? = null,
-            val unbind: (() -> Unit)? = null,
+        val bind: (() -> Unit)? = null,
+        val unbind: (() -> Unit)? = null,
     ) {
         private val sub = object : Sub<Msg>() {
             override fun bind() {

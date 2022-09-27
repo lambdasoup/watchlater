@@ -23,9 +23,9 @@
 package com.lambdasoup.tea
 
 import com.nhaarman.mockitokotlin2.mock
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 
 class SubTest {
 
@@ -57,12 +57,12 @@ class SubTest {
 
         assertNotEquals(batch1, batch2)
     }
-    
+
     @Test
     fun `different subs should be different`() {
         assertNotEquals(sub1, sub2)
     }
-    
+
     @Test
     fun `same subs should be equal`() {
         assertEquals(sub1, sub1)

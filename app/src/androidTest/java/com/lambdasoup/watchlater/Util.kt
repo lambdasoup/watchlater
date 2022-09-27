@@ -31,8 +31,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.core.app.ApplicationProvider
 
 fun SemanticsNodeInteractionsProvider.onNodeWithTextRes(
-    @StringRes textResId: Int, substring: Boolean = false,
-    ignoreCase: Boolean = false, useUnmergedTree: Boolean = false
+    @StringRes textResId: Int,
+    substring: Boolean = false,
+    ignoreCase: Boolean = false,
+    useUnmergedTree: Boolean = false,
 ): SemanticsNodeInteraction {
     val text = ApplicationProvider.getApplicationContext<Context>().resources.getString(textResId)
     return onNodeWithText(
@@ -44,8 +46,10 @@ fun SemanticsNodeInteractionsProvider.onNodeWithTextRes(
 }
 
 fun AndroidComposeTestRule<*, *>.onNodeWithTextRes(
-    @StringRes textResId: Int, substring: Boolean = false,
-    ignoreCase: Boolean = false, useUnmergedTree: Boolean = false
+    @StringRes textResId: Int,
+    substring: Boolean = false,
+    ignoreCase: Boolean = false,
+    useUnmergedTree: Boolean = false,
 ) = (this as SemanticsNodeInteractionsProvider).onNodeWithTextRes(
     textResId, substring, ignoreCase, useUnmergedTree
 )

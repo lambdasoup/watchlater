@@ -129,7 +129,10 @@ fun LauncherScreen(
                 modifier = Modifier
                     .height(topBarHeight)
                     .offset {
-                        IntOffset(x = 0, y = topBarOffsetHeightPx.value.roundToInt())
+                        IntOffset(
+                            x = 0,
+                            y = topBarOffsetHeightPx.value.roundToInt()
+                        )
                     },
                 title = { Text(text = stringResource(id = R.string.app_name)) },
                 actions = {
@@ -181,7 +184,7 @@ fun SetupHeader() {
             style = MaterialTheme.typography.h6,
         )
         VerticalSpace()
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium ) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
                 text = stringResource(id = R.string.launcher_action_text),
                 style = MaterialTheme.typography.body2
@@ -212,7 +215,7 @@ fun SetupStep(
             style = MaterialTheme.typography.subtitle2,
         )
         VerticalSpace()
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium ) {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
                 modifier = Modifier.padAlignTextButtonContentStart(),
                 text = stringResource(id = text),
@@ -220,8 +223,10 @@ fun SetupStep(
             )
         }
         VerticalSpace()
-        WatchLaterTextButton(onClick = onButtonClick,
-                             label = buttonText)
+        WatchLaterTextButton(
+            onClick = onButtonClick,
+            label = buttonText,
+        )
     }
 }
 
@@ -264,7 +269,7 @@ fun ExampleCard(
                 style = MaterialTheme.typography.h6,
             )
             VerticalSpace()
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium ) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
                     modifier = Modifier.padAlignTextButtonContentStart(),
                     text = stringResource(id = R.string.launcher_example_text),

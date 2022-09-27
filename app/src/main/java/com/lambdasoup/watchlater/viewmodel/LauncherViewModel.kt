@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -31,7 +31,11 @@ import com.lambdasoup.tea.times
 import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.data.IntentResolverRepository.ResolverProblems
 import com.lambdasoup.watchlater.util.EventSource
-import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Msg.*
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Msg.OnResolverState
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Msg.OnResume
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Msg.OnWatchLaterSettings
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Msg.OnYouTubeSettings
+import com.lambdasoup.watchlater.viewmodel.LauncherViewModel.Msg.TryExample
 
 class LauncherViewModel(private val repository: IntentResolverRepository) : ViewModel() {
 
@@ -43,14 +47,15 @@ class LauncherViewModel(private val repository: IntentResolverRepository) : View
 
     private val updateRepository = Cmd.event<Msg> { repository.update() }
     private val openYouTubeSettings = Cmd.event<Msg> { events.submit(Event.OpenYouTubeSettings) }
-    private val openWatchLaterSettings = Cmd.event<Msg> { events.submit(Event.OpenWatchLaterSettings) }
+    private val openWatchLaterSettings =
+        Cmd.event<Msg> { events.submit(Event.OpenWatchLaterSettings) }
     private val openExample = Cmd.event<Msg> { events.submit(Event.OpenExample) }
 
     private val tea = Tea(
-            init = Model(resolverProblems = null) * Cmd.none(),
-            view = model::setValue,
-            update = ::update,
-            subscriptions = ::subscriptions,
+        init = Model(resolverProblems = null) * Cmd.none(),
+        view = model::setValue,
+        update = ::update,
+        subscriptions = ::subscriptions,
     )
 
     private fun update(model: Model, msg: Msg): Pair<Model, Cmd<Msg>> {
@@ -60,26 +65,26 @@ class LauncherViewModel(private val repository: IntentResolverRepository) : View
             is OnWatchLaterSettings -> model * openWatchLaterSettings
             is TryExample -> model * openExample
             is OnResolverState ->
-                    model.copy(resolverProblems = msg.resolverProblems) * Cmd.none()
+                model.copy(resolverProblems = msg.resolverProblems) * Cmd.none()
         }
     }
 
     @Suppress("UNUSED_PARAMETER")
     private fun subscriptions(model: Model): Sub<Msg> =
-            Sub.batch(
-                    onResume { OnResume },
-                    resolverStateSubscription { OnResolverState(it) },
-            )
+        Sub.batch(
+            onResume { OnResume },
+            resolverStateSubscription { OnResolverState(it) },
+        )
 
     private val observer =
-            Observer<ResolverProblems> { resolverStateSubscription.submit(it) }
+        Observer<ResolverProblems> { resolverStateSubscription.submit(it) }
 
     init {
         repository.getResolverState().observeForever(observer)
     }
 
     data class Model(
-            val resolverProblems: ResolverProblems?
+        val resolverProblems: ResolverProblems?
     )
 
     sealed class Msg {
@@ -88,7 +93,7 @@ class LauncherViewModel(private val repository: IntentResolverRepository) : View
         object OnWatchLaterSettings : Msg()
         object TryExample : Msg()
         data class OnResolverState(
-                val resolverProblems: ResolverProblems
+            val resolverProblems: ResolverProblems
         ) : Msg()
     }
 
@@ -101,7 +106,7 @@ class LauncherViewModel(private val repository: IntentResolverRepository) : View
     fun onResume() {
         onResume.submit(Unit)
     }
-    
+
     fun onYoutubeSettings() {
         tea.ui(OnYouTubeSettings)
     }

@@ -76,7 +76,6 @@ class AddActivityTest {
         assertYoutubeOpenedWithVideoUri()
     }
 
-
     @get:Rule
     val composeTestRule = createEmptyComposeRule()
 

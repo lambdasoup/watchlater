@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2021
+ * Copyright (c) 2015 - 2022
  *
  * Maximilian Hille <mh@lambdasoup.com>
  * Juliane Lehmann <jl@lambdasoup.com>
@@ -22,9 +22,14 @@
 
 package com.lambdasoup.tea
 
-import com.lambdasoup.tea.TeaTest.Msg.*
+import com.lambdasoup.tea.TeaTest.Msg.OnSubMsg
+import com.lambdasoup.tea.TeaTest.Msg.TaskResult
 import com.lambdasoup.tea.testing.TeaTestEngineRule
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.inOrder
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 
@@ -34,8 +39,8 @@ class TeaTest {
     var rule = TeaTestEngineRule(autoExecute = false)
 
     data class Model(
-            val string: String = "test-string",
-            val int: Int = 0,
+        val string: String = "test-string",
+        val int: Int = 0,
     )
 
     sealed class Msg {
@@ -51,10 +56,10 @@ class TeaTest {
         whenever(subscriptions.invoke(any())).thenReturn(Sub.none())
 
         val tea = Tea(
-                init = Model(string = "test-name") * Cmd.none(),
-                view = view,
-                update = update,
-                subscriptions = subscriptions,
+            init = Model(string = "test-name") * Cmd.none(),
+            view = view,
+            update = update,
+            subscriptions = subscriptions,
         )
         tea.clear()
 
@@ -69,10 +74,10 @@ class TeaTest {
         val sub: Sub<Msg> = mock()
 
         val tea = Tea(
-                init = Model(string = "test-name") * Cmd.none(),
-                view = view,
-                update = update,
-                subscriptions = { sub },
+            init = Model(string = "test-name") * Cmd.none(),
+            view = view,
+            update = update,
+            subscriptions = { sub },
         )
 
         verify(sub).bind()
@@ -88,15 +93,15 @@ class TeaTest {
         val task = Cmd.task<Msg, String> { "test-result" }
 
         val tea = Tea(
-                init = Model() * task { TaskResult("test-result") },
-                view = view,
-                update = { model, msg ->
-                    when (msg) {
-                        is TaskResult -> model.copy(string = msg.s) * Cmd.none()
-                        else -> model * Cmd.none()
-                    }
-                },
-                subscriptions = { Sub.none() },
+            init = Model() * task { TaskResult("test-result") },
+            view = view,
+            update = { model, msg ->
+                when (msg) {
+                    is TaskResult -> model.copy(string = msg.s) * Cmd.none()
+                    else -> model * Cmd.none()
+                }
+            },
+            subscriptions = { Sub.none() },
         )
 
         rule.proceed()
@@ -108,22 +113,22 @@ class TeaTest {
             verify(view).invoke(Model(string = "test-result"))
         }
     }
-    
+
     @Test
     fun `should process sub`() {
         val view: (Model) -> Unit = mock()
         val sub = Sub.create<Int, Msg>()
 
         val tea = Tea(
-                init = Model() * Cmd.none(),
-                view = view,
-                update = { model, msg ->
-                    when (msg) {
-                        is OnSubMsg -> model.copy(int = msg.i) * Cmd.none()
-                        else -> model * Cmd.none()
-                    }
-                },
-                subscriptions = { sub { OnSubMsg(it) } },
+            init = Model() * Cmd.none(),
+            view = view,
+            update = { model, msg ->
+                when (msg) {
+                    is OnSubMsg -> model.copy(int = msg.i) * Cmd.none()
+                    else -> model * Cmd.none()
+                }
+            },
+            subscriptions = { sub { OnSubMsg(it) } },
         )
 
         sub.submit(1337)

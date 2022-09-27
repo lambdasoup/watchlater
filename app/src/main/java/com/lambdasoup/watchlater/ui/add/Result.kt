@@ -40,7 +40,7 @@ import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoAdd
 @Composable
 fun Result(
     videoAdd: VideoAdd,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     when (videoAdd) {
         is VideoAdd.Idle, VideoAdd.Progress -> {
@@ -48,7 +48,11 @@ fun Result(
         }
         is VideoAdd.Success -> ShowSuccess(modifier = modifier)
         is VideoAdd.Error -> ShowError(errorType = videoAdd.error, modifier = modifier)
-        is VideoAdd.HasIntent -> ShowResult(isError = true, R.string.needs_youtube_permissions, modifier)
+        is VideoAdd.HasIntent -> ShowResult(
+            isError = true,
+            R.string.needs_youtube_permissions,
+            modifier,
+        )
     }
 }
 
@@ -58,7 +62,7 @@ private fun ShowResult(
     @StringRes msgResId: Int,
     modifier: Modifier,
 ) {
-   ShowResult(isError = isError, msg = stringResource(id = msgResId), modifier = modifier)
+    ShowResult(isError = isError, msg = stringResource(id = msgResId), modifier = modifier)
 }
 
 @Composable
@@ -100,5 +104,9 @@ private fun ShowError(
         is VideoAdd.ErrorType.Network -> stringResource(id = R.string.error_network)
         is VideoAdd.ErrorType.Other -> stringResource(R.string.error_general, errorType.msg)
     }
-    ShowResult(isError = true, msg = stringResource(id = R.string.could_not_add, errorStr), modifier = modifier)
+    ShowResult(
+        isError = true,
+        msg = stringResource(id = R.string.could_not_add, errorStr),
+        modifier = modifier,
+    )
 }

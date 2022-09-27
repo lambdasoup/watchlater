@@ -23,15 +23,21 @@
 package com.lambdasoup.watchlater.ui
 
 import androidx.annotation.StringRes
-import androidx.compose.material.*
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.lambdasoup.watchlater.R
 
@@ -46,7 +52,8 @@ fun OverflowMenu(
         IconButton(
             onClick = {
                 showMenu = !showMenu
-            }) {
+            }
+        ) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = stringResource(id = R.string.menu_overflow),

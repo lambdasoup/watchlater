@@ -26,4 +26,4 @@ internal fun prettyName(o: Any?): String {
     return o.toString().split('$').last().split('@').first()
 }
 
-operator fun <Model,Msg> Model.times(cmd: Cmd<Msg>) = Pair(this, cmd)
+operator fun <Model, Msg> Model.times(cmd: Cmd<Msg>) = Pair(this, cmd)

@@ -40,13 +40,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository
 import com.lambdasoup.watchlater.ui.WatchLaterTextButton
@@ -64,14 +62,15 @@ fun PlaylistSelection(
         return
     }
 
-    NeutralButtonDialog(onDialogDismiss = onDialogDismiss,
+    NeutralButtonDialog(
+        onDialogDismiss = onDialogDismiss,
         titleRes = R.string.playlist_selection_title,
         onButtonClick = openPlaylistsOnYoutube,
         buttonLabelRes = if (playlists.items.isNotEmpty()) {
             R.string.playlist_selection_edit
         } else {
             R.string.playlist_selection_create
-        }
+        },
     ) {
         if (playlists.items.isNotEmpty()) {
             Column {
@@ -136,10 +135,11 @@ private fun NeutralButtonDialog(
                 // content
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     val scrollState = rememberScrollState()
-                    Box(modifier = Modifier
-                        .verticalScroll(scrollState)
-                        .weight(weight = 1f, fill = false)
-                        .padAlignTextButtonContentStart()
+                    Box(
+                        modifier = Modifier
+                            .verticalScroll(scrollState)
+                            .weight(weight = 1f, fill = false)
+                            .padAlignTextButtonContentStart(),
                     ) {
                         content()
                     }
@@ -154,5 +154,4 @@ private fun NeutralButtonDialog(
             }
         }
     }
-
 }

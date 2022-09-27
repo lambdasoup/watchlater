@@ -74,10 +74,20 @@ class LauncherActivity : AppCompatActivity() {
                 startActivity(Intent(this, HelpActivity::class.java))
             }
             MenuAction.PrivacyPolicy -> {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://lambdasoup.com/privacypolicy-watchlater/")))
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://lambdasoup.com/privacypolicy-watchlater/")
+                    )
+                )
             }
             MenuAction.Store -> {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)))
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID)
+                    )
+                )
             }
         }
     }
@@ -92,7 +102,7 @@ class LauncherActivity : AppCompatActivity() {
             else -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
         }
         val intent = Intent(action, Uri.parse("package:com.google.android.youtube"))
-        if (packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY ) == null) {
+        if (packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) == null) {
             Toast.makeText(this, R.string.no_youtube_settings_activity, Toast.LENGTH_SHORT).show()
             return
         }
@@ -104,7 +114,7 @@ class LauncherActivity : AppCompatActivity() {
             Build.VERSION.SDK_INT >= 31 -> Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS
             else -> Settings.ACTION_APPLICATION_DETAILS_SETTINGS
         }
-        val intent = Intent(action, Uri.parse("package:${packageName}"))
+        val intent = Intent(action, Uri.parse("package:$packageName"))
         startActivity(intent)
     }
 

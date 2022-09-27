@@ -23,8 +23,8 @@ package com.lambdasoup.watchlater.util
 
 fun formatDuration(durationStr: String): String {
     return durationStr
-            .substring(2)
-            .replace("H", "h ")
-            .replace("M", "m ")
-            .replace('S', 's')
+        .substring(2)
+        .replace("H", "h ")
+        .replace("M", "m ")
+        .replace('S', 's')
 }

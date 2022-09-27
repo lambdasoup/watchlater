@@ -77,7 +77,6 @@ class IntentResolverRepository(
 
             // some unknown app is set as the default app to launch with, without chooser.
             else -> false
-
         }
     }
 

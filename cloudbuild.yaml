@@ -3,7 +3,7 @@ steps:
 # build the project
 - name: 'mreichelt/android:31'
   id: build
-  args: ["./gradlew", "assembleDebug", "lintDebug", "testDebugUnitTest"]
+  args: [ "./gradlew", "assembleDebug", "lintDebug", "testDebugUnitTest", "ktlintCheck" ]
   env:
     - 'TERM=dumb'
     - 'GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.parallel=false -Dkotlin.incremental=false"'

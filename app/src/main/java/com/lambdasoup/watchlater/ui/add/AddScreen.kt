@@ -48,6 +48,8 @@ import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -202,68 +204,48 @@ private object NoIndication : Indication {
 @Preview(name = "english", locale = "en")
 @Preview(name = "night", uiMode = UI_MODE_NIGHT_YES)
 @Composable
-fun AddScreenPreviewProgress() = AddScreen(
-    onClickOutside = {},
-    onOverflowAction = {},
-    onSetAccount = {},
-    openPlaylistsOnYoutube = {},
-    onGrantPermissionsClicked = {},
-    onWatchNowClicked = {},
-    onWatchLaterClicked = {},
-    onChangePlaylistClicked = {},
-    onSelectPlaylist = {},
-    onAbortChangePlaylist = {},
-    viewModel = MutableLiveData(
-        AddViewModel.Model(
-            videoId = "foo",
-            videoAdd = AddViewModel.VideoAdd.Success,
-            videoInfo = AddViewModel.VideoInfo.Progress,
-            account = null,
-            permissionNeeded = false,
-            tokenRetried = false,
-            targetPlaylist = null,
-            playlistSelection = null,
+fun AddScreenPreview(@PreviewParameter(SampleVideoInfoProvider::class) videoInfo: AddViewModel.VideoInfo) =
+    AddScreen(
+        onClickOutside = {},
+        onOverflowAction = {},
+        onSetAccount = {},
+        openPlaylistsOnYoutube = {},
+        onGrantPermissionsClicked = {},
+        onWatchNowClicked = {},
+        onWatchLaterClicked = {},
+        onChangePlaylistClicked = {},
+        onSelectPlaylist = {},
+        onAbortChangePlaylist = {},
+        viewModel = MutableLiveData(
+            AddViewModel.Model(
+                videoId = "foo",
+                videoAdd = AddViewModel.VideoAdd.Success,
+                videoInfo = videoInfo,
+                account = null,
+                permissionNeeded = false,
+                tokenRetried = false,
+                targetPlaylist = null,
+                playlistSelection = null,
+            )
         )
     )
-)
 
-@Preview(name = "deutsch", locale = "de")
-@Preview(name = "english", locale = "en")
-@Preview(name = "night", uiMode = UI_MODE_NIGHT_YES)
-@Composable
-fun AddScreenPreviewInfoLoaded() = AddScreen(
-    onClickOutside = {},
-    onOverflowAction = {},
-    onSetAccount = {},
-    openPlaylistsOnYoutube = {},
-    onGrantPermissionsClicked = {},
-    onWatchNowClicked = {},
-    onWatchLaterClicked = {},
-    onChangePlaylistClicked = {},
-    onSelectPlaylist = {},
-    onAbortChangePlaylist = {},
-    viewModel = MutableLiveData(
-        AddViewModel.Model(
-            videoId = "foo",
-            videoAdd = AddViewModel.VideoAdd.Success,
-            videoInfo = AddViewModel.VideoInfo.Loaded(
-                data = YoutubeRepository.Videos.Item(
-                    id = "video-id",
-                    snippet = YoutubeRepository.Videos.Item.Snippet(
-                        title = "Video Title",
-                        description = "Video description",
-                        thumbnails = YoutubeRepository.Videos.Item.Snippet.Thumbnails(
-                            medium = YoutubeRepository.Videos.Item.Snippet.Thumbnails.Thumbnail("dummy-url ignore in preview"),
-                        )
-                    ),
-                    contentDetails = YoutubeRepository.Videos.Item.ContentDetails(duration = "time string"),
-                )
-            ),
-            account = null,
-            permissionNeeded = false,
-            tokenRetried = false,
-            targetPlaylist = null,
-            playlistSelection = null,
-        )
+class SampleVideoInfoProvider : PreviewParameterProvider<AddViewModel.VideoInfo> {
+    override val values = sequenceOf(
+        AddViewModel.VideoInfo.Loaded(
+            data = YoutubeRepository.Videos.Item(
+                id = "video-id",
+                snippet = YoutubeRepository.Videos.Item.Snippet(
+                    title = "Video Title",
+                    description = "Video description",
+                    thumbnails = YoutubeRepository.Videos.Item.Snippet.Thumbnails(
+                        medium = YoutubeRepository.Videos.Item.Snippet.Thumbnails.Thumbnail("dummy-url ignore in preview"),
+                    )
+                ),
+                contentDetails = YoutubeRepository.Videos.Item.ContentDetails(duration = "time string"),
+            )
+        ),
+        AddViewModel.VideoInfo.Progress,
+        AddViewModel.VideoInfo.Error(AddViewModel.VideoInfo.ErrorType.NoAccount),
     )
-)
+}

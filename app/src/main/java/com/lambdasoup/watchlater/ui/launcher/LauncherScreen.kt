@@ -92,6 +92,11 @@ fun LauncherScreen(
                 }
             }
         }
+        val scrollState = rememberScrollState()
+        if (scrollState.maxValue == Int.MAX_VALUE || scrollState.maxValue == 0) {
+            // nestedScrollConnection won't learn when scrolling becomes impossible, so we check here
+            topBarOffsetHeightPx.value = 0f
+        }
 
         // Not using Scaffold here, because it has opinions on where the topBar is that aren't interested in the
         // offset due to scrolling.
@@ -100,7 +105,6 @@ fun LauncherScreen(
                 .fillMaxSize()
                 .nestedScroll(nestedScrollConnection),
         ) {
-            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
                     .verticalScroll(scrollState)
@@ -125,8 +129,7 @@ fun LauncherScreen(
                 modifier = Modifier
                     .height(topBarHeight)
                     .offset {
-                        IntOffset(x = 0,
-                                  y = topBarOffsetHeightPx.value.roundToInt())
+                        IntOffset(x = 0, y = topBarOffsetHeightPx.value.roundToInt())
                     },
                 title = { Text(text = stringResource(id = R.string.app_name)) },
                 actions = {

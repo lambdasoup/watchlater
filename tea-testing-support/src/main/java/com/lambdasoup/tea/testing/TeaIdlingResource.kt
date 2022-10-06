@@ -35,8 +35,11 @@ class TeaIdlingResource {
     private var scheduler = ScheduledThreadPoolExecutor(1)
 
     private val _espressoIdlingResource = EspressoIdlingResourceImpl()
+
+    @Suppress("unused")
     val espressoIdlingResource: EspressoIdlingResource = _espressoIdlingResource
 
+    @Suppress("unused")
     val composeIdlingResource = object : ComposeIdlingResource {
         override val isIdleNow: Boolean
             get() = this@TeaIdlingResource.isIdleNow

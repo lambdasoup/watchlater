@@ -34,20 +34,20 @@ import android.content.pm.verify.domain.DomainVerificationManager
 import android.content.pm.verify.domain.DomainVerificationUserState
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasPackage
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import com.lambdasoup.tea.testing.TeaIdlingResource
 import com.lambdasoup.watchlater.R
+import com.lambdasoup.watchlater.onNodeWithTextRes
 import com.lambdasoup.watchlater.ui.add.AddActivity
 import com.lambdasoup.watchlater.ui.launcher.LauncherActivity
 import com.nhaarman.mockitokotlin2.any
@@ -60,12 +60,13 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import io.cucumber.junit.CucumberOptions
+import io.cucumber.junit.WithJunitRule
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.hamcrest.Matchers.allOf
-import org.hamcrest.Matchers.not
+import org.junit.Rule
 import java.util.concurrent.TimeUnit
 
 @CucumberOptions(
@@ -73,9 +74,14 @@ import java.util.concurrent.TimeUnit
     strict = true,
     name = [".*"],
 )
+@WithJunitRule
 class CucumberTest {
 
-    private var scenario: ActivityScenario<Activity>? = null
+    @get:Rule
+    val rule = createEmptyComposeRule()
+
+    private var scenario: ActivityScenario<ComponentActivity>? = null
+
     private val packageManager: PackageManager = com.lambdasoup.watchlater.packageManager
     private val domainVerificationManager: DomainVerificationManager =
         com.lambdasoup.watchlater.domainVerificationManager
@@ -110,12 +116,12 @@ class CucumberTest {
             mock()
         )
 
-        IdlingRegistry.getInstance().register(idlingResource.espressoIdlingResource)
+        rule.registerIdlingResource(idlingResource.composeIdlingResource)
     }
 
     @After
     fun after() {
-        IdlingRegistry.getInstance().unregister(idlingResource.espressoIdlingResource)
+        rule.unregisterIdlingResource(idlingResource.composeIdlingResource)
         Intents.release()
         server.shutdown()
     }
@@ -131,7 +137,8 @@ class CucumberTest {
 
     @When("click on the demo button")
     fun clickDemoButton() {
-        onView(withText(R.string.launcher_example_button)).perform(click())
+        rule.onNodeWithTextRes(R.string.launcher_example_button, ignoreCase = true)
+            .performClick()
     }
 
     @Given("Watch Later is not set as default")
@@ -181,20 +188,20 @@ class CucumberTest {
 
     @Then("I see the Launcher")
     fun launcherIsOpen() {
-        onView(withText(R.string.launcher_example_title))
-            .check(matches(isDisplayed()))
+        rule.onNodeWithTextRes(R.string.launcher_example_title)
+            .assertIsDisplayed()
     }
 
     @Then("I see the setup instructions")
     fun setupInstructionsVisible() {
-        onView(withText(R.string.launcher_action_title))
-            .check(matches(isDisplayed()))
+        rule.onNodeWithTextRes(R.string.launcher_action_title)
+            .assertIsDisplayed()
     }
 
     @Then("I do not see the setup instructions")
     fun setupInstructionsNotVisible() {
-        onView(withText(R.string.launcher_action_title))
-            .check(matches(not(isDisplayed())))
+        rule.onNodeWithTextRes(R.string.launcher_action_title)
+            .assertDoesNotExist()
     }
 
     @Then("the video is opened")
@@ -257,7 +264,8 @@ class CucumberTest {
 
     @When("the user clicks on 'Watch now'")
     fun userClicksWatchNow() {
-        onView(withText(R.string.action_watchnow)).perform(click())
+        rule.onNodeWithTextRes(R.string.action_watchnow, ignoreCase = true)
+            .performClick()
     }
 
     @Then("the YouTube app is opened with the video URL")
@@ -273,8 +281,8 @@ class CucumberTest {
 
     @Then("I see the video info")
     fun videoInfoDisplayed() {
-        onView(withText("Test video title"))
-            .check(matches(isDisplayed()))
+        rule.onNodeWithText("Test video title")
+            .assertIsDisplayed()
     }
 
     companion object {

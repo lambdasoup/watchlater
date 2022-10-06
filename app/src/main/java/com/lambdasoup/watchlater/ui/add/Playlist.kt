@@ -23,15 +23,15 @@
 package com.lambdasoup.watchlater.ui.add
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository.Playlists.Playlist
-import com.lambdasoup.watchlater.ui.WatchLaterTextButton
 
 @Composable
 fun Playlist(
@@ -46,12 +46,12 @@ fun Playlist(
         Text(
             modifier = Modifier.weight(1f, fill = true),
             text = playlist?.snippet?.title ?: stringResource(id = R.string.playlist_empty),
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
 
-        WatchLaterTextButton(
+        TextButton(
             onClick = onSetPlaylist,
-            label = R.string.account_set
+            content = { Text(stringResource(R.string.account_set)) }
         )
     }
 }

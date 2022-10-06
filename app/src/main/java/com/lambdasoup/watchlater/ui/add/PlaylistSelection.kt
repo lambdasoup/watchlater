@@ -32,11 +32,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -47,9 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.YoutubeRepository
-import com.lambdasoup.watchlater.ui.WatchLaterTextButton
-import com.lambdasoup.watchlater.ui.padAlignTextButtonContentStart
-import com.lambdasoup.watchlater.ui.padWithRoomForTextButtonContent
 
 @Composable
 fun PlaylistSelection(
@@ -92,7 +89,7 @@ fun PlaylistSelection(
         } else {
             Text(
                 text = stringResource(id = R.string.playlist_selection_message),
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -111,45 +108,50 @@ private fun NeutralButtonDialog(
     ) {
         Surface(
             shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colors.surface,
-            contentColor = MaterialTheme.colors.onSurface,
+            color = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(24.dp)
         ) {
             Column(
                 modifier = Modifier
                     .padding(vertical = 24.dp)
-                    .padWithRoomForTextButtonContent(start = 24.dp)
                     .padding(end = 24.dp)
             ) {
                 // Title
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                CompositionLocalProvider(
+                    LocalContentColor provides LocalContentColor.current.copy(
+                        alpha = 0.7f
+                    )
+                ) {
                     Text(
                         text = stringResource(id = titleRes),
                         modifier = Modifier
-                            .padding(bottom = 12.dp)
-                            .padAlignTextButtonContentStart(),
-                        style = MaterialTheme.typography.subtitle1,
+                            .padding(bottom = 12.dp),
+                        style = MaterialTheme.typography.titleMedium,
                     )
                 }
 
                 // content
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                CompositionLocalProvider(
+                    LocalContentColor provides LocalContentColor.current.copy(
+                        alpha = 0.7f
+                    )
+                ) {
                     val scrollState = rememberScrollState()
                     Box(
                         modifier = Modifier
                             .verticalScroll(scrollState)
-                            .weight(weight = 1f, fill = false)
-                            .padAlignTextButtonContentStart(),
+                            .weight(weight = 1f, fill = false),
                     ) {
                         content()
                     }
                 }
 
                 // single button in neutral position
-                WatchLaterTextButton(
+                TextButton(
                     modifier = Modifier.padding(top = 12.dp),
                     onClick = onButtonClick,
-                    label = buttonLabelRes,
+                    content = { Text(stringResource(buttonLabelRes)) },
                 )
             }
         }

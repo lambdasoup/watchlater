@@ -25,8 +25,8 @@ package com.lambdasoup.watchlater.ui.add
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,7 +34,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.lambdasoup.watchlater.R
-import com.lambdasoup.watchlater.ui.success
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoAdd
 
 @Composable
@@ -73,12 +72,12 @@ private fun ShowResult(
 ) {
     Text(
         modifier = modifier
-            .background(color = if (isError) MaterialTheme.colors.error else MaterialTheme.colors.success)
+            .background(color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
             .padding(all = 4.dp),
         text = msg,
-        style = MaterialTheme.typography.caption.merge(
+        style = MaterialTheme.typography.bodySmall.merge(
             TextStyle(
-                color = MaterialTheme.colors.onError,
+                color = MaterialTheme.colorScheme.onError,
                 textAlign = TextAlign.Center,
             )
         )

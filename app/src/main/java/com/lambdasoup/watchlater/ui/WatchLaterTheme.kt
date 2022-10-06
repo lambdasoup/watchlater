@@ -22,136 +22,86 @@
 
 package com.lambdasoup.watchlater.ui
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Shapes
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.Typography
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
-import androidx.compose.material.primarySurface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-private val Lightblue600 = Color(0xFF039BE5)
-private val Lightblue600Dark = Color(0xFF006DB3)
-private val Red600 = Color(0xFFE53935)
-private val Red600Dark = Color(0xFFAB000D)
-private val LightGrey = Color(0xFFF0F0F0)
-private val Green600 = Color(0xFF43A047)
-private val Green600Dark = Color(0xFF00701a)
-
-private val DarkColors = darkColors(
-    secondary = Red600Dark,
-    secondaryVariant = Red600,
-    onSecondary = LightGrey,
+private val LightColors = lightColorScheme(
+    primary = md_theme_light_primary,
+    onPrimary = md_theme_light_onPrimary,
+    primaryContainer = md_theme_light_primaryContainer,
+    onPrimaryContainer = md_theme_light_onPrimaryContainer,
+    secondary = md_theme_light_secondary,
+    onSecondary = md_theme_light_onSecondary,
+    secondaryContainer = md_theme_light_secondaryContainer,
+    onSecondaryContainer = md_theme_light_onSecondaryContainer,
+    tertiary = md_theme_light_tertiary,
+    onTertiary = md_theme_light_onTertiary,
+    tertiaryContainer = md_theme_light_tertiaryContainer,
+    onTertiaryContainer = md_theme_light_onTertiaryContainer,
+    error = md_theme_light_error,
+    errorContainer = md_theme_light_errorContainer,
+    onError = md_theme_light_onError,
+    onErrorContainer = md_theme_light_onErrorContainer,
+    background = md_theme_light_background,
+    onBackground = md_theme_light_onBackground,
+    surface = md_theme_light_surface,
+    onSurface = md_theme_light_onSurface,
+    surfaceVariant = md_theme_light_surfaceVariant,
+    onSurfaceVariant = md_theme_light_onSurfaceVariant,
+    outline = md_theme_light_outline,
+    inverseOnSurface = md_theme_light_inverseOnSurface,
+    inverseSurface = md_theme_light_inverseSurface,
+    inversePrimary = md_theme_light_inversePrimary,
+    surfaceTint = md_theme_light_surfaceTint,
 )
 
-private val LightColors = lightColors(
-    primary = Red600,
-    primaryVariant = Red600Dark,
-    secondary = Lightblue600,
-    secondaryVariant = Lightblue600Dark,
-    onSecondary = Color.White,
-    background = LightGrey,
-    error = Red600,
-)
 
-val Colors.success: Color
-    get() = if (isLight) Green600 else Green600Dark
+private val DarkColors = darkColorScheme(
+    primary = md_theme_dark_primary,
+    onPrimary = md_theme_dark_onPrimary,
+    primaryContainer = md_theme_dark_primaryContainer,
+    onPrimaryContainer = md_theme_dark_onPrimaryContainer,
+    secondary = md_theme_dark_secondary,
+    onSecondary = md_theme_dark_onSecondary,
+    secondaryContainer = md_theme_dark_secondaryContainer,
+    onSecondaryContainer = md_theme_dark_onSecondaryContainer,
+    tertiary = md_theme_dark_tertiary,
+    onTertiary = md_theme_dark_onTertiary,
+    tertiaryContainer = md_theme_dark_tertiaryContainer,
+    onTertiaryContainer = md_theme_dark_onTertiaryContainer,
+    error = md_theme_dark_error,
+    errorContainer = md_theme_dark_errorContainer,
+    onError = md_theme_dark_onError,
+    onErrorContainer = md_theme_dark_onErrorContainer,
+    background = md_theme_dark_background,
+    onBackground = md_theme_dark_onBackground,
+    surface = md_theme_dark_surface,
+    onSurface = md_theme_dark_onSurface,
+    surfaceVariant = md_theme_dark_surfaceVariant,
+    onSurfaceVariant = md_theme_dark_onSurfaceVariant,
+    outline = md_theme_dark_outline,
+    inverseOnSurface = md_theme_dark_inverseOnSurface,
+    inverseSurface = md_theme_dark_inverseSurface,
+    inversePrimary = md_theme_dark_inversePrimary,
+    surfaceTint = md_theme_dark_surfaceTint,
+)
 
 @Composable
 fun WatchLaterTheme(
-    content: @Composable () -> Unit,
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable() () -> Unit
 ) {
-    val isDark = isSystemInDarkTheme()
-    val colors = if (isDark) DarkColors else LightColors
-
-    val systemUiController = rememberSystemUiController()
-    DisposableEffect(systemUiController, isDark) {
-        systemUiController.setStatusBarColor(
-            color = colors.primarySurface
-        )
-        systemUiController.setNavigationBarColor(
-            color = colors.background
-        )
-
-        onDispose {}
+    val colors = if (!useDarkTheme) {
+        LightColors
+    } else {
+        DarkColors
     }
 
     MaterialTheme(
-        colors = colors,
-        typography = Typography(),
-        shapes = Shapes(),
+        colorScheme = colors,
         content = content
-    )
-}
-
-@Composable
-fun Modifier.padWithRoomForTextButtonContent(
-    start: Dp = 0.dp,
-    end: Dp = 0.dp,
-) = padding(
-    start = (start - ButtonDefaults.TextButtonContentPadding.calculateStartPadding(LocalLayoutDirection.current)).coerceAtLeast(0.dp),
-    end = (end - ButtonDefaults.TextButtonContentPadding.calculateEndPadding(LocalLayoutDirection.current)).coerceAtLeast(0.dp),
-)
-
-@Composable
-fun Modifier.padAlignTextButtonContentStart() = padding(
-    start = ButtonDefaults.TextButtonContentPadding.calculateStartPadding(LocalLayoutDirection.current)
-)
-
-@Composable
-fun Modifier.padAlignTextButtonContentEnd() = padding(
-    end = ButtonDefaults.TextButtonContentPadding.calculateEndPadding(LocalLayoutDirection.current)
-)
-
-@Composable
-fun WatchLaterTextButton(
-    onClick: () -> Unit,
-    @StringRes label: Int,
-    modifier: Modifier = Modifier,
-) = TextButton(
-    modifier = modifier,
-    onClick = onClick,
-    colors = ButtonDefaults.textButtonColors(
-        contentColor = MaterialTheme.colors.secondary
-    ),
-) {
-    Text(text = stringResource(id = label).uppercase())
-}
-
-@Composable
-fun WatchLaterButton(
-    onClick: () -> Unit,
-    @StringRes label: Int,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) = Button(
-    modifier = modifier,
-    enabled = enabled,
-    onClick = onClick,
-    colors = ButtonDefaults.buttonColors(
-        backgroundColor = MaterialTheme.colors.secondary,
-        contentColor = MaterialTheme.colors.onSecondary,
-    )
-) {
-    Text(
-        text = stringResource(id = label).uppercase(),
     )
 }

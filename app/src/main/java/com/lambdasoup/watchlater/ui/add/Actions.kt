@@ -27,14 +27,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.lambdasoup.watchlater.R
-import com.lambdasoup.watchlater.ui.WatchLaterButton
 import com.lambdasoup.watchlater.viewmodel.AddViewModel.VideoAdd
 
 @Composable
@@ -50,11 +52,11 @@ fun Actions(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        WatchLaterButton(
+        TextButton(
             modifier = Modifier.weight(1f, fill = true),
             onClick = onWatchNowClicked,
             enabled = hasVideo,
-            label = R.string.action_watchnow,
+            content = { Text(stringResource(R.string.action_watchnow)) },
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -66,14 +68,14 @@ fun Actions(
             if (state == VideoAdd.Progress) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
-                    color = MaterialTheme.colors.secondary,
+                    color = MaterialTheme.colorScheme.secondary,
                 )
             } else {
-                WatchLaterButton(
+                TextButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { videoId?.let { onWatchLaterClicked(it) } },
                     enabled = hasVideo,
-                    label = R.string.action_watchlater,
+                    content = { Text(stringResource(R.string.action_watchlater)) },
                 )
             }
         }

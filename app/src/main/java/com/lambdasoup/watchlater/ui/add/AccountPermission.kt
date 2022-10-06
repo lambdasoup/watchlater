@@ -25,17 +25,16 @@ package com.lambdasoup.watchlater.ui.add
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.lambdasoup.watchlater.R
-import com.lambdasoup.watchlater.ui.WatchLaterTextButton
 
 @Composable
 fun AccountPermission(
@@ -52,19 +51,19 @@ fun AccountPermission(
         ) {
             Text(
                 text = stringResource(id = R.string.add_permissions_description),
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.titleSmall,
             )
-            CompositionLocalProvider(LocalContentAlpha.provides(ContentAlpha.medium)) {
+            CompositionLocalProvider(LocalContentColor provides LocalContentColor.current.copy(alpha = 0.4f)) {
                 Text(
                     text = stringResource(id = R.string.add_permissions_rationale),
-                    style = MaterialTheme.typography.caption,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
 
-        WatchLaterTextButton(
+        TextButton(
             onClick = onGrantPermissionsClicked,
-            label = R.string.add_permissions_grant
+            content = { Text(stringResource(R.string.add_permissions_grant)) }
         )
     }
 }

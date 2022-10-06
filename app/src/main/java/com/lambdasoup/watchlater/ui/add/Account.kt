@@ -24,14 +24,14 @@ package com.lambdasoup.watchlater.ui.add
 
 import android.accounts.Account
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.lambdasoup.watchlater.R
-import com.lambdasoup.watchlater.ui.WatchLaterTextButton
 
 @Composable
 fun Account(
@@ -46,12 +46,14 @@ fun Account(
         Text(
             modifier = Modifier.weight(1f, fill = true),
             text = if (account == null) stringResource(id = R.string.account_empty) else account.name,
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
 
-        WatchLaterTextButton(
+        TextButton(
             onClick = onSetAccount,
-            label = R.string.account_set
-        )
+        ) {
+
+            Text(stringResource(R.string.account_set))
+        }
     }
 }

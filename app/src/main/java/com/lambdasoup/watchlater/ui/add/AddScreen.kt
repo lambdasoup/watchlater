@@ -35,9 +35,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
@@ -59,9 +60,9 @@ import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.ui.OverflowMenu
 import com.lambdasoup.watchlater.ui.WatchLaterTheme
 import com.lambdasoup.watchlater.ui.animateContentHeight
-import com.lambdasoup.watchlater.ui.padWithRoomForTextButtonContent
 import com.lambdasoup.watchlater.viewmodel.AddViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
     onClickOutside: () -> Unit,
@@ -120,8 +121,7 @@ fun AddScreen(
                     Account(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
-                            .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin)),
+                            .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin)),
                         account = viewState.value.account,
                         onSetAccount = onSetAccount,
                     )
@@ -129,8 +129,7 @@ fun AddScreen(
                     Playlist(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
-                            .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin)),
+                            .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin)),
                         playlist = viewState.value.targetPlaylist,
                         onSetPlaylist = onChangePlaylistClicked,
                     )
@@ -140,7 +139,6 @@ fun AddScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(start = dimensionResource(id = R.dimen.activity_horizontal_margin))
-                                .padWithRoomForTextButtonContent(end = dimensionResource(id = R.dimen.activity_horizontal_margin))
                                 .padding(top = 8.dp),
                             onGrantPermissionsClicked = onGrantPermissionsClicked,
                         )

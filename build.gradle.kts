@@ -20,8 +20,24 @@
  *   along with Watch Later.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.3.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
+    }
+}
 
+plugins {
+    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+}
 
-include ':app'
-include ':tea'
-include ':tea-testing-support'
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}

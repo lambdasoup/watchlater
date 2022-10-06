@@ -47,7 +47,11 @@ class LauncherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LauncherScreen(
-                onOverflowAction = this::onOverflowActionSelected
+                onOverflowAction = this::onOverflowActionSelected,
+                onYoutubeSettingsClick = vm::onYoutubeSettings,
+                onOpenExampleVideoClick = this::openExampleVideo,
+                onWatchLaterSettingsClick = this::openWatchLaterSettings,
+                viewModel = vm.model,
             )
         }
 

@@ -22,6 +22,7 @@
 
 package com.lambdasoup.watchlater.ui.launcher
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,13 +54,21 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lambdasoup.watchlater.R
+import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.ui.OverflowMenu
 import com.lambdasoup.watchlater.ui.WatchLaterTheme
+import com.lambdasoup.watchlater.ui.add.AddScreen
+import com.lambdasoup.watchlater.ui.add.SampleVideoInfoProvider
+import com.lambdasoup.watchlater.viewmodel.AddViewModel
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
 import kotlin.math.roundToInt
 
@@ -67,10 +76,13 @@ import kotlin.math.roundToInt
 @Composable
 fun LauncherScreen(
     onOverflowAction: (MenuAction) -> Unit,
-    viewModel: LauncherViewModel = viewModel(),
+    onYoutubeSettingsClick: () -> Unit,
+    onWatchLaterSettingsClick: () -> Unit,
+    onOpenExampleVideoClick: () -> Unit,
+    viewModel: LiveData<LauncherViewModel.Model>,
 ) {
     WatchLaterTheme {
-        val viewState = viewModel.model.observeAsState()
+        val viewState = viewModel.observeAsState()
 
         // Sadly, AppBarHeight is private in androidx.compose.material.AppBar
         val topBarHeight = 56.dp
@@ -115,12 +127,12 @@ fun LauncherScreen(
                         ((resolverProblems.verifiedDomainsMissing > 0) || !resolverProblems.watchLaterIsDefault)
                     ) {
                         SetupGuideCard(
-                            onYoutubeSettingsClick = viewModel::onYoutubeSettings,
-                            onWatchLaterSettingsClick = viewModel::onWatchLaterSettings,
+                            onYoutubeSettingsClick = onYoutubeSettingsClick,
+                            onWatchLaterSettingsClick = onWatchLaterSettingsClick,
                         )
                     }
                 }
-                ExampleCard(onOpenExampleVideoClick = viewModel::onTryExample)
+                ExampleCard(onOpenExampleVideoClick = onOpenExampleVideoClick)
             }
 
             // placed last because of drawing order
@@ -278,3 +290,23 @@ fun ExampleCard(
 
 @Composable
 private fun VerticalSpace() = Spacer(modifier = Modifier.height(16.dp))
+
+@Preview(name = "deutsch", locale = "de")
+@Preview(name = "english", locale = "en")
+@Preview(name = "night", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun LauncherScreenPreview() =
+    LauncherScreen(
+        onOverflowAction = {},
+        onYoutubeSettingsClick = {},
+        onWatchLaterSettingsClick = {},
+        onOpenExampleVideoClick = {},
+        viewModel = MutableLiveData(
+            LauncherViewModel.Model(
+                resolverProblems = IntentResolverRepository.ResolverProblems(
+                    watchLaterIsDefault = false,
+                    verifiedDomainsMissing = 3,
+                )
+            )
+        )
+    )

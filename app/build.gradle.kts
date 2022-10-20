@@ -97,7 +97,8 @@ dependencies {
 
     implementation("androidx.activity:activity-ktx:1.6.0")
     implementation("androidx.activity:activity-compose:1.6.0")
-    implementation("androidx.compose.material3:material3:1.0.0-rc01")
+    implementation("androidx.compose.material3:material3:1.0.0")
+    implementation("androidx.compose.material:material-icons-extended:1.2.1")
     implementation("com.google.accompanist:accompanist-webview:0.25.1")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.25.1")
     debugImplementation("androidx.compose.ui:ui-tooling:1.2.1")
@@ -112,7 +113,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.14.1")
     implementation("io.coil-kt:coil-compose:2.2.2")
     implementation("androidx.annotation:annotation:1.5.0")
-    implementation("com.google.android.material:material:1.6.1")
+    implementation("com.google.android.material:material:1.7.0")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.20")
     implementation("androidx.preference:preference-ktx:1.2.0")

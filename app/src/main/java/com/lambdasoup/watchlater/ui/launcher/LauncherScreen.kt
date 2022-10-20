@@ -24,53 +24,50 @@ package com.lambdasoup.watchlater.ui.launcher
 
 import android.content.res.Configuration
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.OpenInNew
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.lambdasoup.watchlater.R
 import com.lambdasoup.watchlater.data.IntentResolverRepository
 import com.lambdasoup.watchlater.ui.MenuAction
 import com.lambdasoup.watchlater.ui.OverflowMenu
 import com.lambdasoup.watchlater.ui.WatchLaterTheme
-import com.lambdasoup.watchlater.ui.add.AddScreen
-import com.lambdasoup.watchlater.ui.add.SampleVideoInfoProvider
-import com.lambdasoup.watchlater.viewmodel.AddViewModel
 import com.lambdasoup.watchlater.viewmodel.LauncherViewModel
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,75 +79,66 @@ fun LauncherScreen(
     viewModel: LiveData<LauncherViewModel.Model>,
 ) {
     WatchLaterTheme {
+        // Remember a SystemUiController
+        val systemUiController = rememberSystemUiController()
+        val useDarkIcons = !isSystemInDarkTheme()
+
+        val primaryColor = MaterialTheme.colorScheme.primary
+        DisposableEffect(systemUiController, useDarkIcons) {
+            systemUiController.setStatusBarColor(
+                color = primaryColor,
+                darkIcons = false,
+            )
+
+            systemUiController.setNavigationBarColor(
+                color = Color.Transparent,
+                darkIcons = useDarkIcons,
+            )
+
+            onDispose {}
+        }
+
         val viewState = viewModel.observeAsState()
 
-        // Sadly, AppBarHeight is private in androidx.compose.material.AppBar
-        val topBarHeight = 56.dp
-        val topBarHeightPx = with(LocalDensity.current) { topBarHeight.roundToPx().toFloat() }
-
-        val topBarOffsetHeightPx = remember { mutableStateOf(0f) }
-        val nestedScrollConnection = remember {
-            object : NestedScrollConnection {
-                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                    // try to consume before LazyColumn to collapse toolbar if needed, hence pre-scroll
-                    val delta = available.y
-                    val newOffset = topBarOffsetHeightPx.value + delta
-                    topBarOffsetHeightPx.value = newOffset.coerceIn(-topBarHeightPx, 0f)
-                    // here's the catch: let's pretend we consumed 0 in any case, since we want
-                    // Column to scroll anyway for good UX
-                    // We're basically watching scroll without taking it
-                    return Offset.Zero
-                }
-            }
-        }
-        val scrollState = rememberScrollState()
-        if (scrollState.maxValue == Int.MAX_VALUE || scrollState.maxValue == 0) {
-            // nestedScrollConnection won't learn when scrolling becomes impossible, so we check here
-            topBarOffsetHeightPx.value = 0f
-        }
-
-        // Not using Scaffold here, because it has opinions on where the topBar is that aren't interested in the
-        // offset due to scrolling.
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(nestedScrollConnection),
-        ) {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(scrollState)
-            ) {
-                Spacer(modifier = Modifier.height(topBarHeight))
-
-                viewState.value!!.resolverProblems.let { resolverProblems ->
-                    if (resolverProblems != null &&
-                        ((resolverProblems.verifiedDomainsMissing > 0) || !resolverProblems.watchLaterIsDefault)
-                    ) {
-                        SetupGuideCard(
-                            onYoutubeSettingsClick = onYoutubeSettingsClick,
-                            onWatchLaterSettingsClick = onWatchLaterSettingsClick,
-                        )
-                    }
-                }
-                ExampleCard(onOpenExampleVideoClick = onOpenExampleVideoClick)
-            }
-
-            // placed last because of drawing order
-            TopAppBar(
-                modifier = Modifier
-                    .height(topBarHeight)
-                    .offset {
-                        IntOffset(
-                            x = 0,
-                            y = topBarOffsetHeightPx.value.roundToInt()
-                        )
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    colors = TopAppBarDefaults.smallTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    title = { Text(text = stringResource(id = R.string.app_name)) },
+                    actions = {
+                        OverflowMenu(onActionSelected = onOverflowAction)
                     },
-                title = { Text(text = stringResource(id = R.string.app_name)) },
-                actions = {
-                    OverflowMenu(onActionSelected = onOverflowAction)
-                },
-            )
-        }
+                )
+            },
+            content = { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = paddingValues.calculateTopPadding() + 8.dp,
+                            start = 8.dp,
+                            end = 8.dp,
+                        )
+                        .verticalScroll(state = rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    viewState.value!!.resolverProblems.let { resolverProblems ->
+                        if (resolverProblems != null &&
+                            ((resolverProblems.verifiedDomainsMissing > 0) || !resolverProblems.watchLaterIsDefault)
+                        ) {
+                            SetupGuideCard(
+                                onYoutubeSettingsClick = onYoutubeSettingsClick,
+                                onWatchLaterSettingsClick = onWatchLaterSettingsClick,
+                            )
+                        }
+                    }
+                    ExampleCard(onOpenExampleVideoClick = onOpenExampleVideoClick)
+                }
+            }
+        )
     }
 }
 
@@ -159,48 +147,39 @@ fun SetupGuideCard(
     onYoutubeSettingsClick: () -> Unit,
     onWatchLaterSettingsClick: () -> Unit,
 ) {
-    Card(
-        modifier = Modifier.padding(
-            horizontal = dimensionResource(id = R.dimen.activity_horizontal_margin),
-            vertical = dimensionResource(id = R.dimen.activity_vertical_margin)
-        )
-    ) {
-        Column {
-            VerticalSpace()
-
+    Card {
+        Column(
+            modifier = Modifier.padding(all = 8.dp),
+        ) {
             SetupHeader()
 
-            VerticalSpace()
             Divider()
-            VerticalSpace()
 
             SetupYoutube(onYoutubeSettingsClick = onYoutubeSettingsClick)
 
-            VerticalSpace()
             Divider()
-            VerticalSpace()
 
             SetupWatchLater(onWatchLaterSettingsClick = onWatchLaterSettingsClick)
-
-            VerticalSpace()
         }
     }
 }
 
 @Composable
 fun SetupHeader() {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column(
+        modifier = Modifier.padding(
+            horizontal = 16.dp,
+        )
+    ) {
         Text(
             text = stringResource(id = R.string.launcher_action_title),
             style = MaterialTheme.typography.titleLarge,
         )
-        VerticalSpace()
-        CompositionLocalProvider(LocalContentColor provides LocalContentColor.current.copy(alpha = 0.4f)) {
-            Text(
-                text = stringResource(id = R.string.launcher_action_text),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
+        Text(
+            modifier = Modifier.padding(vertical = 16.dp),
+            text = stringResource(id = R.string.launcher_action_text),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
@@ -212,26 +191,28 @@ fun SetupStep(
     onButtonClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .padding(
-                end = dimensionResource(id = R.dimen.activity_horizontal_margin),
-            )
+        modifier = Modifier.padding(
+            vertical = 8.dp,
+            horizontal = 16.dp,
+        )
     ) {
         Text(
+            modifier = Modifier.padding(vertical = 8.dp),
             text = stringResource(id = title),
             style = MaterialTheme.typography.titleSmall,
         )
-        VerticalSpace()
-        CompositionLocalProvider(LocalContentColor provides LocalContentColor.current.copy(alpha = 0.4f)) {
-            Text(
-                text = stringResource(id = text),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-        VerticalSpace()
+        Text(
+            text = stringResource(id = text),
+        )
         TextButton(
+            modifier = Modifier.align(Alignment.End),
             onClick = onButtonClick,
-            content = { Text(stringResource(buttonText)) },
+            content = {
+                Row() {
+                    Text(stringResource(buttonText))
+                    Icon(imageVector = Icons.Outlined.OpenInNew, contentDescription = null)
+                }
+            }
         )
     }
 }
@@ -258,11 +239,7 @@ fun SetupWatchLater(onWatchLaterSettingsClick: () -> Unit) =
 fun ExampleCard(
     onOpenExampleVideoClick: () -> Unit,
 ) {
-    Card(
-        modifier = Modifier.padding(
-            all = dimensionResource(id = R.dimen.activity_horizontal_margin),
-        )
-    ) {
+    Card {
         Column(
             modifier = Modifier
                 .padding(vertical = 16.dp)
@@ -272,14 +249,10 @@ fun ExampleCard(
                 text = stringResource(id = R.string.launcher_example_title),
                 style = MaterialTheme.typography.titleLarge,
             )
-            VerticalSpace()
-            CompositionLocalProvider(LocalContentColor provides LocalContentColor.current.copy(alpha = 0.4f)) {
-                Text(
-                    text = stringResource(id = R.string.launcher_example_text),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-            VerticalSpace()
+            Text(
+                text = stringResource(id = R.string.launcher_example_text),
+                style = MaterialTheme.typography.bodyMedium,
+            )
             TextButton(
                 onClick = onOpenExampleVideoClick,
                 content = { Text(stringResource(R.string.launcher_example_button)) },
@@ -291,9 +264,9 @@ fun ExampleCard(
 @Composable
 private fun VerticalSpace() = Spacer(modifier = Modifier.height(16.dp))
 
-@Preview(name = "deutsch", locale = "de")
 @Preview(name = "english", locale = "en")
 @Preview(name = "night", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "deutsch", locale = "de")
 @Composable
 fun LauncherScreenPreview() =
     LauncherScreen(
